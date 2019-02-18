@@ -22,6 +22,9 @@ barKP = (170, 0, 255)
 buttonIdleColor = (0, 216, 255)
 buttonHoverColor = (0, 140, 255)
 
+btnctr = 999
+ctr = 999
+
 # Initialising PyGame
 pygame.init()
 
@@ -71,36 +74,10 @@ def SpriteCycle(frame,tilesAmt,cells):
     spriteImage = cells[spriteFrame]
     return (spriteFrame,spriteImage)
 
-def TextObjects(textccc,fontccc):
-    textSurface = fontccc.render(textccc,True,black)
-    return textSurface, textSurface.get_rect()
 
-def SwitchAnimation():
-
-    global spriteIdx
-    spriteIdx += 1
-    if spriteIdx > 2: spriteIdx = 0
-    animIdx = spriteIdx
-
-    animations = ("sp31.gif","sp32.gif","sp33.gif")
-
-    _spriteFrameIndex,_spriteTilesAmount,_spriteFrames,_spriteCurrent,_sprite = SpriteCreate(animations[animIdx])
-
-    global spriteFrameIndex
-    global spriteTilesAmount
-    global spriteFrames
-    global spriteCurrent
-    global sprite
-
-    spriteFrameIndex = _spriteFrameIndex
-    spriteTilesAmount = _spriteTilesAmount
-    spriteFrames = _spriteFrames
-    spriteCurrent = _spriteCurrent
-    sprite = _sprite
 
 def QueueAnimationSwitch():
     global toggleQueued
-
     toggleQueued = True
 
 def Button(surface,pos,radius,text,idleColor,hoverColor,action = None):
@@ -190,10 +167,12 @@ def ProgressBar(surface,pos,width,height,color,text,minValue,maxValue,value):
 
 
 # Loading Spritesheet
-spriteFrameIndex,spriteTilesAmount,spriteFrames,spriteCurrent,sprite = SpriteCreate("sp31.gif")
+spriteFrameIndex,spriteTilesAmount,spriteFrames,spriteCurrent,sprite = SpriteCreate("sp30.gif")
 spriteIdx = 0
 toggleQueued = False
-animations = ("sp31.gif","sp32.gif","sp33.gif")
+animations = ("sp30.gif","sp31.gif","sp32.gif","sp33.gif")
+
+
 
 
 
@@ -222,12 +201,15 @@ WriteText(statsSurface,(40,5),"Region:",20,"PokemonSolid.ttf",white,False)
 WriteText(statsSurface,(40,35),"Kalos",30,"PokemonHollow.ttf",white,False)     
 WriteText(statsSurface,(260,45),"#658",50,"PokemonHollow.ttf",white,True)     
 
-ProgressBar(statsSurface,(50,120),200,18,barMaxWP,"Max. WP",20,40,39)
-ProgressBar(statsSurface,(50,170),200,18,barAttack,"Angriff",20,40,39)
-ProgressBar(statsSurface,(50,220),200,18,barDefense,"Verteidigung",20,40,39)
-ProgressBar(statsSurface,(50,270),200,18,barKP,"Kraftpunkte",20,40,39)
+ProgressBar(statsSurface,(50,120),200,18,barMaxWP,"HP",0,150,72)
+ProgressBar(statsSurface,(50,170),200,18,barAttack,"Attack",0,150,95)
+ProgressBar(statsSurface,(50,220),200,18,barDefense,"Defense",0,150,67)
+ProgressBar(statsSurface,(50,270),200,18,barKP,"Sp. Atk",0,150,103)
+ProgressBar(statsSurface,(50,320),200,18,barAttack,"Sp. Def",0,150,71)
+ProgressBar(statsSurface,(50,370),200,18,barMaxWP,"Speed",0,150,122)
 
 
+spriteSurface.set_colorkey(mainBG)
 
 # Start of Game-Loop
 
@@ -237,7 +219,7 @@ while True:
     # New animation queue
     if toggleQueued and spriteFrameIndex == 0:
         spriteIdx += 1
-        if spriteIdx > 2: spriteIdx = 0
+        if spriteIdx > 3: spriteIdx = 0
         spriteFrameIndex,spriteTilesAmount,spriteFrames,spriteCurrent,sprite = SpriteCreate(animations[spriteIdx])
         toggleQueued = False
 
@@ -260,27 +242,30 @@ while True:
 
 
     # Re-Drawing screen
+    
     spriteSurface.fill(mainBG)
-    spriteSurface.set_colorkey(mainBG)
-
     mainSurface.blit(backgroundImage,(0,0))
+    
     spriteSurface.blit(spriteCurrent,sprite)
 
 
-    Button(menuSurface,(45,int(displayHeight/2)-170),25,"animation",buttonIdleColor,buttonHoverColor,QueueAnimationSwitch)
-    Button(menuSurface,(80,int(displayHeight/2)-90),28,"next Evo",buttonIdleColor,buttonHoverColor)
-    Button(menuSurface,(95,int(displayHeight/2)),30,"<",buttonIdleColor,buttonHoverColor)
-    Button(menuSurface,(80,int(displayHeight/2)+90),28,"prev Evo",buttonIdleColor,buttonHoverColor)
-    Button(menuSurface,(45,int(displayHeight/2)+170),25,"EN / DE",buttonIdleColor,buttonHoverColor)
+    if btnctr > 10:
+        Button(menuSurface,(45,int(displayHeight/2)-170),25,"animation",buttonIdleColor,buttonHoverColor,QueueAnimationSwitch)
+        Button(menuSurface,(80,int(displayHeight/2)-90),28,"next Evo",buttonIdleColor,buttonHoverColor)
+        Button(menuSurface,(95,int(displayHeight/2)),30,"<",buttonIdleColor,buttonHoverColor)
+        Button(menuSurface,(80,int(displayHeight/2)+90),28,"prev Evo",buttonIdleColor,buttonHoverColor)
+        Button(menuSurface,(45,int(displayHeight/2)+170),25,"EN / DE",buttonIdleColor,buttonHoverColor)
+        btnctr = 0
+    
 
     
     # Main Surface Infos
-    WriteText(mainSurface,(280,15),"Quajutsu",30,"unown.ttf",white,True)
-    WriteText(mainSurface,(280,70),"Quajutsu",50,"PokemonSolid.ttf",red,True)
+    WriteText(mainSurface,(280,15),"Greninja",30,"unown.ttf",white,True)
+    WriteText(mainSurface,(280,70),"Greninja",50,"PokemonSolid.ttf",red,True)
     WriteText(mainSurface,(280,400),"Water / Dark",25,"calibrilight.ttf",white,True)
    
-    TypeImages("Water","Dark")
     
+    TypeImages("Water","Dark")
 
     mainSurface.blit(statsSurface,(470,0))
 
@@ -291,9 +276,16 @@ while True:
 
 
     # Updating
-    pygame.display.update()
+    if ctr > 200:
+        pygame.display.update()
+        ctr = 0
+
+
+    pygame.display.update((160,(displayHeight/2)-150,300,300))
 
     # Tick
     clock.tick(60)
+    ctr += 1
+    btnctr += 1
 
 
