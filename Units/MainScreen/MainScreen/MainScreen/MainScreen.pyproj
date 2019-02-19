@@ -2,15 +2,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>86eaf23c-099f-4702-b149-b03dea890c02</ProjectGuid>
+    <ProjectGuid>35bc9b75-72fb-49ce-906c-67dc284ba2b3</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>InfoScreen_Rev2.py</StartupFile>
+    <StartupFile>MainScreen.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <Name>InfoScreen_Rev2</Name>
-    <RootNamespace>InfoScreen_Rev2</RootNamespace>
+    <Name>MainScreen</Name>
+    <RootNamespace>MainScreen</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,7 +21,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="InfoScreen_Rev2.py" />
+    <Compile Include="MainScreen.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
