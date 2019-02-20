@@ -25,7 +25,7 @@ menuBarColor = (0, 110, 255)
 # PyGame Initialisation
 pygame.init()
 clock = pygame.time.Clock()
-pygame.mouse.set_visible(False)
+#pygame.mouse.set_visible(False)
 
 # Window and Surface Initialisation
 displayWidth = 800
@@ -48,6 +48,8 @@ nextStatPage = False
 
 statsOffset = 0
 currentStatPage = 0
+
+clockCtr = 0
 
 # Functions
 
@@ -103,7 +105,7 @@ def Button(surface,pos,radius,text,fontSize,idleColor,hoverColor,action = None):
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
 
-    if pos[0] + radius > mouse[0] > pos[0] - 50 and pos[1] + radius > mouse[1] > pos[1] - radius:
+    if pos[0] + radius > mouse[0] > pos[0] - radius and pos[1] + radius > mouse[1] > pos[1] - radius:
         pygame.draw.circle(surface,hoverColor,pos,radius)
         if click[0] == 1 and action != None:
             action()
@@ -274,6 +276,26 @@ def LoadStatSet4(surface):
     WriteText(surface,(30,260),"Egg cycles:",20,"calibrilight.ttf",white,False)    
     WriteText(surface,(170,260),"20",25,"calibrilight.ttf",white,False)  
 
+def LoadStatSet5(surface):
+    WriteText(surface,(40,5),"Region:",20,"PokemonSolid.ttf",white,False)     
+    WriteText(surface,(40,35),"Kalos",30,"PokemonHollow.ttf",white,False)     
+    WriteText(surface,(260,45),"#658",50,"PokemonHollow.ttf",white,True)     
+
+    WriteText(surface,(150,100),"Appearance",30,"PokemonSolid.ttf",white,True)    
+
+    # Gender / Shiny Button and update
+    Button(mainSurface,(380,400),20,"M",20,buttonIdleColor,buttonHoverColor)
+    Button(mainSurface,(430,400),20,"F",20,buttonIdleColor,buttonHoverColor)
+
+    Button(mainSurface,(380,450),20,"M",20,buttonIdleColor,buttonHoverColor)
+    Button(mainSurface,(430,450),20,"F",20,buttonIdleColor,buttonHoverColor)
+
+    pygame.display.update((360,380,40,40))
+    pygame.display.update((410,380,40,40))
+
+    pygame.display.update((360,430,40,40))
+    pygame.display.update((410,430,40,40))
+
 
 
 
@@ -281,6 +303,12 @@ def LoadStatSet4(surface):
 def ToggleNextStatPage():
     global nextStatPage
     nextStatPage = True
+
+def ToggleReturnToMainMenu():
+    global returnToMenu
+    global loadNewPokemon
+    loadNewPokemon = True
+    returnToMenu = True
 
 # Parent Infoscreen Loop
 while not returnToMenu:
@@ -302,7 +330,6 @@ while not returnToMenu:
     pygame.draw.circle(menuSurface,(64,64,64),(-210,int(displayHeight/2)),300)
     pokeballImage = pygame.image.load("pokeball.png").convert()
     menuSurface.blit(pokeballImage,(-250,int(displayHeight/2)-150))
-
     mainSurface.blit(menuSurface,(0,0))
 
     # Drawin stats-screen
@@ -316,7 +343,6 @@ while not returnToMenu:
 
     WriteText(mainSurface,(280,15),"Greninja",30,"unown.ttf",white,True)
     WriteText(mainSurface,(280,70),"Greninja",50,"PokemonSolid.ttf",red,True)
-    WriteText(mainSurface,(280,400),"Water / Dark",25,"calibrilight.ttf",white,True)
 
     WriteText(mainSurface,(280,420),"Water / Dark",20,"calibrilight.ttf",white,True)
     TypeImages(mainSurface,(280,430),"Water","Dark")
@@ -346,20 +372,29 @@ while not returnToMenu:
         spriteSurface.blit(spriteCurrent,sprite)
         mainSurface.blit(spriteSurface,(160,(displayHeight/2)-130))
 
-        # Menu Button and update
-        Button(menuSurface,(45,int(displayHeight/2)-170),25,"animation",15,buttonIdleColor,buttonHoverColor,QueueAnimationSwitch)
-        Button(menuSurface,(80,int(displayHeight/2)-90),28,"next Evo",15,buttonIdleColor,buttonHoverColor)
-        Button(menuSurface,(95,int(displayHeight/2)),30,"<",15,buttonIdleColor,buttonHoverColor)
-        Button(menuSurface,(80,int(displayHeight/2)+90),28,"prev Evo",15,buttonIdleColor,buttonHoverColor)
-        Button(menuSurface,(45,int(displayHeight/2)+170),25,"EN / DE",15,buttonIdleColor,buttonHoverColor)
         
-        mainSurface.blit(menuSurface,(0,0))
+        if clockCtr%5 == 0:
+            # Menu Button and update
+            Button(menuSurface,(45,int(displayHeight/2)-170),25,"animation",15,buttonIdleColor,buttonHoverColor,QueueAnimationSwitch)
+            Button(menuSurface,(80,int(displayHeight/2)-90),28,"next Evo",15,buttonIdleColor,buttonHoverColor)
+            Button(menuSurface,(95,int(displayHeight/2)),30,"<",15,buttonIdleColor,buttonHoverColor,ToggleReturnToMainMenu)
+            Button(menuSurface,(80,int(displayHeight/2)+90),28,"prev Evo",15,buttonIdleColor,buttonHoverColor)
+            Button(menuSurface,(45,int(displayHeight/2)+170),25,"EN / DE",15,buttonIdleColor,buttonHoverColor)
+            mainSurface.blit(menuSurface,(0,0))
+            pygame.display.update((45-25,int(displayHeight/2)-170-25,56,56))
+            pygame.display.update((80-28,int(displayHeight/2)-90-28,56,56))
+            pygame.display.update((95-30,int(displayHeight/2)-30,60,60))
+            pygame.display.update((80-28,int(displayHeight/2)+90-28,56,56))
+            pygame.display.update((45-25,int(displayHeight/2)+170-25,56,56))
+            
+            
+            # Stats Button and update
+            Button(mainSurface,(440,40),30,"Stats",15,buttonIdleColor,buttonHoverColor,ToggleNextStatPage)
+            pygame.display.update((410,10,60,60))
 
-        pygame.display.update((45-25,int(displayHeight/2)-170-25,56,56))
-        pygame.display.update((80-28,int(displayHeight/2)-90-28,56,56))
-        pygame.display.update((95-30,int(displayHeight/2)-30,60,60))
-        pygame.display.update((80-28,int(displayHeight/2)+90-28,56,56))
-        pygame.display.update((45-25,int(displayHeight/2)+170-25,56,56))
+            
+            clockCtr = 0
+
         
 
         # Updating Sprite-Section
@@ -390,9 +425,10 @@ while not returnToMenu:
             # Selecting Stat Content
             if currentStatPage == 0: LoadStatSet0(statsSurface)
             if currentStatPage == 1: LoadStatSet1(statsSurface)
-            if currentStatPage == 2: LoadStatSet2(statsSurface)
-            if currentStatPage == 3: LoadStatSet3(statsSurface)
-            if currentStatPage == 4: LoadStatSet4(statsSurface)
+            if currentStatPage == 2: LoadStatSet5(statsSurface)
+            if currentStatPage == 3: LoadStatSet2(statsSurface)
+            if currentStatPage == 4: LoadStatSet3(statsSurface)
+            if currentStatPage == 5: LoadStatSet4(statsSurface)
 
             # Reset Statpage-Counter
             if currentStatPage > 4: currentStatPage = 0
@@ -400,12 +436,45 @@ while not returnToMenu:
             mainSurface.blit(statsSurface,(470 + statsOffset,0))
             pygame.display.update((470,0,displayWidth-470,480))
 
-
-        # Stats Button and update
-        Button(mainSurface,(450,40),30,"Stats",15,buttonIdleColor,buttonHoverColor,ToggleNextStatPage)
-        pygame.display.update((420,10,60,60))
-
-
         # Tick
         clock.tick(60)
 
+        clockCtr += 1
+
+for x in range(0,10):
+    if x%3 == 0:
+        print(x)
+        mainSurface.blit(backgroundImage,(0,0))
+        menuSurface.fill((64,64,64))
+        menuSurface.set_colorkey((64,64,64))
+        pygame.draw.circle(menuSurface,menuBarColor,(-200,int(displayHeight/2)),300)
+        pygame.draw.circle(menuSurface,(64,64,64),(-210,int(displayHeight/2)),300)
+
+        menuSurface.blit(pokeballImage,(-250 + x,int(displayHeight/2)-150))
+        mainSurface.blit(menuSurface,(0,0))
+        pygame.display.update((0,0,150,480))
+        clock.tick(60)
+
+for x in range(0,100):
+    if x%6 == 0:
+        mainSurface.blit(backgroundImage,(0,0))
+        print(-x + 10)
+        menuSurface.fill((64,64,64))
+        menuSurface.set_colorkey((64,64,64))
+        pygame.draw.circle(menuSurface,menuBarColor,(-200,int(displayHeight/2)),300)
+        pygame.draw.circle(menuSurface,(64,64,64),(-210,int(displayHeight/2)),300)
+
+        menuSurface.blit(pokeballImage,(-250 - x + 10,int(displayHeight/2)-150))
+        mainSurface.blit(menuSurface,(0,0))
+        pygame.display.update((0,0,150,480))
+        clock.tick(60)
+
+mainSurface.fill((255,255,255))
+
+for x in range(0,displayWidth):
+    if x%60 == 0:
+        pygame.display.update((displayWidth - x,0,x,displayHeight))
+        clock.tick(60)
+
+pygame.quit()
+sys.exit()
