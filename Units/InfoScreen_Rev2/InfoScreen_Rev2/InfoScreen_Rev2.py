@@ -1,5 +1,6 @@
 # Importing Modules
 import pygame
+from pygame import gfxdraw
 import time
 import random
 import sys
@@ -35,10 +36,14 @@ mainSurface = pygame.display.set_mode((displayWidth,displayHeight))
 spriteSurface = pygame.Surface((300,300)).convert()
 statsSurface = pygame.Surface((displayWidth-470,480)).convert()
 menuSurface = pygame.Surface((150,480)).convert()
-1
 
 
 # Variables
+spriteFrameIndex = 0
+attackIndex = 1
+attackAmount = 3
+
+
 returnToMenu = False
 loadNewPokemon = False
 
@@ -50,6 +55,11 @@ statsOffset = 0
 currentStatPage = 0
 
 clockCtr = 0
+
+appearanceQueued = False
+appearanceType = ""
+
+genderDifference = False
 
 # Functions
 
@@ -89,7 +99,7 @@ def SpriteCreate(filePath):
     player = playerImg.get_rect()
     player.center = (150,150)
     spriteFrame = 0
-    return (spriteFrame,spriteTiles,cells,playerImg,player)
+    return (spriteTiles,cells,playerImg,player)
 
 def SpriteCycle(frame,tilesAmt,cells):
     spriteFrame = frame + 1
@@ -101,17 +111,20 @@ def QueueAnimationSwitch():
     global toggleQueued
     toggleQueued = True
 
-def Button(surface,pos,radius,text,fontSize,idleColor,hoverColor,action = None):
+def Button(surface,pos,radius,text,fontSize,idleColor,hoverColor,action = None,parameter = None,surfaceOffset = (0,0)):
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
 
-    if pos[0] + radius > mouse[0] > pos[0] - radius and pos[1] + radius > mouse[1] > pos[1] - radius:
-        pygame.draw.circle(surface,hoverColor,pos,radius)
+    if pos[0] + radius + surfaceOffset[0] > mouse[0] > pos[0] - radius + surfaceOffset[0] and pos[1] + radius + surfaceOffset[1] > mouse[1] > pos[1] - radius + surfaceOffset[1]:
+
+        pygame.gfxdraw.aacircle(surface,pos[0]-2,pos[1]-2,radius-4,hoverColor)
+        pygame.gfxdraw.filled_circle(surface,pos[0]-2,pos[1]-2,radius-4,hoverColor)
         if click[0] == 1 and action != None:
-            action()
-          
+            if parameter == None: action()
+            else: action(parameter)
     else:
-        pygame.draw.circle(surface,idleColor,pos,radius)
+        pygame.gfxdraw.aacircle(surface,pos[0]-2,pos[1]-2,radius-4,idleColor)
+        pygame.gfxdraw.filled_circle(surface,pos[0]-2,pos[1]-2,radius-4,idleColor)
 
     WriteText(surface,pos,text,fontSize,"PokemonSolid.ttf",white,True)
 
@@ -173,13 +186,18 @@ def ProgressBar(surface,pos,width,height,color,text,minValue,maxValue,value):
 
     displayWidth = int(width/((maxValue-minValue+1)/(value-minValue+1)))-1
 
-    pygame.draw.circle(surface,white,pos,int(height/2))
-    pygame.draw.circle(surface,white,(pos[0]+width,pos[1]),int(height/2))
-    pygame.draw.rect(surface,white,(pos[0],pos[1]-int(height/2),width,height))
+    pygame.gfxdraw.aacircle(surface,pos[0],pos[1],int(height/2),white)
+    pygame.gfxdraw.filled_circle(surface,pos[0],pos[1],int(height/2),white)
+    pygame.gfxdraw.aacircle(surface,pos[0]+width,pos[1],int(height/2),white)
+    pygame.gfxdraw.filled_circle(surface,pos[0]+width,pos[1],int(height/2),white)
+    pygame.gfxdraw.box(surface,(pos[0],pos[1]-int(height/2),width,height+1),white)
 
-    pygame.draw.circle(surface,color,pos,int(height/2)-3)
-    pygame.draw.circle(surface,color,(pos[0]+displayWidth,pos[1]),int(height/2)-3)
-    pygame.draw.rect(surface,color,(pos[0],pos[1]-int(height/2)+3,displayWidth,height-6))
+    pygame.gfxdraw.aacircle(surface,pos[0],pos[1],int(height/2)-3,color)
+    pygame.gfxdraw.filled_circle(surface,pos[0],pos[1],int(height/2)-3,color)
+    pygame.gfxdraw.aacircle(surface,pos[0]+displayWidth,pos[1],int(height/2)-3,color)
+    pygame.gfxdraw.filled_circle(surface,pos[0]+displayWidth,pos[1],int(height/2)-3,color)
+    pygame.gfxdraw.box(surface,(pos[0],pos[1]-int(height/2)+3,displayWidth,height+1-6),color)
+
 
     WriteText(surface,(pos[0],pos[1]-30),text,20,"calibrilight.ttf",white)
     WriteText(surface,(pos[0]+width+30,pos[1]),str(value),20,"calibrilight.ttf",white,True)
@@ -220,7 +238,6 @@ def LoadStatSet1(surface):
 
     text = "It appears and vanishes with a ninja’s grace. It toys with its enemies using swift movements, while slicing them with throwing stars of sharpest water."
     blit_text(surface, text, (20, 130),pygame.font.Font("calibrilight.ttf",20),(255,255,255))
-
 
 def LoadStatSet2(surface):
     WriteText(surface,(40,5),"Region:",20,"PokemonSolid.ttf",white,False)     
@@ -283,20 +300,35 @@ def LoadStatSet5(surface):
 
     WriteText(surface,(150,100),"Appearance",30,"PokemonSolid.ttf",white,True)    
 
+    global genderDifference
+
+    
+
     # Gender / Shiny Button and update
-    Button(mainSurface,(380,400),20,"M",20,buttonIdleColor,buttonHoverColor)
-    Button(mainSurface,(430,400),20,"F",20,buttonIdleColor,buttonHoverColor)
 
-    Button(mainSurface,(380,450),20,"M",20,buttonIdleColor,buttonHoverColor)
-    Button(mainSurface,(430,450),20,"F",20,buttonIdleColor,buttonHoverColor)
+    if genderDifference:
+        WriteText(surface,(165,150),"Male:",25,"calibrilight.ttf",white,True) 
+        Button(surface,(100,180),20,"Normal",20,buttonIdleColor,buttonHoverColor,QueueAppearance,"FNM",(470,0))
+        Button(surface,(230,180),20,"Shiny",20,buttonIdleColor,buttonHoverColor,QueueAppearance,"FSM",(470,0))
 
-    pygame.display.update((360,380,40,40))
-    pygame.display.update((410,380,40,40))
+        WriteText(surface,(165,220),"Female:",25,"calibrilight.ttf",white,True) 
+        Button(surface,(100,250),20,"Normal",20,buttonIdleColor,buttonHoverColor,QueueAppearance,"FNF",(470,0))
+        Button(surface,(230,250),20,"Shiny",20,buttonIdleColor,buttonHoverColor,QueueAppearance,"FSF",(470,0))
 
-    pygame.display.update((360,430,40,40))
-    pygame.display.update((410,430,40,40))
+        WriteText(surface,(165,300),"Backside:",25,"calibrilight.ttf",white,True) 
+        Button(surface,(100,330),20,"Normal",20,buttonIdleColor,buttonHoverColor,QueueAppearance,"BN",(470,0))
+        Button(surface,(230,330),20,"Shiny",20,buttonIdleColor,buttonHoverColor,QueueAppearance,"BS",(470,0))
+    else:
+        WriteText(surface,(165,150),"Frontside:",25,"calibrilight.ttf",white,True) 
+        Button(surface,(100,180),20,"Normal",20,buttonIdleColor,buttonHoverColor,QueueAppearance,"FN",(470,0))
+        Button(surface,(230,180),20,"Shiny",20,buttonIdleColor,buttonHoverColor,QueueAppearance,"FS",(470,0))
 
+        WriteText(surface,(165,220),"Backside:",25,"calibrilight.ttf",white,True) 
+        Button(surface,(100,250),20,"Normal",20,buttonIdleColor,buttonHoverColor,QueueAppearance,"BN",(470,0))
+        Button(surface,(230,250),20,"Shiny",20,buttonIdleColor,buttonHoverColor,QueueAppearance,"BS",(470,0))
 
+    WriteText(surface,(165,380),"Attack Animation:",25,"calibrilight.ttf",white,True) 
+    Button(surface,(165,410),20,"Toggle",20,buttonIdleColor,buttonHoverColor,QueueAppearance,"ATK",(470,0))
 
 
 
@@ -310,14 +342,24 @@ def ToggleReturnToMainMenu():
     loadNewPokemon = True
     returnToMenu = True
 
+def QueueAppearance(spriteType):
+    global appearanceQueued
+    global appearanceType
+
+    appearanceQueued = True
+    appearanceType = spriteType
+
+
+
 # Parent Infoscreen Loop
 while not returnToMenu:
     
     # Load Pokemon-Data here
     backgroundImage = pygame.image.load("backgrounds/Water.png").convert()
+    genderDifference = False
 
     #Loading Sprites
-    spriteFrameIndex,spriteTilesAmount,spriteFrames,spriteCurrent,sprite = SpriteCreate("sp30.gif")
+    spriteTilesAmount,spriteFrames,spriteCurrent,sprite = SpriteCreate("spritesheets/658/658_FN.gif")
     
 
     mainSurface.blit(backgroundImage,(0,0))
@@ -326,8 +368,11 @@ while not returnToMenu:
     menuSurface.fill((64,64,64))
     menuSurface.set_colorkey((64,64,64))
     
-    pygame.draw.circle(menuSurface,menuBarColor,(-200,int(displayHeight/2)),300)
-    pygame.draw.circle(menuSurface,(64,64,64),(-210,int(displayHeight/2)),300)
+    pygame.gfxdraw.aacircle(menuSurface,-200,int(displayHeight/2),300,menuBarColor)
+    pygame.gfxdraw.filled_circle(menuSurface,-200,int(displayHeight/2),300,menuBarColor)
+    pygame.gfxdraw.aacircle(menuSurface,-210,int(displayHeight/2),300,(64,64,64))
+    pygame.gfxdraw.filled_circle(menuSurface,-210,int(displayHeight/2),300,(64,64,64))
+
     pokeballImage = pygame.image.load("pokeball.png").convert()
     menuSurface.blit(pokeballImage,(-250,int(displayHeight/2)-150))
     mainSurface.blit(menuSurface,(0,0))
@@ -335,8 +380,10 @@ while not returnToMenu:
     # Drawin stats-screen
     statsSurface.fill((0,0,0))
     statsSurface.set_colorkey((0,0,0))
-    pygame.draw.circle(statsSurface,white,(950,int(displayHeight/2)),950)
-    pygame.draw.circle(statsSurface,menuBG,(905,int(displayHeight/2)),900)
+    pygame.gfxdraw.aacircle(statsSurface,950,int(displayHeight/2),950,white)
+    pygame.gfxdraw.filled_circle(statsSurface,950,int(displayHeight/2),950,white)
+    pygame.gfxdraw.aacircle(statsSurface,905,int(displayHeight/2),900,menuBG)
+    pygame.gfxdraw.filled_circle(statsSurface,905,int(displayHeight/2),900,menuBG)
     LoadStatSet0(statsSurface)
     mainSurface.blit(statsSurface,(470 + statsOffset,0))
 
@@ -363,6 +410,28 @@ while not returnToMenu:
             pygame.quit()
             sys.exit()
 
+        # Animation Sprite Appearance Toggle
+        if appearanceQueued:
+            if genderDifference:
+                if appearanceType == "FNM": spriteTilesAmount,spriteFrames,spriteCurrent,sprite = SpriteCreate("spritesheets/658/658_FNM.gif")
+                elif appearanceType == "FNF": spriteTilesAmount,spriteFrames,spriteCurrent,sprite = SpriteCreate("spritesheets/658/658_FNF.gif")
+                elif appearanceType == "FSM": spriteTilesAmount,spriteFrames,spriteCurrent,sprite = SpriteCreate("spritesheets/658/658_FSM.gif")
+                elif appearanceType == "FSF": spriteTilesAmount,spriteFrames,spriteCurrent,sprite = SpriteCreate("spritesheets/658/658_FSF.gif")
+            else:
+                if appearanceType == "FN": spriteTilesAmount,spriteFrames,spriteCurrent,sprite = SpriteCreate("spritesheets/658/658_FN.gif")
+                elif appearanceType == "FS": spriteTilesAmount,spriteFrames,spriteCurrent,sprite = SpriteCreate("spritesheets/658/658_FS.gif")   
+
+            if appearanceType == "BN": spriteTilesAmount,spriteFrames,spriteCurrent,sprite = SpriteCreate("spritesheets/658/658_BN.gif")
+            elif appearanceType == "BS": spriteTilesAmount,spriteFrames,spriteCurrent,sprite = SpriteCreate("spritesheets/658/658_BS.gif")
+            elif appearanceType == "ATK":
+                
+                spriteFrameIndex = 0
+                
+                spriteTilesAmount,spriteFrames,spriteCurrent,sprite = SpriteCreate("spritesheets/658/658_ATK" + str(attackIndex) + ".gif")
+                attackIndex += 1
+                if attackIndex > attackAmount: attackIndex = 1
+            appearanceQueued = False
+
 
         # Animation-Cycle for the Sprite
         spriteSurface.fill((0,0,0))
@@ -375,11 +444,11 @@ while not returnToMenu:
         
         if clockCtr%5 == 0:
             # Menu Button and update
-            Button(menuSurface,(45,int(displayHeight/2)-170),25,"animation",15,buttonIdleColor,buttonHoverColor,QueueAnimationSwitch)
-            Button(menuSurface,(80,int(displayHeight/2)-90),28,"next Evo",15,buttonIdleColor,buttonHoverColor)
-            Button(menuSurface,(95,int(displayHeight/2)),30,"<",15,buttonIdleColor,buttonHoverColor,ToggleReturnToMainMenu)
-            Button(menuSurface,(80,int(displayHeight/2)+90),28,"prev Evo",15,buttonIdleColor,buttonHoverColor)
-            Button(menuSurface,(45,int(displayHeight/2)+170),25,"EN / DE",15,buttonIdleColor,buttonHoverColor)
+            Button(menuSurface,(45,int(displayHeight/2)-170),25,"DEX >",15,buttonIdleColor,buttonHoverColor)
+            Button(menuSurface,(80,int(displayHeight/2)-90),28,"DEX <",15,buttonIdleColor,buttonHoverColor)
+            Button(menuSurface,(95,int(displayHeight/2)),30,"BACK",15,buttonIdleColor,buttonHoverColor,ToggleReturnToMainMenu)
+            Button(menuSurface,(80,int(displayHeight/2)+90),28,"EVO >",15,buttonIdleColor,buttonHoverColor)
+            Button(menuSurface,(45,int(displayHeight/2)+170),25,"EVO <",15,buttonIdleColor,buttonHoverColor)
             mainSurface.blit(menuSurface,(0,0))
             pygame.display.update((45-25,int(displayHeight/2)-170-25,56,56))
             pygame.display.update((80-28,int(displayHeight/2)-90-28,56,56))
@@ -387,12 +456,15 @@ while not returnToMenu:
             pygame.display.update((80-28,int(displayHeight/2)+90-28,56,56))
             pygame.display.update((45-25,int(displayHeight/2)+170-25,56,56))
             
-            
             # Stats Button and update
             Button(mainSurface,(440,40),30,"Stats",15,buttonIdleColor,buttonHoverColor,ToggleNextStatPage)
             pygame.display.update((410,10,60,60))
-
             
+            if currentStatPage == 2:
+                LoadStatSet5(statsSurface)
+                mainSurface.blit(statsSurface,(470 + statsOffset,0))
+                pygame.display.update((470,0,displayWidth-470,480))
+
             clockCtr = 0
 
         
@@ -404,8 +476,10 @@ while not returnToMenu:
         # Drawing stats-screen
         statsSurface.fill((0,0,0))
         statsSurface.set_colorkey((0,0,0))
-        pygame.draw.circle(statsSurface,white,(950,int(displayHeight/2)),950)
-        pygame.draw.circle(statsSurface,menuBG,(905,int(displayHeight/2)),900)
+        pygame.gfxdraw.aacircle(statsSurface,950,int(displayHeight/2),950,white)
+        pygame.gfxdraw.filled_circle(statsSurface,950,int(displayHeight/2),950,white)
+        pygame.gfxdraw.aacircle(statsSurface,905,int(displayHeight/2),900,menuBG)
+        pygame.gfxdraw.filled_circle(statsSurface,905,int(displayHeight/2),900,menuBG)
 
         # Change Stat Screen
 
@@ -431,24 +505,28 @@ while not returnToMenu:
             if currentStatPage == 5: LoadStatSet4(statsSurface)
 
             # Reset Statpage-Counter
-            if currentStatPage > 4: currentStatPage = 0
+            if currentStatPage > 5: currentStatPage = 0
 
             mainSurface.blit(statsSurface,(470 + statsOffset,0))
             pygame.display.update((470,0,displayWidth-470,480))
 
+        
+
+
         # Tick
-        clock.tick(60)
+        clock.tick(50)
 
         clockCtr += 1
 
 for x in range(0,10):
     if x%3 == 0:
-        print(x)
         mainSurface.blit(backgroundImage,(0,0))
         menuSurface.fill((64,64,64))
         menuSurface.set_colorkey((64,64,64))
-        pygame.draw.circle(menuSurface,menuBarColor,(-200,int(displayHeight/2)),300)
-        pygame.draw.circle(menuSurface,(64,64,64),(-210,int(displayHeight/2)),300)
+        pygame.gfxdraw.aacircle(menuSurface,-200,int(displayHeight/2),300,menuBarColor)
+        pygame.gfxdraw.filled_circle(menuSurface,-200,int(displayHeight/2),300,menuBarColor)
+        pygame.gfxdraw.aacircle(menuSurface,-210,int(displayHeight/2),300,(64,64,64))
+        pygame.gfxdraw.filled_circle(menuSurface,-210,int(displayHeight/2),300,(64,64,64))
 
         menuSurface.blit(pokeballImage,(-250 + x,int(displayHeight/2)-150))
         mainSurface.blit(menuSurface,(0,0))
@@ -458,11 +536,12 @@ for x in range(0,10):
 for x in range(0,100):
     if x%6 == 0:
         mainSurface.blit(backgroundImage,(0,0))
-        print(-x + 10)
         menuSurface.fill((64,64,64))
         menuSurface.set_colorkey((64,64,64))
-        pygame.draw.circle(menuSurface,menuBarColor,(-200,int(displayHeight/2)),300)
-        pygame.draw.circle(menuSurface,(64,64,64),(-210,int(displayHeight/2)),300)
+        pygame.gfxdraw.aacircle(menuSurface,-200,int(displayHeight/2),300,menuBarColor)
+        pygame.gfxdraw.filled_circle(menuSurface,-200,int(displayHeight/2),300,menuBarColor)
+        pygame.gfxdraw.aacircle(menuSurface,-210,int(displayHeight/2),300,(64,64,64))
+        pygame.gfxdraw.filled_circle(menuSurface,-210,int(displayHeight/2),300,(64,64,64))
 
         menuSurface.blit(pokeballImage,(-250 - x + 10,int(displayHeight/2)-150))
         mainSurface.blit(menuSurface,(0,0))
@@ -471,7 +550,7 @@ for x in range(0,100):
 
 mainSurface.fill((255,255,255))
 
-for x in range(0,displayWidth):
+for x in range(0,displayWidth+100):
     if x%60 == 0:
         pygame.display.update((displayWidth - x,0,x,displayHeight))
         clock.tick(60)
