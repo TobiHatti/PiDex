@@ -4,6 +4,7 @@ from pygame import gfxdraw
 import time
 import random
 import sys
+import sqlite3
 
 # Color Definitions
 white = (255,255,255)
@@ -37,6 +38,10 @@ spriteSurface = pygame.Surface((300,300)).convert()
 statsSurface = pygame.Surface((displayWidth-470,480)).convert()
 menuSurface = pygame.Surface((150,480)).convert()
 
+# DB-Initialisation and Setup
+conn = sqlite3.connect('pokemon.db')
+conn.row_factory = sqlite3.Row
+c = conn.cursor()
 
 # Variables
 spriteFrameIndex = 0
@@ -60,6 +65,8 @@ appearanceQueued = False
 appearanceType = ""
 
 genderDifference = False
+
+currentPokemon = 1
 
 # Functions
 
@@ -177,8 +184,8 @@ def TypeImages(surface,pos,firstType, secondType = None):
         elif secondType == "Rock": stImage = pygame.image.load("typesS/Rock.png")
         elif secondType == "Steel": stImage = pygame.image.load("typesS/Steel.png")
         elif secondType == "Water": stImage = pygame.image.load("typesS/Water.png")
-        surface.blit(ftImage,(pos[0]-25-30,pos[1]))
-        surface.blit(stImage,(pos[0]-25+30,pos[1]))
+        surface.blit(pygame.image.load("typesS/Water.png"),(pos[0]-25-30,pos[1]))
+        surface.blit(pygame.image.load("typesS/Water.png"),(pos[0]-25+30,pos[1]))
     else:
         surface.blit(ftImage,(pos[0] - 25,pos[1]))
         
@@ -203,106 +210,120 @@ def ProgressBar(surface,pos,width,height,color,text,minValue,maxValue,value):
     WriteText(surface,(pos[0]+width+30,pos[1]),str(value),20,"calibrilight.ttf",white,True)
 
 def LoadStatSet0(surface):
+    global pokeData
+
     WriteText(surface,(40,5),"Region:",20,"PokemonSolid.ttf",white,False)     
-    WriteText(surface,(40,35),"Kalos",30,"PokemonHollow.ttf",white,False)     
-    WriteText(surface,(260,45),"#658",50,"PokemonHollow.ttf",white,True)     
+    WriteText(surface,(40,35),pokeData["regionName"],30,"PokemonHollow.ttf",white,False)     
+    WriteText(surface,(260,45),"#" + str('{0:03d}'.format(pokeData["nationalDex"])),50,"PokemonHollow.ttf",white,True)     
 
     WriteText(surface,(150,100),"Pokédex Data",30,"PokemonSolid.ttf",white,True)  
     
     WriteText(surface,(30,145),"National Dex:",20,"calibrilight.ttf",white,False)    
-    WriteText(surface,(150,145),"#658",25,"calibrilight.ttf",white,False)    
+    WriteText(surface,(150,145),"#" + str('{0:03d}'.format(pokeData["nationalDex"])),25,"calibrilight.ttf",white,False)    
 
-    WriteText(surface,(30,170),"Kalos Dex:",20,"calibrilight.ttf",white,False)    
-    WriteText(surface,(150,170),"#009",25,"calibrilight.ttf",white,False)    
+    WriteText(surface,(30,170),str(pokeData["regionName"]) + " Dex:",20,"calibrilight.ttf",white,False)    
+    WriteText(surface,(150,170),"#" + str('{0:03d}'.format(pokeData["kalosDex"])),25,"calibrilight.ttf",white,False)    
 
     WriteText(surface,(30,220),"Species:",20,"calibrilight.ttf",white,False)    
-    WriteText(surface,(110,220),"Ninja Pokémon",25,"calibrilight.ttf",white,False)    
+    WriteText(surface,(110,220),pokeData["species"],25,"calibrilight.ttf",white,False)    
 
     WriteText(surface,(30,290),"Type:",20,"calibrilight.ttf",white,False) 
-    WriteText(surface,(150,275),"Water / Dark",20,"calibrilight.ttf",white,True)
-    TypeImages(surface,(150,285),"Water","Dark")
+
+    if pokeData["type2NameEN"] == None:
+        WriteText(surface,(150,275),pokeData["type1NameEN"],20,"calibrilight.ttf",white,True)
+        surface.blit(pygame.image.load("typesS/Water.png"),(150-25,285))
+    else:
+        WriteText(surface,(150,275),pokeData["type1NameEN"] + " / " + pokeData["type2NameEN"],20,"calibrilight.ttf",white,True)
+        surface.blit(pygame.image.load("typesS/Water.png"),(150-25-30,285))
+        surface.blit(pygame.image.load("typesS/Water.png"),(150-25+30,285))
 
     WriteText(surface,(30,360),"Height:",20,"calibrilight.ttf",white,False)    
-    WriteText(surface,(100,360),"1.5m",25,"calibrilight.ttf",white,False)  
+    WriteText(surface,(100,360),str(pokeData["height"]/100) + "m",25,"calibrilight.ttf",white,False)  
 
     WriteText(surface,(30,390),"Weight:",20,"calibrilight.ttf",white,False)    
-    WriteText(surface,(100,390),"40.00kg",25,"calibrilight.ttf",white,False)  
+    WriteText(surface,(100,390),str(pokeData["height"]/1000) + "kg",25,"calibrilight.ttf",white,False)  
 
 def LoadStatSet1(surface):
+    global pokeData
+
     WriteText(surface,(40,5),"Region:",20,"PokemonSolid.ttf",white,False)     
-    WriteText(surface,(40,35),"Kalos",30,"PokemonHollow.ttf",white,False)     
-    WriteText(surface,(260,45),"#658",50,"PokemonHollow.ttf",white,True)     
+    WriteText(surface,(40,35),pokeData["regionName"],30,"PokemonHollow.ttf",white,False)     
+    WriteText(surface,(260,45),"#" + str('{0:03d}'.format(pokeData["nationalDex"])),50,"PokemonHollow.ttf",white,True)    
 
     WriteText(surface,(150,100),"Pokédex entry",30,"PokemonSolid.ttf",white,True) 
-    
 
-    text = "It appears and vanishes with a ninja’s grace. It toys with its enemies using swift movements, while slicing them with throwing stars of sharpest water."
-    blit_text(surface, text, (20, 130),pygame.font.Font("calibrilight.ttf",20),(255,255,255))
+    blit_text(surface, pokeData["dexInfo"], (20, 130),pygame.font.Font("calibrilight.ttf",20),(255,255,255))
 
 def LoadStatSet2(surface):
+    global pokeData
+
     WriteText(surface,(40,5),"Region:",20,"PokemonSolid.ttf",white,False)     
-    WriteText(surface,(40,35),"Kalos",30,"PokemonHollow.ttf",white,False)     
-    WriteText(surface,(260,45),"#658",50,"PokemonHollow.ttf",white,True)     
+    WriteText(surface,(40,35),pokeData["regionName"],30,"PokemonHollow.ttf",white,False)     
+    WriteText(surface,(260,45),"#" + str('{0:03d}'.format(pokeData["nationalDex"])),50,"PokemonHollow.ttf",white,True)     
 
     WriteText(surface,(150,100),"Base Stats",30,"PokemonSolid.ttf",white,True)    
 
-    ProgressBar(surface,(50,160),200,18,barMaxWP,"HP",0,150,72)
-    ProgressBar(surface,(50,210),200,18,barAttack,"Attack",0,150,95)
-    ProgressBar(surface,(50,260),200,18,barDefense,"Defense",0,150,67)
-    ProgressBar(surface,(50,310),200,18,barKP,"Sp. Atk",0,150,103)
-    ProgressBar(surface,(50,360),200,18,barAttack,"Sp. Def",0,150,71)
-    ProgressBar(surface,(50,410),200,18,barMaxWP,"Speed",0,150,122)
+    ProgressBar(surface,(50,160),200,18,barMaxWP,"HP",0,150,pokeData["statHP"])
+    ProgressBar(surface,(50,210),200,18,barAttack,"Attack",0,150,pokeData["statAtk"])
+    ProgressBar(surface,(50,260),200,18,barDefense,"Defense",0,150,pokeData["statDef"])
+    ProgressBar(surface,(50,310),200,18,barKP,"Sp. Atk",0,150,pokeData["statSpAtk"])
+    ProgressBar(surface,(50,360),200,18,barAttack,"Sp. Def",0,150,pokeData["statSpDef"])
+    ProgressBar(surface,(50,410),200,18,barMaxWP,"Speed",0,150,pokeData["statSpd"])
 
 def LoadStatSet3(surface):
+    global pokeData
+
     WriteText(surface,(40,5),"Region:",20,"PokemonSolid.ttf",white,False)     
-    WriteText(surface,(40,35),"Kalos",30,"PokemonHollow.ttf",white,False)     
-    WriteText(surface,(260,45),"#658",50,"PokemonHollow.ttf",white,True)     
+    WriteText(surface,(40,35),pokeData["regionName"],30,"PokemonHollow.ttf",white,False)     
+    WriteText(surface,(260,45),"#" + str('{0:03d}'.format(pokeData["nationalDex"])),50,"PokemonHollow.ttf",white,True)    
 
     WriteText(surface,(150,100),"Training",30,"PokemonSolid.ttf",white,True)    
 
     WriteText(surface,(30,145),"EV Yield:",20,"calibrilight.ttf",white,False)    
-    WriteText(surface,(170,145),"3 Speed",25,"calibrilight.ttf",white,False)    
+    WriteText(surface,(170,145),str(pokeData["evYieldAmt"]) + " " +  str(pokeData["evYieldTypeEN"]),25,"calibrilight.ttf",white,False)    
 
     WriteText(surface,(30,185),"Catch Rate:",20,"calibrilight.ttf",white,False)    
-    WriteText(surface,(170,185),"45",25,"calibrilight.ttf",white,False)    
+    WriteText(surface,(170,185),str(pokeData["catchRate"]) + "%",25,"calibrilight.ttf",white,False)    
 
     WriteText(surface,(30,225),"Base Friendship:",20,"calibrilight.ttf",white,False)    
-    WriteText(surface,(170,225),"70",25,"calibrilight.ttf",white,False)    
+    WriteText(surface,(170,225),str(pokeData["baseFriendship"]),25,"calibrilight.ttf",white,False)    
 
     WriteText(surface,(30,265),"Base Exp.:",20,"calibrilight.ttf",white,False)    
-    WriteText(surface,(170,265),"239",25,"calibrilight.ttf",white,False)  
+    WriteText(surface,(170,265),str(pokeData["baseExp"]),25,"calibrilight.ttf",white,False)  
 
     WriteText(surface,(30,305),"Growth Rate:",20,"calibrilight.ttf",white,False)    
-    WriteText(surface,(170,305),"Medium Slow",25,"calibrilight.ttf",white,False)  
+    WriteText(surface,(170,305),str(pokeData["growthRateEN"]),25,"calibrilight.ttf",white,False)  
 
 def LoadStatSet4(surface):
+    global pokeData
+
     WriteText(surface,(40,5),"Region:",20,"PokemonSolid.ttf",white,False)     
-    WriteText(surface,(40,35),"Kalos",30,"PokemonHollow.ttf",white,False)     
-    WriteText(surface,(260,45),"#658",50,"PokemonHollow.ttf",white,True)     
+    WriteText(surface,(40,35),pokeData["regionName"],30,"PokemonHollow.ttf",white,False)     
+    WriteText(surface,(260,45),"#" + str('{0:03d}'.format(pokeData["nationalDex"])),50,"PokemonHollow.ttf",white,True)    
 
     WriteText(surface,(150,100),"Breeding",30,"PokemonSolid.ttf",white,True)    
 
     WriteText(surface,(30,145),"Egg Groups:",20,"calibrilight.ttf",white,False)    
-    WriteText(surface,(170,145),"Water 1",25,"calibrilight.ttf",white,False)    
+    WriteText(surface,(170,145),pokeData["eggGroupNameEN"],25,"calibrilight.ttf",white,False)    
 
     WriteText(surface,(30,185),"Gender:",20,"calibrilight.ttf",white,False)    
-    WriteText(surface,(170,185),"87.5% male",25,"calibrilight.ttf",white,False)    
-    WriteText(surface,(170,220),"12.5% female",25,"calibrilight.ttf",white,False)    
+    WriteText(surface,(170,185),str(pokeData["genderMale"]) + "% male",25,"calibrilight.ttf",white,False)    
+    WriteText(surface,(170,220),str(100-pokeData["genderMale"]) + "% female",25,"calibrilight.ttf",white,False)    
 
 
     WriteText(surface,(30,260),"Egg cycles:",20,"calibrilight.ttf",white,False)    
-    WriteText(surface,(170,260),"20",25,"calibrilight.ttf",white,False)  
+    WriteText(surface,(170,260),str(pokeData["eggCycles"]),25,"calibrilight.ttf",white,False)  
 
 def LoadStatSet5(surface):
+    global pokeData
+
     WriteText(surface,(40,5),"Region:",20,"PokemonSolid.ttf",white,False)     
-    WriteText(surface,(40,35),"Kalos",30,"PokemonHollow.ttf",white,False)     
-    WriteText(surface,(260,45),"#658",50,"PokemonHollow.ttf",white,True)     
+    WriteText(surface,(40,35),pokeData["regionName"],30,"PokemonHollow.ttf",white,False)     
+    WriteText(surface,(260,45),"#" + str('{0:03d}'.format(pokeData["nationalDex"])),50,"PokemonHollow.ttf",white,True)   
 
     WriteText(surface,(150,100),"Appearance",30,"PokemonSolid.ttf",white,True)    
 
     global genderDifference
-
-    
 
     # Gender / Shiny Button and update
 
@@ -349,13 +370,62 @@ def QueueAppearance(spriteType):
     appearanceQueued = True
     appearanceType = spriteType
 
+def ToggleLoadNextDex():
+    global loadNewPokemon
+    global currentPokemon
+    currentPokemon +=1
+    loadNewPokemon = True
+
+def ToggleLoadPrevDex():
+    global loadNewPokemon
+    global currentPokemon
+    currentPokemon -=1
+    loadNewPokemon = True
+
+def ToggleLoadNextEvo():
+    global pokeData
+    global loadNewPokemon
+    global currentPokemon
+    currentPokemon = pokeData["nextEvolution"]
+    loadNewPokemon = True
+
+def ToggleLoadPrevEvo():
+    global pokeData
+    global loadNewPokemon
+    global currentPokemon
+    currentPokemon = pokeData["prevEvolution"]
+    loadNewPokemon = True
 
 
 # Parent Infoscreen Loop
 while not returnToMenu:
     
     # Load Pokemon-Data here
-    backgroundImage = pygame.image.load("backgrounds/Water.png").convert()
+
+    parameters = (currentPokemon,)
+    c.execute("""SELECT *,
+                evoNext.evoNextDex AS nextEvolution,
+                evoPrev.evoDex AS prevEvolution,
+                typeA.typeNameEN AS type1NameEN,
+                typeA.typeNameDE AS type1NameDE,
+                typeA.typeIconImage AS type1IconImage,
+                typeB.typeNameEN AS type2NameEN,
+                typeB.typeNameDE AS type2NameDE,
+                typeB.typeIconImage AS type2IconImage
+                FROM pokemon 
+                LEFT JOIN sprites ON pokemon.nationalDex = sprites.nationalDex
+                LEFT JOIN types AS typeA ON pokemon.typeID1 = typeA.id 
+                LEFT JOIN types AS typeB ON pokemon.typeID2 = typeB.id 
+                LEFT JOIN regions ON pokemon.regionID = regions.id 
+                LEFT JOIN evYieldTypes ON pokemon.evYieldTypeID = evYieldTypes.id
+                LEFT JOIN growthRates ON pokemon.growthRateID = growthRates.id
+                LEFT JOIN eggGroups ON pokemon.eggGroupID = eggGroups.id
+                LEFT JOIN evolutions AS evoNext ON pokemon.nationalDex = evoNext.evoDex
+                LEFT JOIN evolutions AS evoPrev ON pokemon.nationalDex = evoNext.evoNextDex
+                WHERE pokemon.nationalDex = ?""",parameters)
+    pokeData = c.fetchone()
+
+    backgroundImage = pygame.image.load("backgrounds/" + pokeData["typeBGImage"]).convert()
     genderDifference = False
 
     #Loading Sprites
@@ -388,13 +458,20 @@ while not returnToMenu:
     mainSurface.blit(statsSurface,(470 + statsOffset,0))
 
 
-    WriteText(mainSurface,(280,15),"Greninja",30,"unown.ttf",white,True)
-    WriteText(mainSurface,(280,70),"Greninja",50,"PokemonSolid.ttf",red,True)
+    WriteText(mainSurface,(280,15),pokeData["nameEN"],30,"unown.ttf",white,True)
+    WriteText(mainSurface,(280,70),pokeData["nameEN"],50,"PokemonSolid.ttf",red,True)
 
-    WriteText(mainSurface,(280,420),"Water / Dark",20,"calibrilight.ttf",white,True)
-    TypeImages(mainSurface,(280,430),"Water","Dark")
+    if pokeData["type2NameEN"] == None:
+        WriteText(mainSurface,(280,420),pokeData["type1NameEN"],20,"calibrilight.ttf",white,True)
+        mainSurface.blit(pygame.image.load("typesS/Water.png"),(280-25,430))
+    else:
+        WriteText(mainSurface,(280,420),pokeData["type1NameEN"] + " / " + pokeData["type2NameEN"],20,"calibrilight.ttf",white,True)
+        mainSurface.blit(pygame.image.load("typesS/Water.png"),(280-25-30,430))
+        mainSurface.blit(pygame.image.load("typesS/Water.png"),(280-25+30,430))
 
     pygame.display.update()
+
+    loadNewPokemon = False
 
     while not loadNewPokemon:
 
@@ -444,11 +521,11 @@ while not returnToMenu:
         
         if clockCtr%5 == 0:
             # Menu Button and update
-            Button(menuSurface,(45,int(displayHeight/2)-170),25,"DEX >",15,buttonIdleColor,buttonHoverColor)
-            Button(menuSurface,(80,int(displayHeight/2)-90),28,"DEX <",15,buttonIdleColor,buttonHoverColor)
+            Button(menuSurface,(45,int(displayHeight/2)-170),25,"DEX >",15,buttonIdleColor,buttonHoverColor,ToggleLoadNextDex)
+            Button(menuSurface,(80,int(displayHeight/2)-90),28,"DEX <",15,buttonIdleColor,buttonHoverColor,ToggleLoadPrevDex)
             Button(menuSurface,(95,int(displayHeight/2)),30,"BACK",15,buttonIdleColor,buttonHoverColor,ToggleReturnToMainMenu)
-            Button(menuSurface,(80,int(displayHeight/2)+90),28,"EVO >",15,buttonIdleColor,buttonHoverColor)
-            Button(menuSurface,(45,int(displayHeight/2)+170),25,"EVO <",15,buttonIdleColor,buttonHoverColor)
+            Button(menuSurface,(80,int(displayHeight/2)+90),28,"EVO >",15,buttonIdleColor,buttonHoverColor,ToggleLoadNextEvo)
+            Button(menuSurface,(45,int(displayHeight/2)+170),25,"EVO <",15,buttonIdleColor,buttonHoverColor,ToggleLoadPrevEvo)
             mainSurface.blit(menuSurface,(0,0))
             pygame.display.update((45-25,int(displayHeight/2)-170-25,56,56))
             pygame.display.update((80-28,int(displayHeight/2)-90-28,56,56))
