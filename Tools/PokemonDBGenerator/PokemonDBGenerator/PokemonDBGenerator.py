@@ -1,81 +1,292 @@
-#import sqlite3
-#import csv
-
-#conn = sqlite3.connect('pokemon.db')
-#conn.row_factory = sqlite3.Row
-
-#c = conn.cursor()
-
-
-#with open('csv/pokemon.csv') as csv_file:
-#    csv_reader = csv.reader(csv_file, delimiter=';')
-#    line_count = 0
-#    for row in csv_reader:
-#        if line_count != 0:
-#            name = row[1]
-#            nationalDex = row[2]
-#            height = row[3]
-#            weight = row[4]
-#            baseExp = row[5]
-
-#            parameters = (name,nationalDex,height,weight,baseExp)
-#            c.execute("INSERT INTO pokemon (nameEN,nationalDex,height,weight,baseExp) VALUES (?,?,?,?,?)",parameters)
-#            conn.commit()
-#conn.close()
-
+import sqlite3
 import pokepy
+
+
+
+#pokemon = client.get_pokemon(25)
+#pokemonSpecies = client.get_pokemon_species(4)
+#pokemonEvoChain = client.get_evolution_chain(1)
+#pokemonGrowthRate = client.get_growth_rate(1)
+
+#i = 0
+#try:
+#    while pokemonSpecies[0].pokedex_numbers[i].pokedex.name != None:
+#        print(pokemonSpecies[0].pokedex_numbers[i].pokedex.name + " = " + str(pokemonSpecies[0].pokedex_numbers[i].entry_number))
+#        i += 1
+#except IndexError: pass
+
+
+#pokedexTypes = list()
+#isNewDex = True
+
+#for j in range(1,803):
+#    print("Checking Dex-ID: " + str(j))
+
+#    if j%20 == 0: 
+#        print("===== Current State: ====")
+#        print(pokedexTypes)
+#        print("=========================")
+
+#    i = 0
+#    try:
+#        while client.get_pokemon_species(j)[0].pokedex_numbers[i].pokedex.name != None:
+
+#            isNewDex = True
+
+#            for x in range(0,len(pokedexTypes)):
+#                if str(pokedexTypes[x]) == str(client.get_pokemon_species(j)[0].pokedex_numbers[i].pokedex.name): isNewDex = False
+
+#            if isNewDex:
+#                pokedexTypes.append(client.get_pokemon_species(j)[0].pokedex_numbers[i].pokedex.name)
+
+#            i += 1
+#    except: pass
+
+
+#print(pokedexTypes)
+
+conn = sqlite3.connect('pokemon.db')
+conn.row_factory = sqlite3.Row
+c = conn.cursor()
 
 client = pokepy.V2Client()
 
-pokemon = client.get_pokemon(658)
-pokemonSpecies = client.get_pokemon_species(658)
+eGr = 0
 
 
 
 
-print(pokemonSpecies[0].generation)
 
-nationalDex = pokemon[0].id
-kantoDex = 0
-johtoDex = 0
-hoennDex = 0
-sinnohDex = 0
-einallDex = 0
-kalosDex = 0
+for j in range(1,803):
+    try: 
+        #pokemon = client.get_pokemon(j)
+        pokemonSpecies = client.get_pokemon_species(j)
+        #pokemonEvoChain = client.get_evolution_chain(j)
 
-nameEN = pokemonSpecies[0].names[2].name
-nameDE = pokemonSpecies[0].names[5].name
+        eggGroup = pokemonSpecies[0].egg_groups[0].name
 
-type1 = pokemon[0].types[0].type.name
-type2 = pokemon[0].types[1].type.name
+        if str(eggGroup) == "monster": eGr = 1
+        elif str(eggGroup) == "water1": eGr = 2
+        elif str(eggGroup) == "water2": eGr = 3
+        elif str(eggGroup) == "water3": eGr = 4
+        elif str(eggGroup) == "bug": eGr = 5
+        elif str(eggGroup) == "flying": eGr = 6
+        elif str(eggGroup) == "ground": eGr = 7
+        elif str(eggGroup) == "fairy": eGr = 8
+        elif str(eggGroup) == "plant": eGr = 9
+        elif str(eggGroup) == "humanshape": eGr = 10
+        elif str(eggGroup) == "mineral": eGr = 11
+        elif str(eggGroup) == "indeterminate": eGr = 12
+        elif str(eggGroup) == "ditto": eGr = 13
+        elif str(eggGroup) == "dragon": eGr = 14
+        elif str(eggGroup) == "no-eggs": eGr = 15
+        else: eGr = None
 
-generation = 0
+        print(str(j) + " - " + str(eggGroup) + "    " + str(eGr))
 
-species = 0
+       
 
-height = pokemon[0].height
-weight = pokemon[0].weight
+        parameters = (eGr,j,)
 
-dexInfo = 0
+        c.execute("UPDATE pokemon SET eggGroupID = ? WHERE nationalDex = ?",parameters)
+        conn.commit()
+    except: pass
 
-statHP = pokemon[0].stats[5].base_stat
-statAtk = pokemon[0].stats[4].base_stat
-statDef = pokemon[0].stats[3].base_stat
-statSpAtk = pokemon[0].stats[2].base_stat
-statSpDef = pokemon[0].stats[1].base_stat
-statSpd = pokemon[0].stats[0].base_stat
 
-evYield = 0
 
-catchRate = pokemonSpecies[0].capture_rate
+conn.close()
 
-baseFriendship = pokemonSpecies[0].base_happiness
-baseExp = pokemon[0].base_experience
+#for j in range(1,100):
+#    print("Start of " + str(j))
+#    try:
+#        pokemon = client.get_pokemon(j)
+#        pokemonSpecies = client.get_pokemon_species(j)
+#        pokemonEvoChain = client.get_evolution_chain(j)
+#        pokemonGrowthRate = client.get_growth_rate(j)
+    
+#        # Pokedexes
+#        national = None
+#        kanto = None
+#        original_johto = None
+#        updated_johto = None
+#        hoenn = None
+#        updated_hoenn = None
+#        original_sinnoh = None
+#        extended_sinnoh = None
+#        kalos_central = None
+#        kalos_mountain = None
+#        kalos_coastal = None
+#        original_unova = None
+#        updated_unova = None
+#        conquest_gallery = None
+        
+#        try:
+#            i = 0
+#            while pokemonSpecies[0].pokedex_numbers[i].pokedex.name != None:
+#                if str(pokemonSpecies[0].pokedex_numbers[i].pokedex.name) == "national" : national = pokemonSpecies[0].pokedex_numbers[i].entry_number
+#                if str(pokemonSpecies[0].pokedex_numbers[i].pokedex.name) == "kanto" : kanto = pokemonSpecies[0].pokedex_numbers[i].entry_number
+#                if str(pokemonSpecies[0].pokedex_numbers[i].pokedex.name) == "original-johto" : original_johto = pokemonSpecies[0].pokedex_numbers[i].entry_number
+#                if str(pokemonSpecies[0].pokedex_numbers[i].pokedex.name) == "updated-johto" : updated_johto = pokemonSpecies[0].pokedex_numbers[i].entry_number
+#                if str(pokemonSpecies[0].pokedex_numbers[i].pokedex.name) == "hoenn" : hoenn = pokemonSpecies[0].pokedex_numbers[i].entry_number
+#                if str(pokemonSpecies[0].pokedex_numbers[i].pokedex.name) == "updated-hoenn" : updated_hoenn = pokemonSpecies[0].pokedex_numbers[i].entry_number
+#                if str(pokemonSpecies[0].pokedex_numbers[i].pokedex.name) == "original-sinnoh" : original_sinnoh = pokemonSpecies[0].pokedex_numbers[i].entry_number
+#                if str(pokemonSpecies[0].pokedex_numbers[i].pokedex.name) == "extended-sinnoh" : extended_sinnoh = pokemonSpecies[0].pokedex_numbers[i].entry_number
+#                if str(pokemonSpecies[0].pokedex_numbers[i].pokedex.name) == "kalos-central" : kalos_central = pokemonSpecies[0].pokedex_numbers[i].entry_number
+#                if str(pokemonSpecies[0].pokedex_numbers[i].pokedex.name) == "kalos-mountain" : kalos_mountain = pokemonSpecies[0].pokedex_numbers[i].entry_number
+#                if str(pokemonSpecies[0].pokedex_numbers[i].pokedex.name) == "kalos-coastal" : kalos_coastal = pokemonSpecies[0].pokedex_numbers[i].entry_number
+#                if str(pokemonSpecies[0].pokedex_numbers[i].pokedex.name) == "original-unova" : original_unova = pokemonSpecies[0].pokedex_numbers[i].entry_number
+#                if str(pokemonSpecies[0].pokedex_numbers[i].pokedex.name) == "updated-unova" : updated_unova = pokemonSpecies[0].pokedex_numbers[i].entry_number
+#                if str(pokemonSpecies[0].pokedex_numbers[i].pokedex.name) == "conquest-gallery" : conquest_gallery = pokemonSpecies[0].pokedex_numbers[i].entry_number
+#                i += 1
+#        except: pass
 
-growthRate = 0
-eggGroup = 0
-eggCycles = 0
-genderMale = 100 - (100/(pokemonSpecies[0].gender_rate*8))
-genderFemale = 100/(pokemonSpecies[0].gender_rate*8)
+#        # Types
+#        if pokemon[0].types[0].slot == 1:
+#            type1 = pokemon[0].types[0].type.name
+#            type2 = None
+#        else:
+#            type1 = pokemon[0].types[1].type.name
+#            type2 = pokemon[0].types[0].type.name
 
-genderDifference = pokemonSpecies[0].has_gender_differences
+#        if str(type1) == "bug": type1 = 1
+#        elif str(type1) == "dark": type1 = 2
+#        elif str(type1) == "dragon": type1 = 3
+#        elif str(type1) == "electric": type1 = 4
+#        elif str(type1) == "fairy": type1 = 5
+#        elif str(type1) == "fighting": type1 = 6
+#        elif str(type1) == "fire": type1 = 7
+#        elif str(type1) == "flying": type1 = 8
+#        elif str(type1) == "ghost": type1 = 9
+#        elif str(type1) == "grass": type1 = 10
+#        elif str(type1) == "ground": type1 = 11
+#        elif str(type1) == "ice": type1 = 12
+#        elif str(type1) == "normal": type1 = 13
+#        elif str(type1) == "poison": type1 = 14
+#        elif str(type1) == "psychic": type1 = 15
+#        elif str(type1) == "rock": type1 = 16
+#        elif str(type1) == "steel": type1 = 17
+#        elif str(type1) == "water": type1 = 18
+#        else: type1 = 0 
+
+#        if str(type2) == "bug": type2 = 1
+#        elif str(type2) == "dark": type2 = 2
+#        elif str(type2) == "dragon": type2 = 3
+#        elif str(type2) == "electric": type2 = 4
+#        elif str(type2) == "fairy": type2 = 5
+#        elif str(type2) == "fighting": type2 = 6
+#        elif str(type2) == "fire": type2 = 7
+#        elif str(type2) == "flying": type2 = 8
+#        elif str(type2) == "ghost": type2 = 9
+#        elif str(type2) == "grass": type2 = 10
+#        elif str(type2) == "ground": type2 = 11
+#        elif str(type2) == "ice": type2 = 12
+#        elif str(type2) == "normal": type2 = 13
+#        elif str(type2) == "poison": type2 = 14
+#        elif str(type2) == "psychic": type2 = 15
+#        elif str(type2) == "rock": type2 = 16
+#        elif str(type2) == "steel": type2 = 17
+#        elif str(type2) == "water": type2 = 18
+#        else: type2 = 0 
+
+#        # Generations
+#        if pokemonSpecies[0].generation.name == "generation-i": generation = 1
+#        elif pokemonSpecies[0].generation.name == "generation-ii": generation = 2
+#        elif pokemonSpecies[0].generation.name == "generation-iii": generation = 3
+#        elif pokemonSpecies[0].generation.name == "generation-iv": generation = 4
+#        elif pokemonSpecies[0].generation.name == "generation-v": generation = 5
+#        elif pokemonSpecies[0].generation.name == "generation-vi": generation = 6
+#        elif pokemonSpecies[0].generation.name == "generation-vii": generation = 7
+
+#        # Egg Groups
+#        try:
+#            i = 0
+#            while pokemonSpecies[0].egg_groups[i].name != None:
+#                #print(pokemonSpecies[0].egg_groups[i].name)
+#                i += 1
+#        except: pass
+
+#        # Names and Description
+#        nameEN = pokemonSpecies[0].names[2].name
+#        nameDE = pokemonSpecies[0].names[5].name
+
+#        dexInfo = None
+
+#        # Order
+#        order = pokemon[0].order
+
+#        # Height and Weight
+#        height = pokemon[0].height
+#        weight = pokemon[0].weight
+
+#        # Stats
+#        statHP = pokemon[0].stats[5].base_stat
+#        statAtk = pokemon[0].stats[4].base_stat
+#        statDef = pokemon[0].stats[3].base_stat
+#        statSpAtk = pokemon[0].stats[2].base_stat
+#        statSpDef = pokemon[0].stats[1].base_stat
+#        statSpd = pokemon[0].stats[0].base_stat
+
+#        # Genders
+#        genderMale = 100 - (100/(pokemonSpecies[0].gender_rate*8))
+#        genderFemale = 100/(pokemonSpecies[0].gender_rate*8)
+
+#        genderDifference = pokemonSpecies[0].has_gender_differences
+
+#        # Other
+#        catchRate = pokemonSpecies[0].capture_rate
+#        baseFriendship = pokemonSpecies[0].base_happiness
+#        baseExp = pokemon[0].base_experience
+        
+#        # Growth Rate
+#        growthRate = pokemonSpecies[0].growth_rate.name
+
+#       if str(growthRate) == "slow": gRate = 1
+#       if str(growthRate) == "medium": gRate = 2
+#       if str(growthRate) == "fast": gRate = 3
+#       if str(growthRate) == "medium-slow": gRate = 4
+#       if str(growthRate) == "slow-then-very-fast": gRate = 5
+#       if str(growthRate) == "fast-then-very-slow": gRate = 6
+
+#        # EggGroup
+#        eggGroup = pokemonSpecies[0].egg_groups[0].name
+
+#        if str(eggGroup) == "monster": eGr = 1
+#        elif str(eggGroup) == "water1": eGr = 2
+#        elif str(eggGroup) == "water2": eGr = 3
+#        elif str(eggGroup) == "water3": eGr = 4
+#        elif str(eggGroup) == "bug": eGr = 5
+#        elif str(eggGroup) == "flying": eGr = 6
+#        elif str(eggGroup) == "ground": eGr = 7
+#        elif str(eggGroup) == "fairy": eGr = 8
+#        elif str(eggGroup) == "plant": eGr = 9
+#        elif str(eggGroup) == "humanshape": eGr = 10
+#        elif str(eggGroup) == "mineral": eGr = 11
+#        elif str(eggGroup) == "indeterminate": eGr = 12
+#        elif str(eggGroup) == "ditto": eGr = 13
+#        elif str(eggGroup) == "dragon": eGr = 14
+#        elif str(eggGroup) == "no-eggs": eGr = 15
+#        else: eGr = None
+
+#        evYield = None
+
+#        print(nameDE)
+
+#    except: pass
+
+
+
+
+
+
+
+## Egg Groups
+#i = 0
+#try:
+#    while pokemonSpecies[0].egg_groups[i].name != None:
+#        #print(pokemonSpecies[0].egg_groups[i].name)
+#        i += 1
+#except IndexError: pass
+
+
+## doesn't really work...
+#nextEvolutionName = pokemonEvoChain[0].chain.evolves_to[0].species.name

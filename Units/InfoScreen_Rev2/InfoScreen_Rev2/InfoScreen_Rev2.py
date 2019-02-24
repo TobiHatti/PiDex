@@ -7,22 +7,7 @@ import sys
 import sqlite3
 
 # Color Definitions
-white = (255,255,255)
-black = (0,0,0)
-red = (255,10,10)
-mainBG = (186, 212, 255)
-spriteBG = (173, 204, 255)
-statsBG = (155, 193, 255)
-menuBG = (137, 182, 255)
 
-barMaxWP = (255, 208, 0)
-barAttack = (255, 46, 0)
-barDefense = (0, 246, 255)
-barKP = (170, 0, 255)
-
-buttonIdleColor = (0, 216, 255)
-buttonHoverColor = (0, 140, 255)
-menuBarColor = (0, 110, 255)
 
 # PyGame Initialisation
 pygame.init()
@@ -118,7 +103,7 @@ def QueueAnimationSwitch():
     global toggleQueued
     toggleQueued = True
 
-def Button(surface,pos,radius,text,fontSize,idleColor,hoverColor,action = None,parameter = None,surfaceOffset = (0,0)):
+def Button(surface,pos,radius,text,fontSize,idleColor,hoverColor,action = None,parameter = None,surfaceOffset = (0,0), buttonEnabled = True):
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
 
@@ -126,7 +111,7 @@ def Button(surface,pos,radius,text,fontSize,idleColor,hoverColor,action = None,p
 
         pygame.gfxdraw.aacircle(surface,pos[0]-2,pos[1]-2,radius-4,hoverColor)
         pygame.gfxdraw.filled_circle(surface,pos[0]-2,pos[1]-2,radius-4,hoverColor)
-        if click[0] == 1 and action != None:
+        if click[0] == 1 and action != None and buttonEnabled:
             if parameter == None: action()
             else: action(parameter)
     else:
@@ -145,49 +130,6 @@ def WriteText(surface,pos,text,fontSize,fontFamily,fontColor,centered = False):
         textRect = (pos[0],pos[1])
     surface.blit(textSurf,textRect)
 
-def TypeImages(surface,pos,firstType, secondType = None):
-    if firstType == "Bug": ftImage = pygame.image.load("typesS/Bug.png")
-    elif firstType == "Dark": ftImage = pygame.image.load("typesS/Dark.png")
-    elif firstType == "Dragon": ftImage = pygame.image.load("typesS/Dragon.png")
-    elif firstType == "Electric": ftImage = pygame.image.load("typesS/Electric.png")
-    elif firstType == "Fairy": ftImage = pygame.image.load("typesS/Fairy.png")
-    elif firstType == "Fighting": ftImage = pygame.image.load("typesS/Fighting.png")
-    elif firstType == "Fire": ftImage = pygame.image.load("typesS/Fire.png")
-    elif firstType == "Flying": ftImage = pygame.image.load("typesS/Flying.png")
-    elif firstType == "Ghost": ftImage = pygame.image.load("typesS/Ghost.png")
-    elif firstType == "Grass": ftImage = pygame.image.load("typesS/Grass.png")
-    elif firstType == "Ground": ftImage = pygame.image.load("typesS/Ground.png")
-    elif firstType == "Ice": ftImage = pygame.image.load("typesS/Ice.png")
-    elif firstType == "Normal": ftImage = pygame.image.load("typesS/Normal.png")
-    elif firstType == "Poison": ftImage = pygame.image.load("typesS/Poison.png")
-    elif firstType == "Psychic": ftImage = pygame.image.load("typesS/Psychic.png")
-    elif firstType == "Rock": ftImage = pygame.image.load("typesS/Rock.png")
-    elif firstType == "Steel": ftImage = pygame.image.load("typesS/Steel.png")
-    elif firstType == "Water": ftImage = pygame.image.load("typesS/Water.png")
-
-    if secondType != None:
-        if secondType == "Bug": stImage = pygame.image.load("typesS/Bug.png")
-        elif secondType == "Dark": stImage = pygame.image.load("typesS/Dark.png")
-        elif secondType == "Dragon": stImage = pygame.image.load("typesS/Dragon.png")
-        elif secondType == "Electric": stImage = pygame.image.load("typesS/Electric.png")
-        elif secondType == "Fairy": stImage = pygame.image.load("typesS/Fairy.png")
-        elif secondType == "Fighting": stImage = pygame.image.load("typesS/Fighting.png")
-        elif secondType == "Fire": stImage = pygame.image.load("typesS/Fire.png")
-        elif secondType == "Flying": stImage = pygame.image.load("typesS/Flying.png")
-        elif secondType == "Ghost": stImage = pygame.image.load("typesS/Ghost.png")
-        elif secondType == "Grass": stImage = pygame.image.load("typesS/Grass.png")
-        elif secondType == "Ground": stImage = pygame.image.load("typesS/Ground.png")
-        elif secondType == "Ice": stImage = pygame.image.load("typesS/Ice.png")
-        elif secondType == "Normal": stImage = pygame.image.load("typesS/Normal.png")
-        elif secondType == "Poison": stImage = pygame.image.load("typesS/Poison.png")
-        elif secondType == "Psychic": stImage = pygame.image.load("typesS/Psychic.png")
-        elif secondType == "Rock": stImage = pygame.image.load("typesS/Rock.png")
-        elif secondType == "Steel": stImage = pygame.image.load("typesS/Steel.png")
-        elif secondType == "Water": stImage = pygame.image.load("typesS/Water.png")
-        surface.blit(pygame.image.load("typesS/Water.png"),(pos[0]-25-30,pos[1]))
-        surface.blit(pygame.image.load("typesS/Water.png"),(pos[0]-25+30,pos[1]))
-    else:
-        surface.blit(ftImage,(pos[0] - 25,pos[1]))
         
 def ProgressBar(surface,pos,width,height,color,text,minValue,maxValue,value):
 
@@ -222,7 +164,7 @@ def LoadStatSet0(surface):
     WriteText(surface,(150,145),"#" + str('{0:03d}'.format(pokeData["nationalDex"])),25,"calibrilight.ttf",white,False)    
 
     WriteText(surface,(30,170),str(pokeData["regionName"]) + " Dex:",20,"calibrilight.ttf",white,False)    
-    WriteText(surface,(150,170),"#" + str('{0:03d}'.format(pokeData["kalosDex"])),25,"calibrilight.ttf",white,False)    
+    WriteText(surface,(150,170),"#" + str('{0:03d}'.format(pokeData["nationalDex"])),25,"calibrilight.ttf",white,False)    
 
     WriteText(surface,(30,220),"Species:",20,"calibrilight.ttf",white,False)    
     WriteText(surface,(110,220),pokeData["species"],25,"calibrilight.ttf",white,False)    
@@ -231,17 +173,17 @@ def LoadStatSet0(surface):
 
     if pokeData["type2NameEN"] == None:
         WriteText(surface,(150,275),pokeData["type1NameEN"],20,"calibrilight.ttf",white,True)
-        surface.blit(pygame.image.load("typesS/Water.png"),(150-25,285))
+        surface.blit(pygame.image.load("typesS/" + pokeData["type1IconImage"]),(150-25,285))
     else:
         WriteText(surface,(150,275),pokeData["type1NameEN"] + " / " + pokeData["type2NameEN"],20,"calibrilight.ttf",white,True)
-        surface.blit(pygame.image.load("typesS/Water.png"),(150-25-30,285))
-        surface.blit(pygame.image.load("typesS/Water.png"),(150-25+30,285))
+        surface.blit(pygame.image.load("typesS/"+ pokeData["type1IconImage"]),(150-25-30,285))
+        surface.blit(pygame.image.load("typesS/"+ pokeData["type2IconImage"]),(150-25+30,285))
 
     WriteText(surface,(30,360),"Height:",20,"calibrilight.ttf",white,False)    
-    WriteText(surface,(100,360),str(pokeData["height"]/100) + "m",25,"calibrilight.ttf",white,False)  
+    WriteText(surface,(100,360),str(pokeData["height"]/10) + "m",25,"calibrilight.ttf",white,False)  
 
     WriteText(surface,(30,390),"Weight:",20,"calibrilight.ttf",white,False)    
-    WriteText(surface,(100,390),str(pokeData["height"]/1000) + "kg",25,"calibrilight.ttf",white,False)  
+    WriteText(surface,(100,390),str(pokeData["weight"]/10) + "kg",25,"calibrilight.ttf",white,False)  
 
 def LoadStatSet1(surface):
     global pokeData
@@ -252,7 +194,7 @@ def LoadStatSet1(surface):
 
     WriteText(surface,(150,100),"Pokédex entry",30,"PokemonSolid.ttf",white,True) 
 
-    blit_text(surface, pokeData["dexInfo"], (20, 130),pygame.font.Font("calibrilight.ttf",20),(255,255,255))
+    blit_text(surface, str(pokeData["dexInfo"]), (20, 130),pygame.font.Font("calibrilight.ttf",20),(255,255,255))
 
 def LoadStatSet2(surface):
     global pokeData
@@ -374,12 +316,14 @@ def ToggleLoadNextDex():
     global loadNewPokemon
     global currentPokemon
     currentPokemon +=1
+    if currentPokemon == 803: currentPokemon = 1
     loadNewPokemon = True
 
 def ToggleLoadPrevDex():
     global loadNewPokemon
     global currentPokemon
     currentPokemon -=1
+    if currentPokemon == 0: currentPokemon = 802
     loadNewPokemon = True
 
 def ToggleLoadNextEvo():
@@ -431,9 +375,32 @@ while not returnToMenu:
     #Loading Sprites
     spriteTilesAmount,spriteFrames,spriteCurrent,sprite = SpriteCreate("spritesheets/658/658_FN.gif")
     
-
     mainSurface.blit(backgroundImage,(0,0))
     
+    # Load Colors
+
+    white = (255,255,255)
+    black = (0,0,0)
+    red = (255,10,10)
+
+    mainBG = (186, 212, 255)
+    spriteBG = (173, 204, 255)
+    
+    statsBG = (int(pokeData["typeBGColor"].split(',')[0]), int(pokeData["typeBGColor"].split(',')[1]), int(pokeData["typeBGColor"].split(',')[2]))
+    menuBarColor = (int(pokeData["typeAccColor"].split(',')[0]), int(pokeData["typeAccColor"].split(',')[1]), int(pokeData["typeAccColor"].split(',')[2]))
+    buttonIdleColor = (int(pokeData["typeBtnIdleColor"].split(',')[0]), int(pokeData["typeBtnIdleColor"].split(',')[1]), int(pokeData["typeBtnIdleColor"].split(',')[2]))
+    buttonHoverColor = (int(pokeData["typeBtnHoverColor"].split(',')[0]), int(pokeData["typeBtnHoverColor"].split(',')[1]), int(pokeData["typeBtnHoverColor"].split(',')[2]))
+
+    menuBG = (137, 182, 255)
+
+    barMaxWP = (255, 208, 0)
+    barAttack = (255, 46, 0)
+    barDefense = (0, 246, 255)
+    barKP = (170, 0, 255)
+
+    
+
+
     # Drawin menu-screen
     menuSurface.fill((64,64,64))
     menuSurface.set_colorkey((64,64,64))
@@ -447,14 +414,32 @@ while not returnToMenu:
     menuSurface.blit(pokeballImage,(-250,int(displayHeight/2)-150))
     mainSurface.blit(menuSurface,(0,0))
 
+    # Menu Button and update
+    Button(menuSurface,(45,int(displayHeight/2)-170),25,"DEX >",15,buttonIdleColor,buttonHoverColor,ToggleLoadNextDex,None,(0,0),False)
+    Button(menuSurface,(80,int(displayHeight/2)-90),28,"DEX <",15,buttonIdleColor,buttonHoverColor,ToggleLoadPrevDex,None,(0,0),False)
+    Button(menuSurface,(95,int(displayHeight/2)),30,"BACK",15,buttonIdleColor,buttonHoverColor,ToggleReturnToMainMenu,None,(0,0),False)
+    Button(menuSurface,(80,int(displayHeight/2)+90),28,"EVO >",15,buttonIdleColor,buttonHoverColor,ToggleLoadNextEvo,None,(0,0),False)
+    Button(menuSurface,(45,int(displayHeight/2)+170),25,"EVO <",15,buttonIdleColor,buttonHoverColor,ToggleLoadPrevEvo,None,(0,0),False)
+    mainSurface.blit(menuSurface,(0,0))
+
+    # Stats Button and update
+    Button(mainSurface,(440,40),30,"Stats",15,buttonIdleColor,buttonHoverColor,ToggleNextStatPage)
+
+
     # Drawin stats-screen
     statsSurface.fill((0,0,0))
     statsSurface.set_colorkey((0,0,0))
     pygame.gfxdraw.aacircle(statsSurface,950,int(displayHeight/2),950,white)
     pygame.gfxdraw.filled_circle(statsSurface,950,int(displayHeight/2),950,white)
-    pygame.gfxdraw.aacircle(statsSurface,905,int(displayHeight/2),900,menuBG)
-    pygame.gfxdraw.filled_circle(statsSurface,905,int(displayHeight/2),900,menuBG)
-    LoadStatSet0(statsSurface)
+    pygame.gfxdraw.aacircle(statsSurface,905,int(displayHeight/2),900,statsBG)
+    pygame.gfxdraw.filled_circle(statsSurface,905,int(displayHeight/2),900,statsBG)
+    # Selecting Stat Content
+    if currentStatPage == 0: LoadStatSet0(statsSurface)
+    if currentStatPage == 1: LoadStatSet1(statsSurface)
+    if currentStatPage == 2: LoadStatSet5(statsSurface)
+    if currentStatPage == 3: LoadStatSet2(statsSurface)
+    if currentStatPage == 4: LoadStatSet3(statsSurface)
+    if currentStatPage == 5: LoadStatSet4(statsSurface)
     mainSurface.blit(statsSurface,(470 + statsOffset,0))
 
 
@@ -463,11 +448,11 @@ while not returnToMenu:
 
     if pokeData["type2NameEN"] == None:
         WriteText(mainSurface,(280,420),pokeData["type1NameEN"],20,"calibrilight.ttf",white,True)
-        mainSurface.blit(pygame.image.load("typesS/Water.png"),(280-25,430))
+        mainSurface.blit(pygame.image.load("typesS/" + pokeData["type1IconImage"]),(280-25,430))
     else:
         WriteText(mainSurface,(280,420),pokeData["type1NameEN"] + " / " + pokeData["type2NameEN"],20,"calibrilight.ttf",white,True)
-        mainSurface.blit(pygame.image.load("typesS/Water.png"),(280-25-30,430))
-        mainSurface.blit(pygame.image.load("typesS/Water.png"),(280-25+30,430))
+        mainSurface.blit(pygame.image.load("typesS/" + pokeData["type1IconImage"]),(280-25-30,430))
+        mainSurface.blit(pygame.image.load("typesS/" + pokeData["type2IconImage"]),(280-25+30,430))
 
     pygame.display.update()
 
@@ -555,8 +540,8 @@ while not returnToMenu:
         statsSurface.set_colorkey((0,0,0))
         pygame.gfxdraw.aacircle(statsSurface,950,int(displayHeight/2),950,white)
         pygame.gfxdraw.filled_circle(statsSurface,950,int(displayHeight/2),950,white)
-        pygame.gfxdraw.aacircle(statsSurface,905,int(displayHeight/2),900,menuBG)
-        pygame.gfxdraw.filled_circle(statsSurface,905,int(displayHeight/2),900,menuBG)
+        pygame.gfxdraw.aacircle(statsSurface,905,int(displayHeight/2),900,statsBG)
+        pygame.gfxdraw.filled_circle(statsSurface,905,int(displayHeight/2),900,statsBG)
 
         # Change Stat Screen
 
