@@ -6,8 +6,6 @@ import random
 import sys
 import sqlite3
 
-# Color Definitions
-
 
 # PyGame Initialisation
 pygame.init()
@@ -45,6 +43,7 @@ statsOffset = 0
 currentStatPage = 0
 
 clockCtr = 0
+spriteCtr = 0
 
 appearanceQueued = False
 appearanceType = ""
@@ -76,22 +75,34 @@ def SpriteCreate(filePath):
 
     sheet = pygame.image.load(filePath).convert()
     imgWidth, imgHeight = sheet.get_size()
-    spriteTiles = int(imgWidth / 200)
+    spriteTiles = int(imgWidth / 300)
+    spriteTilesVert = int(imgHeight / 300)
     cells = []
-    for n in range(spriteTiles):
-        width, height = (200,200)
-        rect = pygame.Rect(n * width, 0,width,height)
-        image = pygame.Surface(rect.size).convert()
-        image.blit(sheet, (0,0),rect)
-        alpha = image.get_at((0,0))
-        image.set_colorkey(alpha)
-        image = pygame.transform.scale(image,(300,300))
-        cells.append(image)
+    spriteOffset = 0
+
+    for r in range(spriteTilesVert):
+        width, height = (300,300)
+        for n in range(spriteTiles):
+            
+            rect = pygame.Rect(n * width, r * height,width,height)
+            image = pygame.Surface(rect.size).convert()
+            image.blit(sheet, (0,0),rect)
+            alpha = image.get_at((0,0))
+            image.set_colorkey(alpha)
+            #image = pygame.transform.scale(image,(300,300))
+            if r == spriteTilesVert-1:
+                if image.get_at((150,150)) != (0,0,0,255): cells.append(image)
+                else: spriteOffset += 1
+            else:
+                cells.append(image)
+            
+                
+
     playerImg = cells[0]
     player = playerImg.get_rect()
     player.center = (150,150)
     spriteFrame = 0
-    return (spriteTiles,cells,playerImg,player)
+    return (spriteTiles * spriteTilesVert - spriteOffset,cells,playerImg,player)
 
 def SpriteCycle(frame,tilesAmt,cells):
     spriteFrame = frame + 1
@@ -373,8 +384,8 @@ while not returnToMenu:
     genderDifference = False
 
     #Loading Sprites
-    spriteTilesAmount,spriteFrames,spriteCurrent,sprite = SpriteCreate("spritesheets/658/658_FN.gif")
-    
+    spriteTilesAmount,spriteFrames,spriteCurrent,sprite = SpriteCreate("spritesheets/Simplified/" + str(pokeData["nationalDex"]) + "FN.gif")
+
     mainSurface.blit(backgroundImage,(0,0))
     
     # Load Colors
@@ -443,16 +454,13 @@ while not returnToMenu:
     mainSurface.blit(statsSurface,(470 + statsOffset,0))
 
 
-    WriteText(mainSurface,(280,15),pokeData["nameEN"],30,"unown.ttf",white,True)
-    WriteText(mainSurface,(280,70),pokeData["nameEN"],50,"PokemonSolid.ttf",red,True)
+    WriteText(mainSurface,(260,15),pokeData["nameEN"],30,"unown.ttf",white,True)
+    WriteText(mainSurface,(260,70),pokeData["nameEN"],50,"PokemonSolid.ttf",red,True)
 
-    if pokeData["type2NameEN"] == None:
-        WriteText(mainSurface,(280,420),pokeData["type1NameEN"],20,"calibrilight.ttf",white,True)
-        mainSurface.blit(pygame.image.load("typesS/" + pokeData["type1IconImage"]),(280-25,430))
-    else:
-        WriteText(mainSurface,(280,420),pokeData["type1NameEN"] + " / " + pokeData["type2NameEN"],20,"calibrilight.ttf",white,True)
-        mainSurface.blit(pygame.image.load("typesS/" + pokeData["type1IconImage"]),(280-25-30,430))
-        mainSurface.blit(pygame.image.load("typesS/" + pokeData["type2IconImage"]),(280-25+30,430))
+    if pokeData["hasMultipleForms"] == 1:
+        WriteText(mainSurface,(280,420),"Forms:",20,"calibrilight.ttf",white,True)
+
+
 
     pygame.display.update()
 
@@ -496,12 +504,13 @@ while not returnToMenu:
 
 
         # Animation-Cycle for the Sprite
-        spriteSurface.fill((0,0,0))
-        spriteSurface.set_colorkey((0,0,0))
-        spriteFrameIndex,spriteCurrent = SpriteCycle(spriteFrameIndex,spriteTilesAmount,spriteFrames)
-        mainSurface.blit(backgroundImage,(0,0))
-        spriteSurface.blit(spriteCurrent,sprite)
-        mainSurface.blit(spriteSurface,(160,(displayHeight/2)-130))
+        if spriteCtr%2 == 0:
+            spriteSurface.fill((0,0,0))
+            spriteSurface.set_colorkey((0,0,0))
+            spriteFrameIndex,spriteCurrent = SpriteCycle(spriteFrameIndex,spriteTilesAmount,spriteFrames)
+            mainSurface.blit(backgroundImage,(0,0))
+            spriteSurface.blit(spriteCurrent,sprite)
+            mainSurface.blit(spriteSurface,(160,(displayHeight/2)-130))
 
         
         if clockCtr%5 == 0:
@@ -572,13 +581,12 @@ while not returnToMenu:
             mainSurface.blit(statsSurface,(470 + statsOffset,0))
             pygame.display.update((470,0,displayWidth-470,480))
 
-        
-
-
         # Tick
-        clock.tick(50)
+        clock.tick(60)
 
         clockCtr += 1
+        spriteCtr += 1
+        if spriteCtr > 100: spriteCtr = 0
 
 for x in range(0,10):
     if x%3 == 0:
