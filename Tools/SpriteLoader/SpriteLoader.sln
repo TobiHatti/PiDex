@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.421
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "SpriteLoader", "SpriteLoader.pyproj", "{E4B2922F-DF65-4172-813A-40EF45DAAEF8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E4B2922F-DF65-4172-813A-40EF45DAAEF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4B2922F-DF65-4172-813A-40EF45DAAEF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1D282394-D6C7-49D5-AAC4-3AF5886026E7}
+	EndGlobalSection
+EndGlobal
