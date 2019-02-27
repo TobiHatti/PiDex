@@ -4,7 +4,6 @@
 #                                                                                                                   #
 #####################################################################################################################
 
-
 #####################################################################################################################
 #   SETUP                                                                                                           #
 #####################################################################################################################
@@ -71,6 +70,11 @@ nextStatPage = False
 prevStatPage = False
 flipStatPage = False
 
+# Exit-Functions
+exitActive = False
+exitStep = 1
+exitIteration = 0
+
 #####################################################################################################################
 #   FUNCTIONS                                                                                                       #
 #####################################################################################################################
@@ -117,7 +121,7 @@ def SpriteCycle(frame,tilesAmt,cells):
     return (spriteFrame,spriteImage)
 
 
-def MenuSurfaceContent(enableButton = True):
+def MenuSurfaceContent(enableButton = True, pokeballOffset = 0):
 
     # Drawin menu-screen
     menuSurface.fill((64,64,64))
@@ -129,8 +133,7 @@ def MenuSurfaceContent(enableButton = True):
     pygame.gfxdraw.filled_circle(menuSurface,-210,int(displayHeight/2),300,(64,64,64))
 
     pokeballImage = pygame.image.load("pokeball.png").convert()
-    menuSurface.blit(pokeballImage,(-250,int(displayHeight/2)-150))
-    mainSurface.blit(menuSurface,(0,0))
+    menuSurface.blit(pokeballImage,(-250 + pokeballOffset,int(displayHeight/2)-150))
 
     # Menu Button and update
     Basic.Button(menuSurface,(45,int(displayHeight/2)-170),25,"DEX >",15,colorButtonIdle,colorButtonText,ToggleLoadNextDex,None,(0,0),enableButton)
@@ -139,11 +142,14 @@ def MenuSurfaceContent(enableButton = True):
     Basic.Button(menuSurface,(80,int(displayHeight/2)+90),28,"EVO >",15,colorButtonIdle,colorButtonText,ToggleLoadNextEvo,None,(0,0),enableButton)
     Basic.Button(menuSurface,(45,int(displayHeight/2)+170),25,"EVO <",15,colorButtonIdle,colorButtonText,ToggleLoadPrevEvo,None,(0,0),enableButton)
     mainSurface.blit(menuSurface,(0,0))
-    pygame.display.update((45-25,int(displayHeight/2)-170-25,56,56))
-    pygame.display.update((80-28,int(displayHeight/2)-90-28,56,56))
-    pygame.display.update((95-30,int(displayHeight/2)-30,60,60))
-    pygame.display.update((80-28,int(displayHeight/2)+90-28,56,56))
-    pygame.display.update((45-25,int(displayHeight/2)+170-25,56,56))
+    if pokeballOffset == 0:
+        pygame.display.update((45-25,int(displayHeight/2)-170-25,56,56))
+        pygame.display.update((80-28,int(displayHeight/2)-90-28,56,56))
+        pygame.display.update((95-30,int(displayHeight/2)-30,60,60))
+        pygame.display.update((80-28,int(displayHeight/2)+90-28,56,56))
+        pygame.display.update((45-25,int(displayHeight/2)+170-25,56,56))
+    else:
+        pygame.display.update((0,0,150,480))
 
 def StatSurfaceContent(currentStatPage):
 
@@ -213,10 +219,8 @@ def TogglePrevStatPage():
     prevStatPage = True
 
 def ToggleReturnToMainMenu():
-    global returnToMenu
-    global loadNewPokemon
-    loadNewPokemon = True
-    returnToMenu = True
+    global exitActive
+    exitActive = True
 
 def QueueAppearance(spriteType):
     global appearanceQueued
@@ -257,8 +261,6 @@ while not returnToMenu:
                 LEFT JOIN evolutions AS evoPrev ON pokemon.nationalDex = evoNext.evoNextDex
                 WHERE pokemon.nationalDex = ?""",parameters)
     pokeData = c.fetchone()
-
-    print(currentPokemon)
 
     ########################
     # Process Pokemon-Data #
@@ -320,6 +322,17 @@ while not returnToMenu:
             pygame.quit()
             sys.exit()
 
+        # Swipe Processing
+        mouseRel = pygame.mouse.get_rel()
+        click = pygame.mouse.get_pressed()
+
+        if click[0] == 1 and mouseRel[0] < -80: ToggleLoadNextDex()
+        if click[0] == 1 and mouseRel[0] > 80: ToggleLoadPrevDex()
+
+        if click[0] == 1 and mouseRel[1] < -80: ToggleLoadNextEvo()
+        if click[0] == 1 and mouseRel[1] > 80: ToggleLoadPrevEvo()
+
+
         # Animation-Cycle for the Sprite
         if runtimeCounter%2 == 0:
             spriteSurface.fill((0,0,0))
@@ -333,7 +346,7 @@ while not returnToMenu:
         pygame.display.update((160,(displayHeight/2)-130,300,300))
 
         # Drawing Menu-Screen
-        if runtimeCounter%5 == 0:
+        if not exitActive and runtimeCounter%5 == 0:
             MenuSurfaceContent()
 
 
@@ -357,13 +370,39 @@ while not returnToMenu:
             if currentStatPage > 5: currentStatPage = 0
             if currentStatPage < 0: currentStatPage = 5
             StatSurfaceContent(currentStatPage)
-        else: StatNavigationButtons(statsSurface)
-            
+        elif not exitActive: StatNavigationButtons(statsSurface)
 
+        # Exit Routine
+        if exitActive:
+            if exitStep == 1:
+                MenuSurfaceContent(None,exitIteration)
+                exitIteration += 3
+                if exitIteration > 10:
+                    exitIteration = 0
+                    exitStep += 1
 
+            if exitStep == 2:
+                MenuSurfaceContent(None,-exitIteration)
+                exitIteration += 8
+                if exitIteration > 100:
+                    exitIteration = 0
+                    exitStep += 1
+
+            if exitStep == 3:
+                pygame.draw.rect(mainSurface,(255,255,255),(displayWidth - exitIteration,0,exitIteration,displayHeight))
+                pygame.display.update((displayWidth - exitIteration,0,exitIteration,displayHeight))
+                exitIteration += 60
+                if exitIteration > (displayWidth+100):
+                    exitIteration = 0
+                    exitStep += 1
+            if exitStep == 4:
+                pygame.quit()
+                sys.exit()
 
 
         runtimeCounter += 1
         if runtimeCounter > 100: runtimeCounter = 0
 
         clock.tick(60)
+
+
