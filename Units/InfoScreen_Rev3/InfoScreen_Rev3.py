@@ -35,7 +35,8 @@ pygame.mouse.set_visible(True)
 displayWidth = 800
 displayHeight = 480
 
-mainSurface = pygame.display.set_mode((displayWidth,displayHeight))
+mainSurface = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
+#mainSurface = pygame.display.set_mode((displayWidth,displayHeight))
 spriteSurface = pygame.Surface((300,300)).convert()
 statsSurface = pygame.Surface((displayWidth-470,480)).convert()
 menuSurface = pygame.Surface((150,480)).convert()
@@ -74,6 +75,12 @@ flipStatPage = False
 exitActive = False
 exitStep = 1
 exitIteration = 0
+
+# Swipe Support
+swipeSensibility = 10
+mouseRel=(0,0)
+swipeLock = False
+
 
 #####################################################################################################################
 #   FUNCTIONS                                                                                                       #
@@ -323,14 +330,22 @@ while not returnToMenu:
             sys.exit()
 
         # Swipe Processing
+
+        mouseRelLast = mouseRel
         mouseRel = pygame.mouse.get_rel()
         click = pygame.mouse.get_pressed()
 
-        if click[0] == 1 and mouseRel[0] < -80: ToggleLoadNextDex()
-        if click[0] == 1 and mouseRel[0] > 80: ToggleLoadPrevDex()
 
-        if click[0] == 1 and mouseRel[1] < -80: ToggleLoadNextEvo()
-        if click[0] == 1 and mouseRel[1] > 80: ToggleLoadPrevEvo()
+        if swipeLock and  click[0] == 0: swipeLock = False
+
+        if not swipeLock and click[0] == 1 and mouseRelLast[0] > swipeSensibility and mouseRel[0] > swipeSensibility: 
+            ToggleLoadPrevDex()
+            swipeLock = True
+
+        elif not swipeLock and click[0] == 1 and mouseRelLast[0] < -swipeSensibility and mouseRel[0] < -swipeSensibility:
+            ToggleLoadNextDex()
+            swipeLock = True
+
 
 
         # Animation-Cycle for the Sprite
