@@ -39,11 +39,11 @@ class Basic:
 
         hoverColor = (idleColor[0]/2,idleColor[1]/2,idleColor[2]/2)
 
-        if pos[0] + radius + surfaceOffset[0] > mouse[0] > pos[0] - radius + surfaceOffset[0] and pos[1] + radius + surfaceOffset[1] > mouse[1] > pos[1] - radius + surfaceOffset[1]:
+        if pos[0] + radius + surfaceOffset[0] > mouse[0] > pos[0] - radius + surfaceOffset[0] and pos[1] + radius + surfaceOffset[1] > mouse[1] > pos[1] - radius + surfaceOffset[1] and click[0]==1:
 
             pygame.gfxdraw.aacircle(surface,pos[0]-2,pos[1]-2,radius-4,hoverColor)
             pygame.gfxdraw.filled_circle(surface,pos[0]-2,pos[1]-2,radius-4,hoverColor)
-            if click[0] == 1 and action != None and buttonEnabled:
+            if action != None and buttonEnabled:
                 if parameter == None: action()
                 else: action(parameter)
         else:

@@ -17,6 +17,7 @@ import sys
 import sqlite3
 import os
 
+
 # Custom Classes
 from statScreens import StatScreen
 from basics import Basic
@@ -29,14 +30,23 @@ c = conn.cursor()
 # PyGame Initialisation
 pygame.init()
 clock = pygame.time.Clock()
-pygame.mouse.set_visible(True)
+
 
 # Window and Surface Initialisation
 displayWidth = 800
 displayHeight = 480
 
-mainSurface = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
-#mainSurface = pygame.display.set_mode((displayWidth,displayHeight))
+try:
+    if os.uname()[1] == 'raspberrypi': 
+        mainSurface = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
+        pygame.mouse.set_cursor((8,8),(0,0),(0,0,0,0,0,0,0,0),(0,0,0,0,0,0,0,0))
+    else: 
+        mainSurface = pygame.display.set_mode((displayWidth,displayHeight))
+        pygame.mouse.set_visible(True)
+except:
+    mainSurface = pygame.display.set_mode((displayWidth,displayHeight))
+    pygame.mouse.set_visible(True)
+
 spriteSurface = pygame.Surface((300,300)).convert()
 statsSurface = pygame.Surface((displayWidth-470,480)).convert()
 menuSurface = pygame.Surface((150,480)).convert()
@@ -143,18 +153,18 @@ def MenuSurfaceContent(enableButton = True, pokeballOffset = 0):
     menuSurface.blit(pokeballImage,(-250 + pokeballOffset,int(displayHeight/2)-150))
 
     # Menu Button and update
-    Basic.Button(menuSurface,(45,int(displayHeight/2)-170),25,"DEX >",15,colorButtonIdle,colorButtonText,ToggleLoadNextDex,None,(0,0),enableButton)
-    Basic.Button(menuSurface,(80,int(displayHeight/2)-90),28,"DEX <",15,colorButtonIdle,colorButtonText,ToggleLoadPrevDex,None,(0,0),enableButton)
-    Basic.Button(menuSurface,(95,int(displayHeight/2)),30,"BACK",15,colorButtonIdle,colorButtonText,ToggleReturnToMainMenu,None,(0,0),enableButton)
-    Basic.Button(menuSurface,(80,int(displayHeight/2)+90),28,"EVO >",15,colorButtonIdle,colorButtonText,ToggleLoadNextEvo,None,(0,0),enableButton)
-    Basic.Button(menuSurface,(45,int(displayHeight/2)+170),25,"EVO <",15,colorButtonIdle,colorButtonText,ToggleLoadPrevEvo,None,(0,0),enableButton)
+    Basic.Button(menuSurface,(45,int(displayHeight/2)-170),35,"DEX >",20,colorButtonIdle,colorButtonText,ToggleLoadNextDex,None,(0,0),enableButton)
+    Basic.Button(menuSurface,(80,int(displayHeight/2)-90),37,"DEX <",20,colorButtonIdle,colorButtonText,ToggleLoadPrevDex,None,(0,0),enableButton)
+    Basic.Button(menuSurface,(95,int(displayHeight/2)),40,"BACK",20,colorButtonIdle,colorButtonText,ToggleReturnToMainMenu,None,(0,0),enableButton)
+    Basic.Button(menuSurface,(80,int(displayHeight/2)+90),37,"EVO >",20,colorButtonIdle,colorButtonText,ToggleLoadNextEvo,None,(0,0),enableButton)
+    Basic.Button(menuSurface,(45,int(displayHeight/2)+170),35,"EVO <",20,colorButtonIdle,colorButtonText,ToggleLoadPrevEvo,None,(0,0),enableButton)
     mainSurface.blit(menuSurface,(0,0))
     if pokeballOffset == 0:
-        pygame.display.update((45-25,int(displayHeight/2)-170-25,56,56))
-        pygame.display.update((80-28,int(displayHeight/2)-90-28,56,56))
-        pygame.display.update((95-30,int(displayHeight/2)-30,60,60))
-        pygame.display.update((80-28,int(displayHeight/2)+90-28,56,56))
-        pygame.display.update((45-25,int(displayHeight/2)+170-25,56,56))
+        pygame.display.update((45-35,int(displayHeight/2)-170-35,35*2,35*2))
+        pygame.display.update((80-37,int(displayHeight/2)-90-37,37*2,37*2))
+        pygame.display.update((95-40,int(displayHeight/2)-40,40*2,40*2))
+        pygame.display.update((80-37,int(displayHeight/2)+90-37,37*2,37*2))
+        pygame.display.update((45-35,int(displayHeight/2)+170-35,35*2,35*2))
     else:
         pygame.display.update((0,0,150,480))
 
