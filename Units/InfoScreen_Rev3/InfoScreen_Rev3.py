@@ -47,6 +47,8 @@ except:
     mainSurface = pygame.display.set_mode((displayWidth,displayHeight))
     pygame.mouse.set_visible(True)
 
+
+
 spriteSurface = pygame.Surface((300,300)).convert()
 statsSurface = pygame.Surface((displayWidth-470,480)).convert()
 menuSurface = pygame.Surface((150,480)).convert()
@@ -64,7 +66,10 @@ returnToMenu = False
 loadNewPokemon = False
 
 # Runtime Variables
-currentPokemon = 1
+try:
+    currentPokemon = int(sys.argv[1])
+except:
+    currentPokemon = 1
 currentStatPage = 0
 
 statsOffset = 0
@@ -420,8 +425,9 @@ while not returnToMenu:
                 if exitIteration > (displayWidth+100):
                     exitIteration = 0
                     exitStep += 1
-            if exitStep == 4:
+            if exitStep == 4:    
                 pygame.quit()
+                os.system("python3 DexMenuScreen.py")
                 sys.exit()
 
 
