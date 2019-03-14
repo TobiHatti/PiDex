@@ -142,7 +142,7 @@ while True:
                 pygame.display.update()
         if selectedMenuOption == 1:
             print("Option 1")
-            DexMenu.Show();
+            DexMenu.Show()
         elif selectedMenuOption == 2:
             print("Option 2")
         elif selectedMenuOption == 3:

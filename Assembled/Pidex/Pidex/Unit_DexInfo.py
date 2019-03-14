@@ -16,6 +16,64 @@ currentPokemon = 1
 
 class DexInfo:
     
+    currentPokemon = 1
+
+    returnToMenu = False
+    loadNewPokemon = False
+
+    exitActive = False
+
+    #####################################################################################################################
+    #   TOGGLE FUNCTIONS                                                                                                #
+    #####################################################################################################################
+
+        
+
+    def ToggleLoadNextDex():
+        DexInfo.currentPokemon +=1
+        if DexInfo.currentPokemon == 803: DexInfo.currentPokemon = 1
+        DexInfo.loadNewPokemon = True
+
+    def ToggleLoadPrevDex():
+        DexInfo.currentPokemon -=1
+        if DexInfo.currentPokemon == 0: DexInfo.currentPokemon = 802
+        DexInfo.loadNewPokemon = True
+
+    def ToggleLoadNextEvo():
+        global pokeData
+        global loadNewPokemon
+        global currentPokemon
+        currentPokemon = pokeData["nextEvolution"]
+        loadNewPokemon = True
+
+    def ToggleLoadPrevEvo():
+        global pokeData
+        global loadNewPokemon
+        global currentPokemon
+        currentPokemon = pokeData["prevEvolution"]
+        loadNewPokemon = True
+
+    def ToggleNextStatPage():
+        global flipStatPage
+        global nextStatPage
+        flipStatPage = True
+        nextStatPage = True
+
+    def TogglePrevStatPage():
+        global flipStatPage
+        global prevStatPage
+        flipStatPage = True
+        prevStatPage = True
+
+    def ToggleReturnToMainMenu():
+        DexInfo.exitActive = True
+
+    def QueueAppearance(spriteType):
+        global appearanceQueued
+        global appearanceType
+
+        appearanceQueued = True
+        appearanceType = spriteType
 
     def Show(startPokemon = 0):
         # PyGame Initialisation
@@ -56,8 +114,8 @@ class DexInfo:
         black = (0,0,0)
 
         # Loop Conditions
-        returnToMenu = False
-        loadNewPokemon = False
+        #returnToMenu = False
+        #loadNewPokemon = False
 
         # Runtime Variables
         statsOffset = 0
@@ -65,7 +123,7 @@ class DexInfo:
 
         # Counters
         runtimeCounter = 0
-        currentPokemon = startPokemon
+        DexInfo.currentPokemon = startPokemon
 
         # Sprite-specific variables
         spriteFrameIndex = 0
@@ -77,7 +135,7 @@ class DexInfo:
         flipStatPage = False
 
         # Exit-Functions
-        exitActive = False
+        #exitActive = False
         exitStep = 1
         exitIteration = 0
 
@@ -148,11 +206,11 @@ class DexInfo:
             menuSurface.blit(pokeballImage,(-250 + pokeballOffset,int(displayHeight/2)-150))
 
             # Menu Button and update
-            Basic.Button(menuSurface,(45,int(displayHeight/2)-170),35,"DEX >",20,colorButtonIdle,colorButtonText,ToggleLoadNextDex,None,(0,0),enableButton)
-            Basic.Button(menuSurface,(80,int(displayHeight/2)-90),37,"DEX <",20,colorButtonIdle,colorButtonText,ToggleLoadPrevDex,None,(0,0),enableButton)
-            Basic.Button(menuSurface,(95,int(displayHeight/2)),40,"BACK",20,colorButtonIdle,colorButtonText,ToggleReturnToMainMenu,None,(0,0),enableButton)
-            Basic.Button(menuSurface,(80,int(displayHeight/2)+90),37,"EVO >",20,colorButtonIdle,colorButtonText,ToggleLoadNextEvo,None,(0,0),enableButton)
-            Basic.Button(menuSurface,(45,int(displayHeight/2)+170),35,"EVO <",20,colorButtonIdle,colorButtonText,ToggleLoadPrevEvo,None,(0,0),enableButton)
+            Basic.Button(menuSurface,(45,int(displayHeight/2)-170),35,"DEX >",20,colorButtonIdle,colorButtonText,DexInfo.ToggleLoadNextDex,None,(0,0),enableButton)
+            Basic.Button(menuSurface,(80,int(displayHeight/2)-90),37,"DEX <",20,colorButtonIdle,colorButtonText,DexInfo.ToggleLoadPrevDex,None,(0,0),enableButton)
+            Basic.Button(menuSurface,(95,int(displayHeight/2)),40,"BACK",20,colorButtonIdle,colorButtonText,DexInfo.ToggleReturnToMainMenu,None,(0,0),enableButton)
+            Basic.Button(menuSurface,(80,int(displayHeight/2)+90),37,"EVO >",20,colorButtonIdle,colorButtonText,DexInfo.ToggleLoadNextEvo,None,(0,0),enableButton)
+            Basic.Button(menuSurface,(45,int(displayHeight/2)+170),35,"EVO <",20,colorButtonIdle,colorButtonText,DexInfo.ToggleLoadPrevEvo,None,(0,0),enableButton)
             mainSurface.blit(menuSurface,(0,0))
             if pokeballOffset == 0:
                 pygame.display.update((45-35,int(displayHeight/2)-170-35,35*2,35*2))
@@ -174,7 +232,7 @@ class DexInfo:
             pygame.gfxdraw.filled_circle(statsSurface,905,int(displayHeight/2),900,colorStatBackground)
 
             # Selecting Stat Content
-            StatScreen.Load(currentStatPage,statsSurface,pokeData,white,(colorAccentColor,genderDifference,colorButtonIdle,colorButtonText,QueueAppearance)) 
+            StatScreen.Load(currentStatPage,statsSurface,pokeData,white,(colorAccentColor,genderDifference,colorButtonIdle,colorButtonText,DexInfo.QueueAppearance)) 
     
 
             mainSurface.blit(statsSurface,(470 + statsOffset,0))
@@ -182,76 +240,23 @@ class DexInfo:
 
         def StatNavigationButtons(surface):
             pygame.draw.rect(mainSurface,colorStatBackground,(470+140-30,450-20,140,40))
-            Basic.Button(mainSurface,(140 + 470,450),20,"<",25,colorButtonIdle,colorButtonText,TogglePrevStatPage,None,(0,0))
-            Basic.Button(mainSurface,(220 + 470,450),20,">",25,colorButtonIdle,colorButtonText,ToggleNextStatPage,None,(0,0))
+            Basic.Button(mainSurface,(140 + 470,450),20,"<",25,colorButtonIdle,colorButtonText,DexInfo.TogglePrevStatPage,None,(0,0))
+            Basic.Button(mainSurface,(220 + 470,450),20,">",25,colorButtonIdle,colorButtonText,DexInfo.ToggleNextStatPage,None,(0,0))
             pygame.display.update((470+140-30,450-20,140,40))
 
-        #####################################################################################################################
-        #   TOGGLE FUNCTIONS                                                                                                #
-        #####################################################################################################################
-
-        def ToggleLoadNextDex():
-            global loadNewPokemon
-            global currentPokemon
-            currentPokemon +=1
-            if currentPokemon == 803: currentPokemon = 1
-            loadNewPokemon = True
-
-        def ToggleLoadPrevDex():
-            global loadNewPokemon
-            global currentPokemon
-            currentPokemon -=1
-            if currentPokemon == 0: currentPokemon = 802
-            loadNewPokemon = True
-
-        def ToggleLoadNextEvo():
-            global pokeData
-            global loadNewPokemon
-            global currentPokemon
-            currentPokemon = pokeData["nextEvolution"]
-            loadNewPokemon = True
-
-        def ToggleLoadPrevEvo():
-            global pokeData
-            global loadNewPokemon
-            global currentPokemon
-            currentPokemon = pokeData["prevEvolution"]
-            loadNewPokemon = True
-
-        def ToggleNextStatPage():
-            global flipStatPage
-            global nextStatPage
-            flipStatPage = True
-            nextStatPage = True
-
-        def TogglePrevStatPage():
-            global flipStatPage
-            global prevStatPage
-            flipStatPage = True
-            prevStatPage = True
-
-        def ToggleReturnToMainMenu():
-            global exitActive
-            exitActive = True
-
-        def QueueAppearance(spriteType):
-            global appearanceQueued
-            global appearanceType
-
-            appearanceQueued = True
-            appearanceType = spriteType
+        
 
         #####################################################################################################################
         #   LOADING LOOP                                                                                                    #
         #####################################################################################################################
 
-        while not returnToMenu:
+        while not DexInfo.returnToMenu:
 
             ########################
             # Loading Pokemon-Data #
             ########################
 
-            parameters = (currentPokemon,)
+            parameters = (DexInfo.currentPokemon,)
             c.execute("""SELECT *,
                         evoNext.evoNextDex AS nextEvolution,
                         evoPrev.evoDex AS prevEvolution,
@@ -313,14 +318,14 @@ class DexInfo:
 
             if pokeData["hasMultipleForms"] == 1: Basic.WriteText(mainSurface,(280,420),"Forms:",20,"calibrilight.ttf",white,True)
   
-            loadNewPokemon = False
+            DexInfo.loadNewPokemon = False
 
             pygame.display.update()
     
         #####################################################################################################################
         #   DISPLAY LOOP                                                                                                    #
         #####################################################################################################################
-            while not loadNewPokemon:
+            while not DexInfo.loadNewPokemon:
 
                 # Event Processing
                 for event in pygame.event.get():
@@ -366,7 +371,7 @@ class DexInfo:
                 pygame.display.update((160,(displayHeight/2)-130,300,300))
 
                 # Drawing Menu-Screen
-                if not exitActive and runtimeCounter%5 == 0:
+                if not DexInfo.exitActive and runtimeCounter%5 == 0:
                     MenuSurfaceContent()
 
 
@@ -390,10 +395,10 @@ class DexInfo:
                     if currentStatPage > 5: currentStatPage = 0
                     if currentStatPage < 0: currentStatPage = 5
                     StatSurfaceContent(currentStatPage)
-                elif not exitActive: StatNavigationButtons(statsSurface)
+                elif not DexInfo.exitActive: StatNavigationButtons(statsSurface)
 
                 # Exit Routine
-                if exitActive:
+                if DexInfo.exitActive:
                     if exitStep == 1:
                         MenuSurfaceContent(None,exitIteration)
                         exitIteration += 3
@@ -415,10 +420,9 @@ class DexInfo:
                         if exitIteration > (displayWidth+100):
                             exitIteration = 0
                             exitStep += 1
-                    if exitStep == 4:    
-                        pygame.quit()
-                        os.system("python3 DexMenuScreen.py")
-                        sys.exit()
+                    if exitStep == 4:  
+                        DexInfo.exitActive = False
+                        return
 
 
                 runtimeCounter += 1
