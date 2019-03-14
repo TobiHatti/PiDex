@@ -5,6 +5,9 @@ import random
 import sys
 import math
 
+from Unit_DexMenu import *
+from Unit_DexInfo import *
+
 # Color Definitions
 white = (255,255,255)
 grayA = (200,200,200)
@@ -21,7 +24,17 @@ clock = pygame.time.Clock()
 displayWidth = 800
 displayHeight = 480
 
-mainSurface = pygame.display.set_mode((displayWidth,displayHeight))
+try:
+    if os.uname()[1] == 'raspberrypi': 
+        mainSurface = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
+        pygame.mouse.set_cursor((8,8),(0,0),(0,0,0,0,0,0,0,0),(0,0,0,0,0,0,0,0))
+    else: 
+        mainSurface = pygame.display.set_mode((displayWidth,displayHeight))
+        pygame.mouse.set_visible(True)
+except:
+    mainSurface = pygame.display.set_mode((displayWidth,displayHeight))
+    pygame.mouse.set_visible(True)
+
 
 # Variables
 menuOptionSelected = False
@@ -42,7 +55,7 @@ pSegment6 = ((displayWidth/3,displayHeight),(displayWidth/2,displayHeight/2),(di
 pSegment7 = ((displayWidth,displayHeight),(displayWidth,displayHeight-(displayHeight/6)),(displayWidth/2,displayHeight/2),(displayWidth-(displayWidth/3),displayHeight))
 
 
-while not menuOptionSelected:
+while True:
 
     # Event Processing
     for event in pygame.event.get():
@@ -121,28 +134,32 @@ while not menuOptionSelected:
     pygame.draw.circle(mainSurface,(0,0,0),(int(displayWidth/2),int(displayHeight/2)),100)
     pygame.draw.circle(mainSurface,(255,255,255),(int(displayWidth/2),int(displayHeight/2)),85)
 
-    pygame.display.update()
-
+    if menuOptionSelected:
+        menuOptionSelected = False
+        for x in range(0, 500):
+            if x%2 == 0:
+                pygame.draw.circle(mainSurface,(255,255,255),(int(displayWidth/2),int(displayHeight/2)),100+x)
+                pygame.display.update()
+        if selectedMenuOption == 1:
+            print("Option 1")
+            DexMenu.Show();
+        elif selectedMenuOption == 2:
+            print("Option 2")
+        elif selectedMenuOption == 3:
+            print("Option 3")
+        elif selectedMenuOption == 4:
+            print("Option 4")
+        elif selectedMenuOption == 5:
+            print("Option 5")
+        elif selectedMenuOption == 6:
+            print("Option 6")
+        elif selectedMenuOption == 7:
+            print("Option 7")
+    else: pygame.display.update()
     
 
 
-for x in range(0, 500):
-    if x%2 == 0:
-        pygame.draw.circle(mainSurface,(255,255,255),(int(displayWidth/2),int(displayHeight/2)),100+x)
-        pygame.display.update()
 
 
-if selectedMenuOption == 1:
-    print("Option 1")
-elif selectedMenuOption == 2:
-    print("Option 2")
-elif selectedMenuOption == 3:
-    print("Option 3")
-elif selectedMenuOption == 4:
-    print("Option 4")
-elif selectedMenuOption == 5:
-    print("Option 5")
-elif selectedMenuOption == 6:
-    print("Option 6")
-elif selectedMenuOption == 7:
-    print("Option 7")
+
+
