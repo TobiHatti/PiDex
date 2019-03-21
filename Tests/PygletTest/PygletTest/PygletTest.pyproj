@@ -2,15 +2,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>ddf1a392-5cd6-49c4-be8b-3c0edc079140</ProjectGuid>
+    <ProjectGuid>dd0cff45-f684-463d-b8da-694d39853527</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>InfoScreen_Rev4.B.py</StartupFile>
+    <StartupFile>PygletTest.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <Name>InfoScreen_Rev4.B</Name>
-    <RootNamespace>InfoScreen_Rev4.B</RootNamespace>
+    <Name>PygletTest</Name>
+    <RootNamespace>PygletTest</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,22 +21,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Buttons.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="CDrawing.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="CText.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DexInfo.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="InfoScreen_Rev4.B.py" />
-    <Compile Include="SpriteManager.py">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="PygletTest.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
