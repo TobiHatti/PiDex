@@ -69,7 +69,7 @@ loadNewPokemon = False
 try:
     currentPokemon = int(sys.argv[1])
 except:
-    currentPokemon = 1
+    currentPokemon = 133
 currentStatPage = 0
 
 statsOffset = 0

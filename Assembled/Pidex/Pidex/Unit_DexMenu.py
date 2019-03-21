@@ -103,9 +103,9 @@ class DexMenu:
                         img = pygame.image.load("sprites/" + str('{0:03d}'.format(dexNumber)) + "/sprite-small-FN-" + str('{0:03d}'.format(dexNumber)) + ".png").convert_alpha()
                         pygame.transform.scale(img,(96,96))
 
-                        if (m*96+170) < mouse[0]  < (m*96+96+170) and (x*96+dexScrollOffset+50) < mouse[1]  < (x*96+dexScrollOffset+96+50): 
-                            pygame.draw.rect(dexSurface,(0,255,0),((m*96),(x*96+dexScrollOffset),96,96))
-                    
+                        if (m*96+170) < mouse[0]  < (m*96+96+170) and (x*96+dexScrollOffset+50) < mouse[1]  < (x*96+dexScrollOffset+96+50):
+                            for c in range(0,48):
+                                pygame.draw.circle(dexSurface,(c*4+63,c*4+63,200),((m*96+48),(x*96+dexScrollOffset+48)),48-c)                    
                             # Additional condition for scroll support
                             if click[0] == 1 and engagedMousePos == (0,0):
                                 selectionEngaged = True
@@ -113,8 +113,13 @@ class DexMenu:
                             if selectionEngaged and click[0] == 0:
                                 selectionEngaged = False
                                 if engagedMousePos[0] - 10 < mouse[0] < engagedMousePos[0] + 10 and engagedMousePos[1] - 10 < mouse[1] < engagedMousePos[1] + 10:
-                                    DexInfo.Show(dexNumber)
+                                    
+                                    for x in range(0,240):
+                                        pygame.draw.circle(mainSurface,(255,255,255),(400,240),x*2)
+                                        pygame.display.update()
 
+                                    dexScrollOffset = -int(((DexInfo.Show(dexNumber) * 96)/6) - 2 * 96) 
+                                        
                                 engagedMousePos = (0,0)
 
 
