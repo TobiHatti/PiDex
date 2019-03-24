@@ -28,6 +28,8 @@ class DexInfo:
     running = True
     loadNewPokemon = False
 
+    thread = Thread()
+
 #########################################################################################
 #   TOGGLE FUNCTION                                                                     #
 #########################################################################################
@@ -52,6 +54,11 @@ class DexInfo:
         DexInfo.currentPokemon -= 1
         if DexInfo.currentPokemon <=  0: DexInfo.currentPokemon = 802
 
+    def LoadSpritesheet():
+        DexInfo.thread = Thread(target = Sprite.Create, args = ("spritesheets/Simplified/" + str(DexInfo.currentPokemon) + "FN.gif",DexInfo.currentPokemon,)) 
+        DexInfo.thread.start()
+    
+
 #########################################################################################
 #########################################################################################
 #   MAIN START                                                                          #
@@ -59,7 +66,7 @@ class DexInfo:
 #########################################################################################
 
     def Show(selectedPokemon):
-
+   
 #########################################################################################
 #   INITIALISATION AND SETUP                                                            #
 #########################################################################################
@@ -104,18 +111,23 @@ class DexInfo:
         screenDistortOffsetHor1 = 0
         screenDistortOffsetHor2 = -200
 
+        thread = None
+
 #########################################################################################
 #   LOADING LOOP                                                                        #
 #########################################################################################
-        #spriteTilesAmount,spriteFrames,spriteCurrent,sprite = Sprite.Create("spritesheets/Simplified/" + str(DexInfo.currentPokemon) + "FN.gif")
+ 
+        DexInfo.LoadSpritesheet()
 
         while DexInfo.running:
 
             # Loading spritesheet
 
-            
-            thread = Thread(target = Sprite.Create, args = ("spritesheets/Simplified/" + str(DexInfo.currentPokemon) + "FN.gif",)) 
-            thread.start()
+            #try:
+            #    thread = Thread(target = Sprite.Create, args = ("spritesheets/Simplified/" + str(DexInfo.currentPokemon) + "FN.gif",)) 
+       
+            #    thread.start()
+            #except: pass
 
             # Loading data
             parameters = (DexInfo.currentPokemon,)
@@ -141,38 +153,47 @@ class DexInfo:
                         WHERE pokemon.nationalDex = ?""",parameters)
             DexInfo.pokeData = c.fetchone()
 
+
+            dexTypeColor = (int(DexInfo.pokeData["typeBGColor"].split(',')[0]), int(DexInfo.pokeData["typeBGColor"].split(',')[1]), int(DexInfo.pokeData["typeBGColor"].split(',')[2]))
+            dexTypeColorDark = (int(DexInfo.pokeData["typeBtnHoverColor"].split(',')[0]), int(DexInfo.pokeData["typeBtnHoverColor"].split(',')[1]), int(DexInfo.pokeData["typeBtnHoverColor"].split(',')[2]))
+
+
             # One-Time Drawing routines
 
             mainSurface.fill((30,30,30))
 
-            Draw.RoundRect(mainSurface,(40,40,40),(520,10,270,130),15,2,(255,0,255),"Stats")
-            Draw.RoundRect(mainSurface,(40,40,40),(520,200,270,80),15,2,(255,0,255),"Evolution Chain")
-            Draw.RoundRect(mainSurface,(40,40,40),(520,290,270,80),15,2,(255,0,255),"Gender Ratio")
-            Draw.RoundRect(mainSurface,(40,40,40),(10,360,300,110),15,2,(255,0,255))
-            Draw.RoundRect(mainSurface,(255,0,255),(10,300,400,115),15,2,(255,0,255))
-            Draw.RoundRect(mainSurface,(40,40,40),(10,10,500,360),26,2,(255,0,255))
+            Draw.RoundRect(mainSurface,(40,40,40),(520,10,270,130),15,2,dexTypeColor,"Stats")
+            Draw.RoundRect(mainSurface,(40,40,40),(520,200,270,80),15,2,dexTypeColor,"Evolution Chain")
+            Draw.RoundRect(mainSurface,(40,40,40),(520,290,270,80),15,2,dexTypeColor,"Gender Ratio")
+            Draw.RoundRect(mainSurface,(40,40,40),(10,360,300,110),15,2,dexTypeColor)
+            Draw.RoundRect(mainSurface,dexTypeColor,(10,300,400,115),15,2,dexTypeColor)
+            Draw.RoundRect(mainSurface,(40,40,40),(10,10,500,360),26,2,dexTypeColor)
+            Draw.RoundRect(mainSurface,(40,40,40),(440,300,60,60),26,2,dexTypeColor)
+
+            spriteImg = pygame.image.load("sprites/001/sprite-small-FN-001.png")
+            mainSurface.blit(spriteImg,(440,300))
+
             Draw.RoundRect(mainSurface,(40,40,40),(20,374,110,39),10)
-            Draw.Pokeball(mainSurface,(40,40),(255,0,255),(40,40,40))
+            Draw.Pokeball(mainSurface,(35,35),dexTypeColor,(40,40,40))
 
             Text.Write(mainSurface,(28,376),"#" + str(DexInfo.currentPokemon),35,"joy.otf",(255,255,255))
             Text.Write(mainSurface,(138,376),DexInfo.pokeData["nameEN"],35,"joy.otf",(255,255,255))
             Text.Write(mainSurface,(20,425),"Species:",20,"calibrilight.ttf",(255,255,255))
             Text.Write(mainSurface,(20,445),"Region:",20,"calibrilight.ttf",(255,255,255))
             Text.Write(mainSurface,(90,425),"Evolution Pokémon",20,"calibrilight.ttf",(255,255,255))
-            Text.Write(mainSurface,(90,445),"Kantho",20,"calibrilight.ttf",(255,255,255))
+            Text.Write(mainSurface,(90,445),DexInfo.pokeData["regionName"],20,"calibrilight.ttf",(255,255,255))
 
-            pygame.draw.rect(mainSurface,(255,0,255),(420,383,12,12))
-            pygame.draw.rect(mainSurface,(255,0,255),(436,383,24,12))
-            pygame.draw.rect(mainSurface,(255,0,255),(464,383,45,12))
-            Text.Write(mainSurface,(425,396),"T  Y  P  E  :",18,"joy.otf",(255,0,255))
+            pygame.draw.rect(mainSurface,dexTypeColor,(420,383,12,12))
+            pygame.draw.rect(mainSurface,dexTypeColor,(436,383,24,12))
+            pygame.draw.rect(mainSurface,dexTypeColor,(464,383,45,12))
+            Text.Write(mainSurface,(425,396),"T  Y  P  E  :",18,"joy.otf",dexTypeColor)
 
             if DexInfo.pokeData["type2NameEN"] == None or DexInfo.pokeData["type2NameEN"] == "":
-                Draw.TypeSignSingle(mainSurface,(520,380),(150,0,150),DexInfo.pokeData["type1NameEN"])
+                Draw.TypeSignSingle(mainSurface,(520,380),dexTypeColor,DexInfo.pokeData["type1NameEN"])
             else:
-                Draw.TypeSign1(mainSurface,(520,380),(150,0,150),DexInfo.pokeData["type1NameEN"])
-                Draw.TypeSign2(mainSurface,(645,380),(255,0,255),DexInfo.pokeData["type2NameEN"])
+                Draw.TypeSign1(mainSurface,(520,380),dexTypeColor,DexInfo.pokeData["type1NameEN"])
+                Draw.TypeSign2(mainSurface,(645,380),dexTypeColorDark,DexInfo.pokeData["type2NameEN"])
             
-
             pygame.display.update()
 
             DexInfo.loadNewPokemon = False
@@ -203,19 +224,23 @@ class DexInfo:
                 #screenDistortOffsetHor2 += 5
                 #if screenDistortOffsetHor2 > 800: screenDistortOffsetHor2 = -60
 
-                if not thread.isAlive():
-                    pygame.display.update(Button.RoundRect(mainSurface,(255,0,255),(150,0,150),(255,255,255),(320,430,100,30),10,"Prev Dex",15,"joy.otf",2,(255,255,255),DexInfo.TogglePrevDex))
-                    pygame.display.update(Button.RoundRect(mainSurface,(255,0,255),(150,0,150),(255,255,255),(440,430,100,30),10,"Prev Evo",15,"joy.otf",2,(255,255,255),DexInfo.TogglePrevEvo))
-                    pygame.display.update(Button.RoundRect(mainSurface,(255,0,255),(150,0,150),(255,255,255),(560,430,100,30),10,"Next Evo",15,"joy.otf",2,(255,255,255),DexInfo.ToggleNextEvo))
-                    pygame.display.update(Button.RoundRect(mainSurface,(255,0,255),(150,0,150),(255,255,255),(680,430,100,30),10,"Next Dex",15,"joy.otf",2,(255,255,255),DexInfo.ToggleNextDex))
+                if not DexInfo.thread.isAlive():
+                    pygame.display.update(Button.RoundRect(mainSurface,dexTypeColor,dexTypeColorDark,(255,255,255),(320,430,100,30),10,"Prev Dex",15,"joy.otf",2,(255,255,255),DexInfo.TogglePrevDex,None,DexInfo.LoadSpritesheet))
+                    pygame.display.update(Button.RoundRect(mainSurface,dexTypeColor,dexTypeColorDark,(255,255,255),(440,430,100,30),10,"Prev Evo",15,"joy.otf",2,(255,255,255),DexInfo.TogglePrevEvo,None,DexInfo.LoadSpritesheet))
+                    pygame.display.update(Button.RoundRect(mainSurface,dexTypeColor,dexTypeColorDark,(255,255,255),(560,430,100,30),10,"Next Evo",15,"joy.otf",2,(255,255,255),DexInfo.ToggleNextEvo,None,DexInfo.LoadSpritesheet))
+                    pygame.display.update(Button.RoundRect(mainSurface,dexTypeColor,dexTypeColorDark,(255,255,255),(680,430,100,30),10,"Next Dex",15,"joy.otf",2,(255,255,255),DexInfo.ToggleNextDex,None,DexInfo.LoadSpritesheet))
                 else:
-                    pygame.display.update(Button.RoundRect(mainSurface,(150,0,150),(150,0,150),(255,255,255),(320,430,100,30),10,"Prev Dex",15,"joy.otf",2,(255,255,255)))
-                    pygame.display.update(Button.RoundRect(mainSurface,(150,0,150),(150,0,150),(255,255,255),(440,430,100,30),10,"Prev Evo",15,"joy.otf",2,(255,255,255)))
-                    pygame.display.update(Button.RoundRect(mainSurface,(150,0,150),(150,0,150),(255,255,255),(560,430,100,30),10,"Next Evo",15,"joy.otf",2,(255,255,255)))
-                    pygame.display.update(Button.RoundRect(mainSurface,(150,0,150),(150,0,150),(255,255,255),(680,430,100,30),10,"Next Dex",15,"joy.otf",2,(255,255,255)))
+                    pygame.display.update(Button.RoundRect(mainSurface,dexTypeColorDark,dexTypeColorDark,(255,255,255),(320,430,100,30),10,"Prev Dex",15,"joy.otf",2,(255,255,255)))
+                    pygame.display.update(Button.RoundRect(mainSurface,dexTypeColorDark,dexTypeColorDark,(255,255,255),(440,430,100,30),10,"Prev Evo",15,"joy.otf",2,(255,255,255)))
+                    pygame.display.update(Button.RoundRect(mainSurface,dexTypeColorDark,dexTypeColorDark,(255,255,255),(560,430,100,30),10,"Next Evo",15,"joy.otf",2,(255,255,255)))
+                    pygame.display.update(Button.RoundRect(mainSurface,dexTypeColorDark,dexTypeColorDark,(255,255,255),(680,430,100,30),10,"Next Dex",15,"joy.otf",2,(255,255,255)))
 
                 # Animation-Cycle for the Sprite
+<<<<<<< HEAD
                 if not thread.isAlive():
+=======
+                if not DexInfo.thread.isAlive() and Sprite.loadedSpriteNr == DexInfo.currentPokemon:
+>>>>>>> fa60c9012f323b7a9597ea96511e849228604895
                     if runtimeCtr % 1 == 0: 
                         Sprite.Cycle(Sprite.frameIndex,Sprite.tilesAmount,Sprite.frames)    
                         spriteSurface.fill((40,40,40))
@@ -227,19 +252,19 @@ class DexInfo:
                     spriteSurface.fill((40,40,40))
                     spriteSurface.set_colorkey((0,0,0))
                     if runtimeCtr % 2 == 0:
-                        pygame.gfxdraw.aacircle(spriteSurface,120,150,8,(255,0,255))
-                        pygame.gfxdraw.aacircle(spriteSurface,150,150,8,(150,0,150))
-                        pygame.gfxdraw.aacircle(spriteSurface,180,150,8,(255,0,255))
-                        pygame.gfxdraw.filled_circle(spriteSurface,120,150,8,(255,0,255))
-                        pygame.gfxdraw.filled_circle(spriteSurface,150,150,8,(150,0,150))
-                        pygame.gfxdraw.filled_circle(spriteSurface,180,150,8,(255,0,255))
+                        pygame.gfxdraw.aacircle(spriteSurface,120,150,8,dexTypeColor)
+                        pygame.gfxdraw.aacircle(spriteSurface,150,150,8,dexTypeColorDark)
+                        pygame.gfxdraw.aacircle(spriteSurface,180,150,8,dexTypeColor)
+                        pygame.gfxdraw.filled_circle(spriteSurface,120,150,8,dexTypeColor)
+                        pygame.gfxdraw.filled_circle(spriteSurface,150,150,8,dexTypeColorDark)
+                        pygame.gfxdraw.filled_circle(spriteSurface,180,150,8,dexTypeColor)
                     else:
-                        pygame.gfxdraw.aacircle(spriteSurface,120,150,8,(150,0,150))
-                        pygame.gfxdraw.aacircle(spriteSurface,150,150,8,(255,0,255))
-                        pygame.gfxdraw.aacircle(spriteSurface,180,150,8,(150,0,150))
-                        pygame.gfxdraw.filled_circle(spriteSurface,120,150,8,(150,0,150))
-                        pygame.gfxdraw.filled_circle(spriteSurface,150,150,8,(255,0,255))
-                        pygame.gfxdraw.filled_circle(spriteSurface,180,150,8,(150,0,150))
+                        pygame.gfxdraw.aacircle(spriteSurface,120,150,8,dexTypeColorDark)
+                        pygame.gfxdraw.aacircle(spriteSurface,150,150,8,dexTypeColor)
+                        pygame.gfxdraw.aacircle(spriteSurface,180,150,8,dexTypeColorDark)
+                        pygame.gfxdraw.filled_circle(spriteSurface,120,150,8,dexTypeColorDark)
+                        pygame.gfxdraw.filled_circle(spriteSurface,150,150,8,dexTypeColor)
+                        pygame.gfxdraw.filled_circle(spriteSurface,180,150,8,dexTypeColorDark)
                     mainSurface.blit(spriteSurface,(100,60))
                     pygame.display.update(100,60,300,300)
 
