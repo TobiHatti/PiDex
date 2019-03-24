@@ -216,7 +216,7 @@ class DexInfo:
 
                 # Animation-Cycle for the Sprite
                 if not thread.isAlive():
-                    if runtimeCtr % 2 == 0: 
+                    if runtimeCtr % 1 == 0: 
                         Sprite.Cycle(Sprite.frameIndex,Sprite.tilesAmount,Sprite.frames)    
                         spriteSurface.fill((40,40,40))
                         spriteSurface.set_colorkey((0,0,0))
