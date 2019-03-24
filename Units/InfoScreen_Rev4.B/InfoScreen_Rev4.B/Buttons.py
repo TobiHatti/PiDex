@@ -8,7 +8,7 @@ class Button(object):
     
     lastClickState = 0
 
-    def RoundRect(surface,idleColor,hoverColor,textColor,rect,radius,text,fontsize,fontfamily,borderWidth=None,borderColor=(0,0,0),action = None,parameters = None, onReleaseAction = None):
+    def RoundRect(surface,idleColor,hoverColor,textColor,rect,radius,text,fontsize,fontfamily,borderWidth=None,borderColor=(0,0,0),action = None,parameters = None, onReleaseAction = None, enabled = True):
         
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
@@ -18,17 +18,19 @@ class Button(object):
         if Button.lastClickState == 1 and click[0] == 0 and onReleaseAction != None:
             onReleaseAction()
 
+        if enabled:
 
-        if rect[0] < mouse[0] < rect[0]+rect[2] and rect[1] < mouse[1] < rect[1]+rect[3]:
-            activeColor = hoverColor 
-            if click[0] == 1 and action != None:
-                if parameters == None: action() 
-                else: action(parameters)
-                time.sleep(0.06)
+            if rect[0] < mouse[0] < rect[0]+rect[2] and rect[1] < mouse[1] < rect[1]+rect[3]:
+                activeColor = hoverColor 
+                if click[0] == 1 and action != None:
+                    if parameters == None: action() 
+                    else: action(parameters)
+                    time.sleep(0.2)
                 
-        else: activeColor = idleColor
+            else: activeColor = idleColor
 
-        
+        else:
+            activeColor = (100,100,100)
 
         pygame.draw.circle(surface,activeColor,(rect[0]+radius,rect[1]+radius),radius)    
         pygame.draw.circle(surface,activeColor,(rect[0]-radius + rect[2],rect[1]+radius),radius)
