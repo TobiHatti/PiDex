@@ -236,11 +236,7 @@ class DexInfo:
                     pygame.display.update(Button.RoundRect(mainSurface,dexTypeColorDark,dexTypeColorDark,(255,255,255),(680,430,100,30),10,"Next Dex",15,"joy.otf",2,(255,255,255)))
 
                 # Animation-Cycle for the Sprite
-<<<<<<< HEAD
-                if not thread.isAlive():
-=======
                 if not DexInfo.thread.isAlive() and Sprite.loadedSpriteNr == DexInfo.currentPokemon:
->>>>>>> fa60c9012f323b7a9597ea96511e849228604895
                     if runtimeCtr % 1 == 0: 
                         Sprite.Cycle(Sprite.frameIndex,Sprite.tilesAmount,Sprite.frames)    
                         spriteSurface.fill((40,40,40))
