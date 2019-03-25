@@ -9,7 +9,7 @@ import sys
 import sqlite3
 import os
 
-from Buttons import Button
+from CButton import Button
 from SpriteManager import Sprite
 from CDrawing import Draw
 from CText import Text
@@ -27,6 +27,8 @@ class DexInfo:
     currentPokemon = 1
     running = True
     loadNewPokemon = False
+    statScreenActive = False
+    evoScreenActive = False
 
     conn = sqlite3.connect('pokemon.db')
     conn.row_factory = sqlite3.Row
@@ -37,6 +39,10 @@ class DexInfo:
 #########################################################################################
 #   TOGGLE FUNCTION                                                                     #
 #########################################################################################
+    
+    def ToggleEvoChainScreen():
+        if DexInfo.evoScreenActive: DexInfo.evoScreenActive = False
+        else: DexInfo.evoScreenActive = True
 
     def ToggleNextDex():
         DexInfo.loadNewPokemon = True
@@ -59,10 +65,8 @@ class DexInfo:
             DexInfo.currentPokemon = DexInfo.pokeData["prevEvolution"]
 
     def LoadSpritesheet():
-        mouse = pygame.mouse.get_pos()
-        if 320 < mouse[0] < 780 and 430 < mouse[1] < 460 :
-            DexInfo.thread = Thread(target = Sprite.Create, args = ("spritesheets/Simplified/" + str(DexInfo.currentPokemon) + "FN.gif",DexInfo.currentPokemon,)) 
-            DexInfo.thread.start()
+        DexInfo.thread = Thread(target = Sprite.Create, args = ("spritesheets/Simplified/" + str(DexInfo.currentPokemon) + "FN.gif",DexInfo.currentPokemon,)) 
+        DexInfo.thread.start()
 
     def EvoChain():
         evoChain = [DexInfo.currentPokemon]
@@ -130,6 +134,8 @@ class DexInfo:
 
         spriteSurface = pygame.Surface((300,300)).convert_alpha()
 
+        evoChainSurface = pygame.Surface((500-2*26,360-2*26)).convert_alpha()
+
 #########################################################################################
 #   VARIABLE DEFINITIONS                                                                #
 #########################################################################################
@@ -140,7 +146,6 @@ class DexInfo:
         spriteReloadTrigger = 30
         spriteReloaded = False
 
-
         thread = None
 
 #########################################################################################
@@ -150,6 +155,8 @@ class DexInfo:
         # Required for loading spritesheet the first time
         DexInfo.thread = Thread(target = Sprite.Create, args = ("spritesheets/Simplified/" + str(DexInfo.currentPokemon) + "FN.gif",DexInfo.currentPokemon,)) 
         DexInfo.thread.start()        
+
+        
 
 
         while DexInfo.running:
@@ -182,6 +189,27 @@ class DexInfo:
             dexTypeColor = (int(DexInfo.pokeData["typeBGColor"].split(',')[0]), int(DexInfo.pokeData["typeBGColor"].split(',')[1]), int(DexInfo.pokeData["typeBGColor"].split(',')[2]))
             dexTypeColorDark = (int(DexInfo.pokeData["typeBtnHoverColor"].split(',')[0]), int(DexInfo.pokeData["typeBtnHoverColor"].split(',')[1]), int(DexInfo.pokeData["typeBtnHoverColor"].split(',')[2]))
 
+            # Button Setup
+            Button.idleColor = dexTypeColor
+            Button.hoverColor = dexTypeColorDark 
+            Button.fontColor = (255,255,255)
+            Button.disabledColor = (150,150,150)
+            Button.borderColor = (255,255,255)
+            Button.fontFamily = "joy.otf"
+
+            # Nav Buttons
+            btnPrevDex = Button.RoundRect(mainSurface,(320,430,100,30),10,"Prev Dex",15,2,DexInfo.TogglePrevDex,None,DexInfo.LoadSpritesheet)
+            btnPrevEvo = Button.RoundRect(mainSurface,(440,430,100,30),10,"Prev Evo",15,2,DexInfo.TogglePrevEvo,None,DexInfo.LoadSpritesheet)
+            btnNextEvo = Button.RoundRect(mainSurface,(560,430,100,30),10,"Next Evo",15,2,DexInfo.ToggleNextEvo,None,DexInfo.LoadSpritesheet)
+            btnNextDex = Button.RoundRect(mainSurface,(680,430,100,30),10,"Next Dex",15,2,DexInfo.ToggleNextDex,None,DexInfo.LoadSpritesheet)
+
+            # Gender Buttons
+            btnGenderM = Button.RoundRect(mainSurface,(18,160,40,40),10,"M",25,2)
+            btnGenderF = Button.RoundRect(mainSurface,(18,210,40,40),10,"F",25,2)
+
+            # Form Buttons
+            btnFormNormal = Button.RoundRect(mainSurface,(520,155,126,30),10,"Normal",18,2,DexInfo.ToggleEvoChainScreen)
+            btnFormShiny = Button.RoundRect(mainSurface,(661,155,126,30),10,"Shiny",18,2)
 
             # One-Time Drawing routines
 
@@ -211,9 +239,6 @@ class DexInfo:
             widthMale = DexInfo.pokeData["genderMale"]*(totalBarWidth/100)
             widthFemale = (100-DexInfo.pokeData["genderFemale"])*(totalBarWidth/100)
 
-            #pygame.draw.rect(mainSurface,(255,0,0),(5+520,340,widthMale-5,20))
-            #pygame.draw.rect(mainSurface,(0,255,0),(5+5+5+widthMale+520,340,widthFemale-5,20))
-
             if DexInfo.pokeData["genderMale"] < 100 and DexInfo.pokeData["genderMale"] > 0:
                 pygame.draw.rect(mainSurface,dexTypeColor,(5+widthMale+520,335,5,35))
                 Text.Write(mainSurface,(5+520+(widthMale/2),352),"M",25,"joy.otf",(255,255,255),True)
@@ -222,7 +247,6 @@ class DexInfo:
                 Text.Write(mainSurface,(520+5+(255/2),352),"M",25,"joy.otf",(255,255,255),True)  
             else:
                 Text.Write(mainSurface,(520+5+(255/2),352),"F",25,"joy.otf",(255,255,255),True)  
-
 
             
 
@@ -252,20 +276,24 @@ class DexInfo:
 
             # Drawing Buttons before cycle (fixes visual bug)
             # Nav Buttons
-            pygame.display.update(Button.RoundRect(mainSurface,dexTypeColorDark,dexTypeColorDark,(255,255,255),(320,430,100,30),10,"Prev Dex",15,"joy.otf",2,(255,255,255)))
-            pygame.display.update(Button.RoundRect(mainSurface,dexTypeColorDark,dexTypeColorDark,(255,255,255),(440,430,100,30),10,"Prev Evo",15,"joy.otf",2,(255,255,255)))
-            pygame.display.update(Button.RoundRect(mainSurface,dexTypeColorDark,dexTypeColorDark,(255,255,255),(560,430,100,30),10,"Next Evo",15,"joy.otf",2,(255,255,255)))
-            pygame.display.update(Button.RoundRect(mainSurface,dexTypeColorDark,dexTypeColorDark,(255,255,255),(680,430,100,30),10,"Next Dex",15,"joy.otf",2,(255,255,255)))
+            pygame.display.update(btnPrevDex.Show(False))
+            pygame.display.update(btnPrevEvo.Show(False))
+            pygame.display.update(btnNextEvo.Show(False))
+            pygame.display.update(btnNextDex.Show(False))
 
             # Gender Buttons
             if DexInfo.pokeData["genderDifference"] == 1:
-                pygame.display.update(Button.RoundRect(mainSurface,(60,60,240),(100,100,255),(255,255,255),(18,160,40,40),10,"M",25,"joy.otf",2,(255,255,255)))
-                pygame.display.update(Button.RoundRect(mainSurface,(240,60,60),(255,100,100),(255,255,255),(18,210,40,40),10,"F",25,"joy.otf",2,(255,255,255)))
+                pygame.display.update(btnGenderM.Show(False))
+                pygame.display.update(btnGenderF.Show(False))
                     
             # Shiny Buttons
-            pygame.display.update(Button.RoundRect(mainSurface,dexTypeColor,dexTypeColorDark,(255,255,255),(520,155,126,30),10,"Normal",18,"joy.otf",2,(255,255,255)))
-            pygame.display.update(Button.RoundRect(mainSurface,(239,191,0),(255,226,63),(255,255,255),(661,155,126,30),10,"Shiny",18,"joy.otf",2,(255,255,255)))
-                     
+            pygame.display.update(btnFormNormal.Show(False))
+            pygame.display.update(btnFormShiny.Show(False))
+
+            # Form Buttons
+            pygame.display.update(pygame.draw.rect(mainSurface,(40,40,40),(22,330,476,36)))
+            
+
 
             print(DexInfo.EvoChain())
             
@@ -293,76 +321,108 @@ class DexInfo:
                     sys.exit()
 
 
+                if DexInfo.pokeData["nextEvolution"] != None: nextEvoExists = True
+                else: nextEvoExists = False
+
+                if DexInfo.pokeData["prevEvolution"] != None: prevEvoExists = True
+                else: prevEvoExists = False
+
                 if not DexInfo.thread.isAlive():
-
-                    if DexInfo.pokeData["nextEvolution"] != None: nextEvoExists = True
-                    else: nextEvoExists = False
-
-                    if DexInfo.pokeData["prevEvolution"] != None: prevEvoExists = True
-                    else: prevEvoExists = False
-
                     # Nav Buttons
-                    pygame.display.update(Button.RoundRect(mainSurface,dexTypeColor,dexTypeColorDark,(255,255,255),(320,430,100,30),10,"Prev Dex",15,"joy.otf",2,(255,255,255),DexInfo.TogglePrevDex,None,DexInfo.LoadSpritesheet))
-                    pygame.display.update(Button.RoundRect(mainSurface,dexTypeColor,dexTypeColorDark,(255,255,255),(440,430,100,30),10,"Prev Evo",15,"joy.otf",2,(255,255,255),DexInfo.TogglePrevEvo,None,DexInfo.LoadSpritesheet,prevEvoExists))
-                    pygame.display.update(Button.RoundRect(mainSurface,dexTypeColor,dexTypeColorDark,(255,255,255),(560,430,100,30),10,"Next Evo",15,"joy.otf",2,(255,255,255),DexInfo.ToggleNextEvo,None,DexInfo.LoadSpritesheet,nextEvoExists))
-                    pygame.display.update(Button.RoundRect(mainSurface,dexTypeColor,dexTypeColorDark,(255,255,255),(680,430,100,30),10,"Next Dex",15,"joy.otf",2,(255,255,255),DexInfo.ToggleNextDex,None,DexInfo.LoadSpritesheet))
-                    
+                    pygame.display.update(btnPrevDex.Show())
+                    pygame.display.update(btnPrevEvo.Show(disabled = not prevEvoExists))
+                    pygame.display.update(btnNextEvo.Show(disabled = not nextEvoExists))
+                    pygame.display.update(btnNextDex.Show())
+
                     # Gender Buttons
-                    if DexInfo.pokeData["genderDifference"] == 1:
-                        pygame.display.update(Button.RoundRect(mainSurface,(60,60,240),(100,100,255),(255,255,255),(18,160,40,40),10,"M",25,"joy.otf",2,(255,255,255)))
-                        pygame.display.update(Button.RoundRect(mainSurface,(240,60,60),(255,100,100),(255,255,255),(18,210,40,40),10,"F",25,"joy.otf",2,(255,255,255)))
-                    
+                    if DexInfo.pokeData["genderDifference"] == 1:              
+                        pygame.display.update(btnGenderM.Show())
+                        pygame.display.update(btnGenderF.Show())
+
                     # Shiny Buttons
-                    pygame.display.update(Button.RoundRect(mainSurface,dexTypeColor,dexTypeColorDark,(255,255,255),(520,155,126,30),10,"Normal",18,"joy.otf",2,(255,255,255)))
-                    pygame.display.update(Button.RoundRect(mainSurface,(239,191,0),(255,226,63),(255,255,255),(661,155,126,30),10,"Shiny",18,"joy.otf",2,(255,255,255)))
-                       
-                
+                    pygame.display.update(btnFormNormal.Show())
+                    pygame.display.update(btnFormShiny.Show())
+
+                    # Form Buttons
+                    if False:
+                        if not DexInfo.thread.isAlive():
+                            pygame.display.update(Button.Circle(mainSurface,dexTypeColor,dexTypeColorDark,(255,255,255),(40,348),15,"1",22,"joy.otf",2,(255,255,255)))
+                            pygame.display.update(Button.Circle(mainSurface,dexTypeColor,dexTypeColorDark,(255,255,255),(80,348),15,"2",22,"joy.otf",2,(255,255,255)))
+                            pygame.display.update(Button.Circle(mainSurface,dexTypeColor,dexTypeColorDark,(255,255,255),(120,348),15,"3",22,"joy.otf",2,(255,255,255)))
+                            pygame.display.update(Button.Circle(mainSurface,dexTypeColor,dexTypeColorDark,(255,255,255),(160,348),15,"4",22,"joy.otf",2,(255,255,255)))
+                            pygame.display.update(Button.Circle(mainSurface,dexTypeColor,dexTypeColorDark,(255,255,255),(200,348),15,"5",22,"joy.otf",2,(255,255,255)))
+                            pygame.display.update(Button.Circle(mainSurface,dexTypeColor,dexTypeColorDark,(255,255,255),(240,348),15,"6",22,"joy.otf",2,(255,255,255)))
+                            pygame.display.update(Button.Circle(mainSurface,dexTypeColor,dexTypeColorDark,(255,255,255),(280,348),15,"7",22,"joy.otf",2,(255,255,255)))
+                            pygame.display.update(Button.Circle(mainSurface,dexTypeColor,dexTypeColorDark,(255,255,255),(320,348),15,"8",22,"joy.otf",2,(255,255,255)))
+                            pygame.display.update(Button.Circle(mainSurface,dexTypeColor,dexTypeColorDark,(255,255,255),(360,348),15,"9",22,"joy.otf",2,(255,255,255)))
+                            pygame.display.update(Button.Circle(mainSurface,dexTypeColor,dexTypeColorDark,(255,255,255),(400,348),15,"10",22,"joy.otf",2,(255,255,255)))
+                            pygame.display.update(Button.Circle(mainSurface,dexTypeColor,dexTypeColorDark,(255,255,255),(440,348),15,"11",22,"joy.otf",2,(255,255,255)))
+                            pygame.display.update(Button.Circle(mainSurface,dexTypeColor,dexTypeColorDark,(255,255,255),(480,348),15,"12",22,"joy.otf",2,(255,255,255)))
+                        else:
+                            pygame.draw.rect(mainSurface,(40,40,40),(22,330,476,36))
+                    else:
+                        pygame.draw.rect(mainSurface,(40,40,40),(22,330,476,36))
+
+
                 else:
                     # Nav Buttons
-                    pygame.display.update(Button.RoundRect(mainSurface,dexTypeColorDark,dexTypeColorDark,(255,255,255),(320,430,100,30),10,"Prev Dex",15,"joy.otf",2,(255,255,255)))
-                    pygame.display.update(Button.RoundRect(mainSurface,dexTypeColorDark,dexTypeColorDark,(255,255,255),(440,430,100,30),10,"Prev Evo",15,"joy.otf",2,(255,255,255)))
-                    pygame.display.update(Button.RoundRect(mainSurface,dexTypeColorDark,dexTypeColorDark,(255,255,255),(560,430,100,30),10,"Next Evo",15,"joy.otf",2,(255,255,255)))
-                    pygame.display.update(Button.RoundRect(mainSurface,dexTypeColorDark,dexTypeColorDark,(255,255,255),(680,430,100,30),10,"Next Dex",15,"joy.otf",2,(255,255,255)))
+                    pygame.display.update(btnPrevDex.Show(False))
+                    pygame.display.update(btnPrevEvo.Show(False,not prevEvoExists))
+                    pygame.display.update(btnNextEvo.Show(False,not nextEvoExists))
+                    pygame.display.update(btnNextDex.Show(False))
 
                     # Gender Buttons
                     if DexInfo.pokeData["genderDifference"] == 1:
-                        pygame.display.update(Button.RoundRect(mainSurface,(60,60,240),(100,100,255),(255,255,255),(18,160,40,40),10,"M",25,"joy.otf",2,(255,255,255)))
-                        pygame.display.update(Button.RoundRect(mainSurface,(240,60,60),(255,100,100),(255,255,255),(18,210,40,40),10,"F",25,"joy.otf",2,(255,255,255)))
+                        pygame.display.update(btnGenderM.Show(False))
+                        pygame.display.update(btnGenderF.Show(False))
                     
                     # Shiny Buttons
-                    pygame.display.update(Button.RoundRect(mainSurface,dexTypeColor,dexTypeColorDark,(255,255,255),(520,155,126,30),10,"Normal",18,"joy.otf",2,(255,255,255)))
-                    pygame.display.update(Button.RoundRect(mainSurface,(239,191,0),(255,226,63),(255,255,255),(661,155,126,30),10,"Shiny",18,"joy.otf",2,(255,255,255)))
-                       
+                    pygame.display.update(btnFormNormal.Show(False))
+                    pygame.display.update(btnFormShiny.Show(False))
+
+                    # Form Buttons
+                    pygame.display.update(pygame.draw.rect(mainSurface,(40,40,40),(22,330,476,36)))
                 
 
                 # Animation-Cycle for the Sprite
-                if not DexInfo.thread.isAlive() and Sprite.loadedSpriteNr == DexInfo.currentPokemon:
-                    if runtimeCtr % 1 == 0: 
-                        Sprite.Cycle(Sprite.frameIndex,Sprite.tilesAmount,Sprite.frames)    
+                if DexInfo.statScreenActive:
+                    print("stat")
+                elif DexInfo.evoScreenActive:
+                    pygame.draw.rect(evoChainSurface,(40,40,40),(90,5,300,300))
+                    evoChainSurface.fill((40,40,40))
+                    evoChainSurface.set_colorkey((0,0,0))
+                    Text.Write(evoChainSurface,(250,30),"Evolution Chain",25,"joy.otf",(255,255,255),True)
+                    mainSurface.blit(evoChainSurface,(10+26,10))
+                    pygame.display.update(10,10,500-2*26,360-2*26)
+                else:
+                    if not DexInfo.thread.isAlive() and Sprite.loadedSpriteNr == DexInfo.currentPokemon:
+                        if runtimeCtr % 1 == 0: 
+                            Sprite.Cycle(Sprite.frameIndex,Sprite.tilesAmount,Sprite.frames)    
+                            spriteSurface.fill((40,40,40))
+                            spriteSurface.set_colorkey((0,0,0))
+                            spriteSurface.blit(Sprite.current,Sprite.sprite)
+                            mainSurface.blit(spriteSurface,(100,15))
+                            pygame.display.update(100,15,300,300)
+                    else:
                         spriteSurface.fill((40,40,40))
                         spriteSurface.set_colorkey((0,0,0))
-                        spriteSurface.blit(Sprite.current,Sprite.sprite)
+                        if runtimeCtr % 2 == 0:
+                            pygame.gfxdraw.aacircle(spriteSurface,120,150,8,dexTypeColor)
+                            pygame.gfxdraw.aacircle(spriteSurface,150,150,8,dexTypeColorDark)
+                            pygame.gfxdraw.aacircle(spriteSurface,180,150,8,dexTypeColor)
+                            pygame.gfxdraw.filled_circle(spriteSurface,120,150,8,dexTypeColor)
+                            pygame.gfxdraw.filled_circle(spriteSurface,150,150,8,dexTypeColorDark)
+                            pygame.gfxdraw.filled_circle(spriteSurface,180,150,8,dexTypeColor)
+                        else:
+                            pygame.gfxdraw.aacircle(spriteSurface,120,150,8,dexTypeColorDark)
+                            pygame.gfxdraw.aacircle(spriteSurface,150,150,8,dexTypeColor)
+                            pygame.gfxdraw.aacircle(spriteSurface,180,150,8,dexTypeColorDark)
+                            pygame.gfxdraw.filled_circle(spriteSurface,120,150,8,dexTypeColorDark)
+                            pygame.gfxdraw.filled_circle(spriteSurface,150,150,8,dexTypeColor)
+                            pygame.gfxdraw.filled_circle(spriteSurface,180,150,8,dexTypeColorDark)
+                        pygame.draw.rect(mainSurface,(40,40,40),(22,330,476,36))
                         mainSurface.blit(spriteSurface,(100,15))
                         pygame.display.update(100,15,300,300)
-                else:
-                    spriteSurface.fill((40,40,40))
-                    spriteSurface.set_colorkey((0,0,0))
-                    if runtimeCtr % 2 == 0:
-                        pygame.gfxdraw.aacircle(spriteSurface,120,150,8,dexTypeColor)
-                        pygame.gfxdraw.aacircle(spriteSurface,150,150,8,dexTypeColorDark)
-                        pygame.gfxdraw.aacircle(spriteSurface,180,150,8,dexTypeColor)
-                        pygame.gfxdraw.filled_circle(spriteSurface,120,150,8,dexTypeColor)
-                        pygame.gfxdraw.filled_circle(spriteSurface,150,150,8,dexTypeColorDark)
-                        pygame.gfxdraw.filled_circle(spriteSurface,180,150,8,dexTypeColor)
-                    else:
-                        pygame.gfxdraw.aacircle(spriteSurface,120,150,8,dexTypeColorDark)
-                        pygame.gfxdraw.aacircle(spriteSurface,150,150,8,dexTypeColor)
-                        pygame.gfxdraw.aacircle(spriteSurface,180,150,8,dexTypeColorDark)
-                        pygame.gfxdraw.filled_circle(spriteSurface,120,150,8,dexTypeColorDark)
-                        pygame.gfxdraw.filled_circle(spriteSurface,150,150,8,dexTypeColor)
-                        pygame.gfxdraw.filled_circle(spriteSurface,180,150,8,dexTypeColorDark)
-                    mainSurface.blit(spriteSurface,(100,60))
-                    pygame.display.update(100,60,300,300)
 
                 clock.tick(60)
 

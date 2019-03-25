@@ -11,24 +11,23 @@ class Draw(object):
 
         pygame.gfxdraw.aacircle(surface,rect[0]+radius,rect[1]+radius,radius,color)
         pygame.gfxdraw.filled_circle(surface,rect[0]+radius,rect[1]+radius,radius,color)
-        pygame.gfxdraw.aacircle(surface,rect[0]-radius + rect[2]-1,rect[1]+radius,radius,color)
-        pygame.gfxdraw.filled_circle(surface,rect[0]-radius + rect[2]-1,rect[1]+radius,radius,color)
+        pygame.gfxdraw.aacircle(surface,rect[0]-radius + rect[2],rect[1]+radius,radius,color)
+        pygame.gfxdraw.filled_circle(surface,rect[0]-radius + rect[2],rect[1]+radius,radius,color)
         pygame.gfxdraw.aacircle(surface,rect[0]+radius,rect[1]-radius + rect[3]-1,radius,color)
         pygame.gfxdraw.filled_circle(surface,rect[0]+radius,rect[1]-radius + rect[3]-1,radius,color)
-        pygame.gfxdraw.aacircle(surface,rect[0]-radius + rect[2]-1,rect[1]-radius + rect[3]-1,radius,color)
-        pygame.gfxdraw.filled_circle(surface,rect[0]-radius + rect[2]-1,rect[1]-radius + rect[3]-1,radius,color)
+        pygame.gfxdraw.aacircle(surface,rect[0]-radius + rect[2],rect[1]-radius + rect[3]-1,radius,color)
+        pygame.gfxdraw.filled_circle(surface,rect[0]-radius + rect[2],rect[1]-radius + rect[3]-1,radius,color)
 
         pygame.draw.rect(surface,color,(rect[0] + radius, rect[1], rect[2] - 2*radius, rect[3]))
         pygame.draw.rect(surface,color,(rect[0], rect[1] + radius, rect[2], rect[3] - 2*radius))
 
         if titlebar != None:
-            pygame.gfxdraw.aacircle(surface,rect[0]+radius,rect[1]+radius,radius,borderColor)
-            pygame.gfxdraw.filled_circle(surface,rect[0]+radius,rect[1]+radius,radius,borderColor)
-            pygame.gfxdraw.aacircle(surface,rect[0]+rect[2]-radius,rect[1]+radius,radius,borderColor)
-            pygame.gfxdraw.filled_circle(surface,rect[0]+rect[2]-radius,rect[1]+radius,radius,borderColor)
-
+            pygame.gfxdraw.aacircle(surface,rect[0]+radius,rect[1]+radius,radius,color)
+            pygame.gfxdraw.filled_circle(surface,rect[0]+radius,rect[1]+radius,radius,color)
+            pygame.gfxdraw.aacircle(surface,rect[0]+rect[2]-radius,rect[1]+radius,radius,color)
+            pygame.gfxdraw.filled_circle(surface,rect[0]+rect[2]-radius,rect[1]+radius,radius,color)
             pygame.draw.rect(surface,borderColor,(rect[0]+radius,rect[1],rect[2]-2*radius,radius))
-            pygame.draw.rect(surface,color,(rect[0],rect[1]+radius,rect[2],radius+1))
+            pygame.draw.rect(surface,color,(rect[0],rect[1]+radius,rect[2],radius))
             pygame.draw.rect(surface,borderColor,(rect[0],rect[1]+radius,rect[2],10))
             Text.Write(surface,(rect[0]+(rect[2]/2),rect[1]+14),titlebar,20,"joy.otf",(255,255,255),True)
 
