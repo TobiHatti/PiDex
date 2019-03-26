@@ -28,6 +28,9 @@
     <Compile Include="CText.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="CUserInterface.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="DexInfo.py">
       <SubType>Code</SubType>
     </Compile>

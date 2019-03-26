@@ -59,151 +59,142 @@ pokemonEvoChain = client.get_evolution_chain(10)
 
 pokemonSpecies = client.get_pokemon_species(pokemonEvoChain[0].chain.species.name)
 
-try:
-    for x in range(1,803):
-        print(x)
-        try:
-            pokemonEvoChain = client.get_evolution_chain(x)
+#try:
+#    for x in range(1,803):
+#        print(x)
+#        try:
+#            pokemonEvoChain = client.get_evolution_chain(x)
 
-            for x1 in range(0,17):
-                try:
+#            for x1 in range(0,17):
+#                try:
 
-                    pmFrom = pokemonEvoChain[0].chain.species.name
-                    pmTo = pokemonEvoChain[0].chain.evolves_to[x1].species.name
+#                    pmFrom = pokemonEvoChain[0].chain.species.name
+#                    pmTo = pokemonEvoChain[0].chain.evolves_to[x1].species.name
 
-                    pmFromDex = client.get_pokemon_species(pmFrom)[0].id
-                    pmToDex = client.get_pokemon_species(pmTo)[0].id
+#                    pmFromDex = client.get_pokemon_species(pmFrom)[0].id
+#                    pmToDex = client.get_pokemon_species(pmTo)[0].id
 
-                    try: pmMinLevel = pokemonEvoChain[0].chain.evolves_to[x1].evolution_details[0].min_level
-                    except: pmMinLevel = None
+#                    try: pmMinLevel = pokemonEvoChain[0].chain.evolves_to[x1].evolution_details[0].min_level
+#                    except: pmMinLevel = None
 
-                    try: pmEvoItem = pokemonEvoChain[0].chain.evolves_to[x1].evolution_details[0].item.name
-                    except: pmEvoItem = None
+#                    try: pmEvoItem = pokemonEvoChain[0].chain.evolves_to[x1].evolution_details[0].item.name
+#                    except: pmEvoItem = None
 
-                    print("From: " + pmFrom + " To: " + pmTo)
-                    print("From: " + str(pmFromDex) + " To: " + str(pmToDex))
-                    print("Min-Level: " + str(pmMinLevel))
-                    print("================================Item: " + str(pmEvoItem))
+#                    print("From: " + pmFrom + " To: " + pmTo)
+#                    print("From: " + str(pmFromDex) + " To: " + str(pmToDex))
+#                    print("Min-Level: " + str(pmMinLevel))
+#                    print("================================Item: " + str(pmEvoItem))
 
-                    parameters = (pmFromDex,pmToDex,pmMinLevel,pmEvoItem,)
-                    c.execute("INSERT INTO evolutions (evoDex, evoNextDex, evoNextItem,evoNextLevel) VALUES (?,?,?,?)",parameters)
-                    conn.commit()
+#                    parameters = (pmFromDex,pmToDex,pmMinLevel,pmEvoItem,)
+#                    c.execute("INSERT INTO evolutions (evoDex, evoNextDex, evoNextItem,evoNextLevel) VALUES (?,?,?,?)",parameters)
+#                    conn.commit()
 
                 
 
-                except: pass
+#                except: pass
 
-                for x2 in range(0,17):
-                    try:
-                        pmFrom = pokemonEvoChain[0].chain.evolves_to[x1].species.name
-                        pmTo = pokemonEvoChain[0].chain.evolves_to[x1].evolves_to[x2].species.name
+#                for x2 in range(0,17):
+#                    try:
+#                        pmFrom = pokemonEvoChain[0].chain.evolves_to[x1].species.name
+#                        pmTo = pokemonEvoChain[0].chain.evolves_to[x1].evolves_to[x2].species.name
 
-                        pmFromDex = client.get_pokemon_species(pmFrom)[0].id
-                        pmToDex = client.get_pokemon_species(pmTo)[0].id
+#                        pmFromDex = client.get_pokemon_species(pmFrom)[0].id
+#                        pmToDex = client.get_pokemon_species(pmTo)[0].id
 
-                        try: pmMinLevel = pokemonEvoChain[0].evolves_to[x1].evolves_to[x2].evolution_details[0].min_level
-                        except: pmMinLevel = None
+#                        try: pmMinLevel = pokemonEvoChain[0].evolves_to[x1].evolves_to[x2].evolution_details[0].min_level
+#                        except: pmMinLevel = None
 
-                        try: pmEvoItem = pokemonEvoChain[0].evolves_to[x1].evolves_to[x2].evolution_details[0].item.name
-                        except: pmEvoItem = None
+#                        try: pmEvoItem = pokemonEvoChain[0].evolves_to[x1].evolves_to[x2].evolution_details[0].item.name
+#                        except: pmEvoItem = None
 
-                        print("From: " + pmFrom + " To: " + pmTo)
-                        print("From: " + str(pmFromDex) + " To: " + str(pmToDex))
-                        print("Min-Level: " + str(pmMinLevel))
-                        print("================================Item: " + str(pmEvoItem))
+#                        print("From: " + pmFrom + " To: " + pmTo)
+#                        print("From: " + str(pmFromDex) + " To: " + str(pmToDex))
+#                        print("Min-Level: " + str(pmMinLevel))
+#                        print("================================Item: " + str(pmEvoItem))
 
-                        parameters = (pmFromDex,pmToDex,pmMinLevel,pmEvoItem,)
-                        c.execute("INSERT INTO evolutions (evoDex, evoNextDex, evoNextItem,evoNextLevel) VALUES (?,?,?,?)",parameters)
-                        conn.commit()
-                    except: pass
+#                        parameters = (pmFromDex,pmToDex,pmMinLevel,pmEvoItem,)
+#                        c.execute("INSERT INTO evolutions (evoDex, evoNextDex, evoNextItem,evoNextLevel) VALUES (?,?,?,?)",parameters)
+#                        conn.commit()
+#                    except: pass
 
-                    for x3 in range(0,17):
-                        try:
-                            pmFrom = pokemonEvoChain[0].chain.evolves_to[x1].evolves_to[x2].species.name
-                            pmTo = pokemonEvoChain[0].chain.evolves_to[x1].evolves_to[x2].evolves_to[x3].species.name
+#                    for x3 in range(0,17):
+#                        try:
+#                            pmFrom = pokemonEvoChain[0].chain.evolves_to[x1].evolves_to[x2].species.name
+#                            pmTo = pokemonEvoChain[0].chain.evolves_to[x1].evolves_to[x2].evolves_to[x3].species.name
 
-                            pmFromDex = client.get_pokemon_species(pmFrom)[0].id
-                            pmToDex = client.get_pokemon_species(pmTo)[0].id
+#                            pmFromDex = client.get_pokemon_species(pmFrom)[0].id
+#                            pmToDex = client.get_pokemon_species(pmTo)[0].id
 
-                            try: pmMinLevel = pokemonEvoChain[0].chain.evolves_to[x1].evolves_to[x2].evolves_to[x3].evolution_details[0].min_level
-                            except: pmMinLevel = None
+#                            try: pmMinLevel = pokemonEvoChain[0].chain.evolves_to[x1].evolves_to[x2].evolves_to[x3].evolution_details[0].min_level
+#                            except: pmMinLevel = None
 
-                            try: pmEvoItem = pokemonEvoChain[0].chain.evolves_to[x1].evolves_to[x2].evolves_to[x3].evolution_details[0].item.name
-                            except: pmEvoItem = None
+#                            try: pmEvoItem = pokemonEvoChain[0].chain.evolves_to[x1].evolves_to[x2].evolves_to[x3].evolution_details[0].item.name
+#                            except: pmEvoItem = None
 
-                            print("From: " + pmFrom + " To: " + pmTo)
-                            print("From: " + str(pmFromDex) + " To: " + str(pmToDex))
-                            print("Min-Level: " + str(pmMinLevel))
-                            print("================================Item: " + str(pmEvoItem))
+#                            print("From: " + pmFrom + " To: " + pmTo)
+#                            print("From: " + str(pmFromDex) + " To: " + str(pmToDex))
+#                            print("Min-Level: " + str(pmMinLevel))
+#                            print("================================Item: " + str(pmEvoItem))
 
-                            parameters = (pmFromDex,pmToDex,pmMinLevel,pmEvoItem,)
-                            c.execute("INSERT INTO evolutions (evoDex, evoNextDex, evoNextItem,evoNextLevel) VALUES (?,?,?,?)",parameters)
-                            conn.commit()
-                        except: pass   
+#                            parameters = (pmFromDex,pmToDex,pmMinLevel,pmEvoItem,)
+#                            c.execute("INSERT INTO evolutions (evoDex, evoNextDex, evoNextItem,evoNextLevel) VALUES (?,?,?,?)",parameters)
+#                            conn.commit()
+#                        except: pass   
 
-                        for x4 in range(0,17):
-                            try:
-                                pmFrom = pokemonEvoChain[0].chain.evolves_to[x1].evolves_to[x2].evolves_to[x3].species.name
-                                pmTo = pokemonEvoChain[0].chain.evolves_to[x1].evolves_to[x2].evolves_to[x3].evolves_to[x4].species.name
+#                        for x4 in range(0,17):
+#                            try:
+#                                pmFrom = pokemonEvoChain[0].chain.evolves_to[x1].evolves_to[x2].evolves_to[x3].species.name
+#                                pmTo = pokemonEvoChain[0].chain.evolves_to[x1].evolves_to[x2].evolves_to[x3].evolves_to[x4].species.name
 
-                                pmFromDex = client.get_pokemon_species(pmFrom)[0].id
-                                pmToDex = client.get_pokemon_species(pmTo)[0].id
+#                                pmFromDex = client.get_pokemon_species(pmFrom)[0].id
+#                                pmToDex = client.get_pokemon_species(pmTo)[0].id
 
-                                try: pmMinLevel = pokemonEvoChain[0].chain.evolves_to[x1].evolves_to[x2].evolves_to[x3].evolves_to[x4].evolution_details[0].min_level
-                                except: pmMinLevel = None
+#                                try: pmMinLevel = pokemonEvoChain[0].chain.evolves_to[x1].evolves_to[x2].evolves_to[x3].evolves_to[x4].evolution_details[0].min_level
+#                                except: pmMinLevel = None
 
-                                try: pmEvoItem = pokemonEvoChain[0].chain.evolves_to[x1].evolves_to[x2].evolves_to[x3].evolves_to[x4].evolution_details[0].item.name
-                                except: pmEvoItem = None
+#                                try: pmEvoItem = pokemonEvoChain[0].chain.evolves_to[x1].evolves_to[x2].evolves_to[x3].evolves_to[x4].evolution_details[0].item.name
+#                                except: pmEvoItem = None
 
-                                print("From: " + pmFrom + " To: " + pmTo)
-                                print("From: " + str(pmFromDex) + " To: " + str(pmToDex))
-                                print("Min-Level: " + str(pmMinLevel))
-                                print("================================Item: " + str(pmEvoItem))
+#                                print("From: " + pmFrom + " To: " + pmTo)
+#                                print("From: " + str(pmFromDex) + " To: " + str(pmToDex))
+#                                print("Min-Level: " + str(pmMinLevel))
+#                                print("================================Item: " + str(pmEvoItem))
 
-                                parameters = (pmFromDex,pmToDex,pmMinLevel,pmEvoItem,)
-                                c.execute("INSERT INTO evolutions (evoDex, evoNextDex, evoNextItem,evoNextLevel) VALUES (?,?,?,?)",parameters)
-                                conn.commit()
-                            except: pass
-        except: pass
-except: print("Done")
-
-
+#                                parameters = (pmFromDex,pmToDex,pmMinLevel,pmEvoItem,)
+#                                c.execute("INSERT INTO evolutions (evoDex, evoNextDex, evoNextItem,evoNextLevel) VALUES (?,?,?,?)",parameters)
+#                                conn.commit()
+#                            except: pass
+#        except: pass
+#except: print("Done")
 
 
-#for j in range(1,803):
-#    try: 
-#        #pokemon = client.get_pokemon(j)
-#        pokemonSpecies = client.get_pokemon_species(j)
-#        #pokemonEvoChain = client.get_evolution_chain(j)
 
-#        eggGroup = pokemonSpecies[0].egg_groups[0].name
 
-#        if str(eggGroup) == "monster": eGr = 1
-#        elif str(eggGroup) == "water1": eGr = 2
-#        elif str(eggGroup) == "water2": eGr = 3
-#        elif str(eggGroup) == "water3": eGr = 4
-#        elif str(eggGroup) == "bug": eGr = 5
-#        elif str(eggGroup) == "flying": eGr = 6
-#        elif str(eggGroup) == "ground": eGr = 7
-#        elif str(eggGroup) == "fairy": eGr = 8
-#        elif str(eggGroup) == "plant": eGr = 9
-#        elif str(eggGroup) == "humanshape": eGr = 10
-#        elif str(eggGroup) == "mineral": eGr = 11
-#        elif str(eggGroup) == "indeterminate": eGr = 12
-#        elif str(eggGroup) == "ditto": eGr = 13
-#        elif str(eggGroup) == "dragon": eGr = 14
-#        elif str(eggGroup) == "no-eggs": eGr = 15
-#        else: eGr = None
 
-#        print(str(j) + " - " + str(eggGroup) + "    " + str(eGr))
 
+for j in range(1,803):
+    try: 
+        #pokemon = client.get_pokemon(j)
+        pokemonSpecies = client.get_pokemon_species(j)
+        #pokemonEvoChain = client.get_evolution_chain(j)
+
+        for x in range(0,100):
+            try:
+                if pokemonSpecies[0].flavor_text_entries[x].language.name=="en":
+                     print(str(j)+ ": " + pokemonSpecies[0].flavor_text_entries[x].flavor_text)
+                     parameters = (pokemonSpecies[0].flavor_text_entries[x].flavor_text,j,)
+                     c.execute("UPDATE pokemon SET dexInfo = ? WHERE nationalDex = ?",parameters)
+                     conn.commit()
+                     print()
+                     break
+            except: pass
        
+        
+        
 
-#        parameters = (eGr,j,)
 
-#        c.execute("UPDATE pokemon SET eggGroupID = ? WHERE nationalDex = ?",parameters)
-#        conn.commit()
-#    except: pass
+        
+    except: pass
 
 
 
@@ -380,12 +371,38 @@ except: print("Done")
 #        elif str(eggGroup) == "no-eggs": eGr = 15
 #        else: eGr = None
 
-#        evYield = None
+#        evPoints = pokemon[0].stats[0].effort
+        #evType = pokemon[0].stats[0].stat.name
+
+        #for x in range(0,6):
+        #    evYieldType = pokemon[0].stats[x].stat.name
+
+        #    if pokemon[0].stats[x].effort != 0:
+
+        #        if evYieldType == "hp": evYieldID = 1
+        #        if evYieldType == "attack": evYieldID = 2
+        #        if evYieldType == "defense": evYieldID = 3
+        #        if evYieldType == "special-attack": evYieldID = 4
+        #        if evYieldType == "special-defense": evYieldID = 5
+        #        if evYieldType == "speed": evYieldID = 6
+
+        #        evPoints = pokemon[0].stats[x].effort
+
+        #        print(str(j) + ": " + str(evPoints) + " " + evYieldType + " (" + str(evYieldID) + ")")
+            
+        #        parameters = (j,evYieldID,evPoints,)
+        #        c.execute("INSERT INTO evYields (nationalDex,evYieldTypeID,evYieldPoints) VALUES (?,?,?)",parameters)
+        #        conn.commit()
 
 #        print(nameDE)
 
 #    except: pass
 
+##   Pokemon Species
+#    print(pokemonSpecies[0].genera[2].genus)
+
+
+    
 
 
 

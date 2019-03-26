@@ -3,9 +3,11 @@ import time
 from pygame import gfxdraw
 from CText import Text
 from CDrawing import Draw
+from threading import Thread
 
 class Button:
- 
+
+    sleepThread = Thread()
     idleColor = (0,0,0)
     hoverColor = (40,40,40)
     disabledColor = (60,60,60)
@@ -50,15 +52,19 @@ class Button:
  
                         Draw.RoundRect(self.surface,self.hoverColor,self.rect,self.radius,self.borderWidth,self.borderColor)
 
-                        if click[0] == 1:
-                            if self.clickAction != None:
-                                if self.clickParameters != None: self.clickAction(self.clickParameters)
-                                else: self.clickAction()
-                            time.sleep(Button.clickCooldown)
-                        if click[0] == 0 and self.lastClickState == 1:
-                            if self.releaseAction != None:
-                                if self.releaseParameters != None: self.releaseAction(self.releaseParameters)
-                                else: self.releaseAction()
+                        if not Button.sleepThread.isAlive():
+                            if click[0] == 1:
+                                if self.clickAction != None:
+                                    if self.clickParameters != None: self.clickAction(self.clickParameters)
+                                    else: self.clickAction()
+
+                                Button.sleepThread = Thread(target = time.sleep, args = (Button.clickCooldown,)) 
+                                Button.sleepThread.start()    
+
+                            if click[0] == 0 and self.lastClickState == 1:
+                                if self.releaseAction != None:
+                                    if self.releaseParameters != None: self.releaseAction(self.releaseParameters)
+                                    else: self.releaseAction()
                     else: Draw.RoundRect(self.surface,self.idleColor,self.rect,self.radius,self.borderWidth,self.borderColor)
                 else: Draw.RoundRect(self.surface,self.idleColor,self.rect,self.radius,self.borderWidth,self.borderColor)
             else: Draw.RoundRect(self.surface,self.disabledColor,self.rect,self.radius,self.borderWidth,self.borderColor)
@@ -67,7 +73,8 @@ class Button:
 
             self.lastClickState = click[0]
 
-            return self.rect
+            if self.borderWidth != None: return (self.rect[0]-self.borderWidth,self.rect[1]-self.borderWidth,self.rect[2]+2*self.borderWidth,self.rect[3]+2*self.borderWidth)
+            else: return self.rect
 
         
 
