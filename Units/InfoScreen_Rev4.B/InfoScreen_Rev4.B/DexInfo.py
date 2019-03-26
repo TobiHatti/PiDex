@@ -24,7 +24,8 @@ class DexInfo:
 #########################################################################################
 
     pokeData = None
-    currentPokemon = 1
+    evoChain = None
+    currentPokemon = 133
     running = True
     loadNewPokemon = False
     statScreenActive = False
@@ -95,6 +96,26 @@ class DexInfo:
 
         return evoChain 
 
+    def FullChain():
+        simpleChain = DexInfo.EvoChain()
+        fullChain = [[simpleChain[0]]]
+        fullChainSegment = []
+
+        for sCh in simpleChain:
+            currentSelector = sCh
+            fullChainSegment = []
+
+            parameters = (currentSelector,)
+            DexInfo.c.execute("""SELECT * FROM evolutions WHERE evoDex = ?""",parameters)
+            evoResults = DexInfo.c.fetchall()
+            for evoResult in evoResults:
+                if evoResult != None:
+                    fullChainSegment.append(evoResult["evoNextDex"])
+            if len(fullChainSegment) != 0:
+                fullChain.append(fullChainSegment)
+
+        return fullChain
+
 #########################################################################################
 #########################################################################################
 #   MAIN START                                                                          #
@@ -134,7 +155,7 @@ class DexInfo:
 
         spriteSurface = pygame.Surface((300,300)).convert_alpha()
 
-        evoChainSurface = pygame.Surface((500-2*26,360-2*26)).convert_alpha()
+        evoChainSurface = pygame.Surface((500-26,360-26)).convert_alpha()
 
 #########################################################################################
 #   VARIABLE DEFINITIONS                                                                #
@@ -222,12 +243,12 @@ class DexInfo:
             Draw.RoundRect(mainSurface,dexTypeColor,(10,300,400,115),15,2,dexTypeColor)
             Draw.RoundRect(mainSurface,(40,40,40),(10,10,500,360),26,2,dexTypeColor)
 
-            # Sprites
-            Draw.RoundRect(mainSurface,(40,40,40),(412,18,90,90),21,2,dexTypeColor)
+            # Sprites (In sprite cycle)
+            #Draw.RoundRect(mainSurface,(40,40,40),(412,18,90,90),21,2,dexTypeColor)
             spriteImg = pygame.image.load("sprites/" + str('{0:03d}'.format(DexInfo.pokeData["nationalDex"])) +"/sprite-small-FN-" + str('{0:03d}'.format(DexInfo.pokeData["nationalDex"])) + ".png")
             spriteImg = pygame.transform.scale(spriteImg,(96,96))
-            mainSurface.blit(spriteImg,(412-3,18-3))
-            Text.Write(mainSurface,(456,118),"Show Sprites",12,"joy.otf",(255,255,255),True)
+            #mainSurface.blit(spriteImg,(412-3,18-3))
+            #Text.Write(mainSurface,(456,118),"Show Sprites",12,"joy.otf",(255,255,255),True)
 
             # Evo Chain
             evoImg = pygame.image.load("sprites/" + str('{0:03d}'.format(DexInfo.pokeData["nationalDex"])) +"/sprite-small-FN-" + str('{0:03d}'.format(DexInfo.pokeData["nationalDex"])) + ".png")
@@ -292,11 +313,10 @@ class DexInfo:
 
             # Form Buttons
             pygame.display.update(pygame.draw.rect(mainSurface,(40,40,40),(22,330,476,36)))
-            
 
+            DexInfo.evoChain = DexInfo.EvoChain()
+            DexInfo.fullChain = DexInfo.FullChain()
 
-            print(DexInfo.EvoChain())
-            
             pygame.display.update()
 
             spriteReloaded = False
@@ -384,25 +404,74 @@ class DexInfo:
                     pygame.display.update(pygame.draw.rect(mainSurface,(40,40,40),(22,330,476,36)))
                 
 
-                # Animation-Cycle for the Sprite
+                # Animation-Cycle for the Sprite and Stat-Screens
                 if DexInfo.statScreenActive:
                     print("stat")
                 elif DexInfo.evoScreenActive:
-                    pygame.draw.rect(evoChainSurface,(40,40,40),(90,5,300,300))
+
+                    Draw.RoundRect(mainSurface,(40,40,40),(10,10,500,360),26,2,dexTypeColor)
+
                     evoChainSurface.fill((40,40,40))
                     evoChainSurface.set_colorkey((0,0,0))
                     Text.Write(evoChainSurface,(250,30),"Evolution Chain",25,"joy.otf",(255,255,255),True)
-                    mainSurface.blit(evoChainSurface,(10+26,10))
-                    pygame.display.update(10,10,500-2*26,360-2*26)
+                    
+
+                    
+                    verticalOffset = 0
+
+                    if len(DexInfo.fullChain) == 1: horizontalOffset = 205
+                    elif len(DexInfo.fullChain) == 2: horizontalOffset = 205 - 48 - 40
+                    elif len(DexInfo.fullChain) == 3: horizontalOffset = 205 - 96 - 60
+                    elif len(DexInfo.fullChain) == 4: horizontalOffset = 205 - 144 - 75
+
+                    for evoGroups in DexInfo.fullChain:
+
+                        if len(evoGroups) == 1: verticalOffset = 131
+                        elif len(evoGroups) == 2:verticalOffset = 83
+                        else: verticalOffset = 35
+
+                        evoItemCount = 0
+                        for evoItem in evoGroups:
+                            evoItemImg = pygame.transform.scale(pygame.image.load("sprites/" + str('{0:03d}'.format(evoItem)) +"/sprite-small-FN-" + str('{0:03d}'.format(evoItem)) + ".png"),(96,96))
+                            evoChainSurface.blit(evoItemImg,(horizontalOffset,verticalOffset))
+                            verticalOffset += 96
+                            evoItemCount += 1
+                            if evoItemCount >= 3: 
+                                horizontalOffset += 60
+                                verticalOffset = 35
+                                evoItemCount = 0
+                        horizontalOffset += 150
+
+                    Text.Write(evoChainSurface,(250,320),str(len(DexInfo.fullChain)) + " stage evolution-chain",20,"joy.otf",(255,255,255),True)
+
+                    mainSurface.blit(evoChainSurface,(23,23))
+                    Draw.Pokeball(mainSurface,(35,35),dexTypeColor,(40,40,40))
+                    pygame.display.update(0,0,526,386)
+
+
                 else:
                     if not DexInfo.thread.isAlive() and Sprite.loadedSpriteNr == DexInfo.currentPokemon:
                         if runtimeCtr % 1 == 0: 
+
+                            Draw.RoundRect(mainSurface,(40,40,40),(10,10,500,360),26,2,dexTypeColor)
                             Sprite.Cycle(Sprite.frameIndex,Sprite.tilesAmount,Sprite.frames)    
                             spriteSurface.fill((40,40,40))
                             spriteSurface.set_colorkey((0,0,0))
                             spriteSurface.blit(Sprite.current,Sprite.sprite)
                             mainSurface.blit(spriteSurface,(100,15))
-                            pygame.display.update(100,15,300,300)
+                            Draw.Pokeball(mainSurface,(35,35),dexTypeColor,(40,40,40))
+                            #pygame.display.update(100,15,300,300)
+
+                            # Sprites
+                            Draw.RoundRect(mainSurface,(40,40,40),(412,18,90,90),21,2,dexTypeColor)
+                            spriteImg = pygame.image.load("sprites/" + str('{0:03d}'.format(DexInfo.pokeData["nationalDex"])) +"/sprite-small-FN-" + str('{0:03d}'.format(DexInfo.pokeData["nationalDex"])) + ".png")
+                            spriteImg = pygame.transform.scale(spriteImg,(96,96))
+                            mainSurface.blit(spriteImg,(412-3,18-3))
+                            Text.Write(mainSurface,(456,118),"Show Sprites",12,"joy.otf",(255,255,255),True)
+
+
+                            pygame.display.update(0,0,526,386)
+                            
                     else:
                         spriteSurface.fill((40,40,40))
                         spriteSurface.set_colorkey((0,0,0))
@@ -434,7 +503,6 @@ class DexInfo:
                 else: loadActiveCounter = 0
 
                 if not spriteReloaded and loadActiveCounter >= spriteReloadTrigger: 
-                    print("Retriggering")
                     DexInfo.thread = Thread(target = Sprite.Create, args = ("spritesheets/Simplified/" + str(DexInfo.currentPokemon) + "FN.gif",DexInfo.currentPokemon,)) 
                     DexInfo.thread.start()     
                     spriteReloaded = True

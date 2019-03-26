@@ -83,3 +83,10 @@ class Draw(object):
         pygame.gfxdraw.filled_polygon(surface,((pos[0]+30+200,pos[1]),(pos[0]+200+70,pos[1]),(pos[0]+200+70,pos[1]+35),(pos[0]+200,pos[1]+35),(pos[0]+30+200,pos[1])),color)
         Text.Write(surface,(pos[0]+75,pos[1]+18),text,20,"joy.otf",(255,255,255),True)
         return (pos[0],pos[1],220,35)
+
+    class Arrow:
+
+        def Left(surface,color,pos,size):
+            pygame.gfxdraw.aapolygon(surface,((pos[0],pos[1]-10*size),(pos[0]+10*size,pos[1]),(pos[0],pos[1]+10*size),(pos[0],pos[1]-10*size)),color)
+            pygame.gfxdraw.filled_polygon(surface,((pos[0],pos[1]-10*size),(pos[0]+10*size,pos[1]),(pos[0],pos[1]+10*size),(pos[0],pos[1]-10*size)),color)
+            
