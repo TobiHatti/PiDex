@@ -169,8 +169,8 @@ class DexInfo:
         DexInfo.c.execute("SELECT * FROM pokemon LEFT JOIN types AS typeA ON pokemon.typeID1 = typeA.id WHERE pokemon.nationalDex = ?",parameters)
         pmResult = DexInfo.c.fetchone()
 
-        colorA = (int(pmResult["typeBGColor"].split(',')[0]), int(pmResult["typeBGColor"].split(',')[1]), int(pmResult["typeBGColor"].split(',')[2]))
-        colorB = (int(pmResult["typeBtnHoverColor"].split(',')[0]), int(pmResult["typeBtnHoverColor"].split(',')[1]), int(pmResult["typeBtnHoverColor"].split(',')[2]))
+        colorA = (int(pmResult["typeColor"].split(',')[0]), int(pmResult["typeColor"].split(',')[1]), int(pmResult["typeColor"].split(',')[2]))
+        colorB = (int(pmResult["typeColorBright"].split(',')[0]), int(pmResult["typeColorBright"].split(',')[1]), int(pmResult["typeColorBright"].split(',')[2]))
 
         return (colorA,colorB)
 
@@ -257,12 +257,8 @@ class DexInfo:
             DexInfo.c.execute("""SELECT *,
                         evoNext.evoNextDex AS nextEvolution,
                         evoPrev.evoDex AS prevEvolution,
-                        typeA.typeNameEN AS type1NameEN,
-                        typeA.typeNameDE AS type1NameDE,
-                        typeA.typeIconImage AS type1IconImage,
-                        typeB.typeNameEN AS type2NameEN,
-                        typeB.typeNameDE AS type2NameDE,
-                        typeB.typeIconImage AS type2IconImage
+                        typeA.typeName AS type1Name,
+                        typeB.typeName AS type2Name
                         FROM pokemon 
                         LEFT JOIN sprites ON pokemon.nationalDex = sprites.nationalDex
                         LEFT JOIN types AS typeA ON pokemon.typeID1 = typeA.id 
@@ -278,8 +274,8 @@ class DexInfo:
             DexInfo.pokeData = DexInfo.c.fetchone()
 
 
-            dexTypeColor = (int(DexInfo.pokeData["typeBGColor"].split(',')[0]), int(DexInfo.pokeData["typeBGColor"].split(',')[1]), int(DexInfo.pokeData["typeBGColor"].split(',')[2]))
-            dexTypeColorDark = (int(DexInfo.pokeData["typeBtnHoverColor"].split(',')[0]), int(DexInfo.pokeData["typeBtnHoverColor"].split(',')[1]), int(DexInfo.pokeData["typeBtnHoverColor"].split(',')[2]))
+            dexTypeColor = (int(DexInfo.pokeData["typeColor"].split(',')[0]), int(DexInfo.pokeData["typeColor"].split(',')[1]), int(DexInfo.pokeData["typeColor"].split(',')[2]))
+            dexTypeColorDark = (int(DexInfo.pokeData["typeColorBright"].split(',')[0]), int(DexInfo.pokeData["typeColorBright"].split(',')[1]), int(DexInfo.pokeData["typeColorBright"].split(',')[2]))
 
             # Button Setup
             Button.idleColor = dexTypeColor
@@ -324,7 +320,7 @@ class DexInfo:
             Text.Write(mainSurface,(525+55,123),str('{0:.2f}'.format(DexInfo.pokeData["weight"]/10)) + " kg",19,"joy.otf",(255,255,255),True)
             Draw.RoundRect(mainSurface,(40,40,40),(525+115,40,146,45),10,1,dexTypeColor,"")
             Text.Write(mainSurface,(525+115+73,50),"Egg Group",17,"joy.otf",(255,255,255),True)
-            Text.Write(mainSurface,(525+115+73,73),DexInfo.pokeData["eggGroupNameEN"],17,"joy.otf",(255,255,255),True)
+            Text.Write(mainSurface,(525+115+73,73),DexInfo.pokeData["eggGroupName"],17,"joy.otf",(255,255,255),True)
             Draw.RoundRect(mainSurface,(40,40,40),(520,200,270,100),15,2,dexTypeColor,"Evolution Chain")
             Draw.RoundRect(mainSurface,(40,40,40),(520,310,270,60),15,2,dexTypeColor,"Gender Ratio")
             Draw.RoundRect(mainSurface,(40,40,40),(10,360,300,110),15,2,dexTypeColor)
@@ -355,7 +351,7 @@ class DexInfo:
             Draw.Pokeball(mainSurface,(35,35),dexTypeColor,(40,40,40))
 
             Text.Write(mainSurface,(28,376),"#" + str('{0:03d}'.format(DexInfo.pokeData["nationalDex"])),35,"joy.otf",(255,255,255))
-            Text.Write(mainSurface,(138,376),DexInfo.pokeData["nameEN"],35,"joy.otf",(255,255,255))
+            Text.Write(mainSurface,(138,376),DexInfo.pokeData["name"],35,"joy.otf",(255,255,255))
             Text.Write(mainSurface,(20,425),"Species:",20,"calibrilight.ttf",(255,255,255))
             Text.Write(mainSurface,(20,445),"Region:",20,"calibrilight.ttf",(255,255,255))
             Text.Write(mainSurface,(90,425),DexInfo.pokeData["species"],20,"calibrilight.ttf",(255,255,255))
@@ -368,11 +364,11 @@ class DexInfo:
             pygame.draw.rect(mainSurface,dexTypeColor,(464,383,45,12))
             Text.Write(mainSurface,(425,396),"T  Y  P  E  :",18,"joy.otf",dexTypeColor)
 
-            if DexInfo.pokeData["type2NameEN"] == None or DexInfo.pokeData["type2NameEN"] == "":
-                Draw.TypeSignSingle(mainSurface,(520,380),dexTypeColor,DexInfo.pokeData["type1NameEN"])
+            if DexInfo.pokeData["type2Name"] == None or DexInfo.pokeData["type2Name"] == "":
+                Draw.TypeSignSingle(mainSurface,(520,380),dexTypeColor,DexInfo.pokeData["type1Name"])
             else:
-                Draw.TypeSign1(mainSurface,(520,380),dexTypeColor,DexInfo.pokeData["type1NameEN"])
-                Draw.TypeSign2(mainSurface,(645,380),dexTypeColorDark,DexInfo.pokeData["type2NameEN"])
+                Draw.TypeSign1(mainSurface,(520,380),dexTypeColor,DexInfo.pokeData["type1Name"])
+                Draw.TypeSign2(mainSurface,(645,380),dexTypeColorDark,DexInfo.pokeData["type2Name"])
 
 
             # Drawing Buttons before cycle (fixes visual bug)
@@ -493,7 +489,7 @@ class DexInfo:
                         Text.Write(evoChainSurface,(275,70),"Base Exp.:",15,"joy.otf",(180,180,180))
                         Text.Write(evoChainSurface,(365,70),str(DexInfo.pokeData["baseExp"]),15,"joy.otf",(255,255,255))
                         Text.Write(evoChainSurface,(275,90),"Growth.:",15,"joy.otf",(180,180,180))
-                        Text.Write(evoChainSurface,(355,90),str(DexInfo.pokeData["growthRateEN"]),15,"joy.otf",(255,255,255))
+                        Text.Write(evoChainSurface,(355,90),str(DexInfo.pokeData["growthRate"]),15,"joy.otf",(255,255,255))
 
                         Text.Write(evoChainSurface,(275,110),"EV-Yield:",15,"joy.otf",(180,180,180))
                         # Fetch EV-Yield data
@@ -502,7 +498,7 @@ class DexInfo:
                         pmResult = DexInfo.c.fetchall()
                         evYieldTextOffset = 0
                         for evYield in pmResult:
-                            Text.Write(evoChainSurface,(360,110 + evYieldTextOffset),str(evYield["evYieldPoints"]) + " " + evYield["evYieldTypeEN"],15,"joy.otf",(255,255,255))
+                            Text.Write(evoChainSurface,(360,110 + evYieldTextOffset),str(evYield["evYieldPoints"]) + " " + evYield["evYieldType"],15,"joy.otf",(255,255,255))
                             evYieldTextOffset += 20
 
 

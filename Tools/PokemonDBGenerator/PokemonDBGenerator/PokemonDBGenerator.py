@@ -53,6 +53,12 @@ client = pokepy.V2Client()
 
 eGr = 0
 
+pokemonWithMega = (15,18,80,208,256,260,302,319,323,334,362,373,376,380,381,384,428,475,351,719,3,6,9,65,94,115,127,130,142,150,181,212,214,229,248,257,282,303,306,308,310,354,359,445,448,460)
+for pm in pokemonWithMega:
+    parameters = (pm,)
+    print(pm)
+    c.execute("UPDATE pokemon SET hasMegaEvolution = 1 WHERE nationalDex = ?",parameters)
+    conn.commit()
 
 
 pokemonEvoChain = client.get_evolution_chain(10)
