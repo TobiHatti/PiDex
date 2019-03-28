@@ -11,33 +11,63 @@ conn.row_factory = sqlite3.Row
 c = conn.cursor()
 
 
-parameters = (2,)
-c.execute("""SELECT * FROM pokemon WHERE regionID = 1 OR regionID = 2 OR regionID = 3 OR regionID = 4 ORDER BY nameEN ASC""")
-
-
+c.execute("""SELECT * FROM pokemon WHERE (regionID = 1 OR regionID = 2 OR regionID = 3 OR regionID = 4) AND hasMegaEvolution = 1 ORDER BY name ASC""")
 pokeData = c.fetchall()
-i=0
 
-onlyfiles = [f for f in listdir("spritesheets/Simplyfied/") if isfile(join("spritesheets/Simplyfied/", f))]
-
-
-
-for data in pokeData:
-    print(str(data["nationalDex"]) + "  " + data["nameEN"])
+i = 0
+for pm in pokeData:
     try:
-        if data["genderDifference"] == 1: 
-            #print(data["nameEN"] + "_Female")
+        os.rename("MegaEvolutions/" + pm["name"] + "_Mega.gif", "MegaEvolutions/" + str(pm["nationalDex"]) + "FNM.gif")
+        print(pm["nationalDex"])
+    except: print("Error: " + pm["name"])
+    i+=1
+
+print(i)
+
+
+
+#c.execute("""SELECT * FROM pokemon WHERE (regionID = 1 OR regionID = 2 OR regionID = 3 OR regionID = 4) AND genderDifference = 1 ORDER BY name ASC""")
+#pokeData = c.fetchall()
+
+#i = 0
+#for pm in pokeData:
+#    try:
+#        os.rename("GendersFemale/" + pm["name"] + "_Female.gif", "GendersFemale/" + str(pm["nationalDex"]) + "FNF.gif")
+#        print(pm["nationalDex"])
+#    except: print("Error: " + pm["name"])
+#    i+=1
+
+#print(i)
+
+
+
+#parameters = (2,)
+#c.execute("""SELECT * FROM pokemon WHERE regionID = 1 OR regionID = 2 OR regionID = 3 OR regionID = 4 ORDER BY nameEN ASC""")
+
+
+#pokeData = c.fetchall()
+#i=0
+
+#onlyfiles = [f for f in listdir("spritesheets/Simplyfied/") if isfile(join("spritesheets/Simplyfied/", f))]
+
+
+
+#for data in pokeData:
+#    print(str(data["nationalDex"]) + "  " + data["nameEN"])
+#    try:
+#        if data["genderDifference"] == 1: 
+#            #print(data["nameEN"] + "_Female")
 
             
-            #os.rename("spritesheets/Simplyfied/" + data["nameEN"] + ".gif", "spritesheets/Simplyfied/" + str(data["nationalDex"]) + "FN.gif")
-            i += 1
-        else:
-            #os.rename("spritesheets/Simplyfied/" + data["nameEN"] + ".gif", "spritesheets/Simplyfied/" + str(data["nationalDex"]) + "FN.gif")
-            i += 1
-    except: print("Error: " + data["nameEN"])
+#            #os.rename("spritesheets/Simplyfied/" + data["nameEN"] + ".gif", "spritesheets/Simplyfied/" + str(data["nationalDex"]) + "FN.gif")
+#            i += 1
+#        else:
+#            #os.rename("spritesheets/Simplyfied/" + data["nameEN"] + ".gif", "spritesheets/Simplyfied/" + str(data["nationalDex"]) + "FN.gif")
+#            i += 1
+#    except: print("Error: " + data["nameEN"])
 
-print(str(i))
+#print(str(i))
 
-conn.commit()
+#conn.commit()
 
-conn.close()
+#conn.close()
