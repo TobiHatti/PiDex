@@ -11,15 +11,35 @@ conn.row_factory = sqlite3.Row
 c = conn.cursor()
 
 
-c.execute("""SELECT * FROM pokemon WHERE (regionID = 1 OR regionID = 2 OR regionID = 3 OR regionID = 4) AND hasMegaEvolution = 1 ORDER BY name ASC""")
+#c.execute("""SELECT * FROM pokemon WHERE (regionID = 1 OR regionID = 2 OR regionID = 3 OR regionID = 4) AND hasMegaEvolution = 1 ORDER BY name ASC""")
+c.execute("""SELECT * FROM pokemon ORDER BY name ASC""")
 pokeData = c.fetchall()
 
 i = 0
 for pm in pokeData:
+
+    #try:
+    #    os.rename("Shiny/" + pm["name"] + "_Mega.gif", "Shiny/" + str(pm["nationalDex"]) + "FSM.gif")
+    #    print(pm["nationalDex"])
+    #except: pass
+
+    #try:
+    #    os.rename("Shiny/" + pm["name"] + "_Female.gif", "Shiny/" + str(pm["nationalDex"]) + "FSF.gif")
+    #    print(pm["nationalDex"])
+    #except: pass
+
+    #try:
+    #    os.rename("Shiny/" + pm["name"] + ".gif", "Shiny/" + str(pm["nationalDex"]) + "FS.gif")
+    #except: pass
+
     try:
-        os.rename("MegaEvolutions/" + pm["name"] + "_Mega.gif", "MegaEvolutions/" + str(pm["nationalDex"]) + "FNM.gif")
-        print(pm["nationalDex"])
-    except: print("Error: " + pm["name"])
+        os.rename("Shiny/" + pm["name"] + "_Alola.gif", "Shiny/" + str(pm["nationalDex"]) + "FSA.gif")
+    except: pass
+
+    try:
+        os.rename("Shiny/" + pm["name"] + "_M.gif", "Shiny/" + str(pm["nationalDex"]) + "FS.gif")
+    except: pass
+    
     i+=1
 
 print(i)
