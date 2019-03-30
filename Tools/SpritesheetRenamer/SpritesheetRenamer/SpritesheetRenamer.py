@@ -14,11 +14,12 @@ c = conn.cursor()
 
 
 #c.execute("""SELECT * FROM pokemon WHERE (regionID = 1 OR regionID = 2 OR regionID = 3 OR regionID = 4) AND hasMegaEvolution = 1 ORDER BY name ASC""")
-c.execute("""SELECT * FROM pokemon ORDER BY name ASC""")
+c.execute("""SELECT * FROM pokemon ORDER BY nationalDex ASC""")
 pokeData = c.fetchall()
 
 i = 0
 for pm in pokeData:
+
 
     # Renamer
     #try:
@@ -53,158 +54,161 @@ for pm in pokeData:
     #if os.path.isfile(filePath3) and os.path.isfile(filePath1): print(str(pm["nationalDex"]) + " = Wrong") 
     #if os.path.isfile(filePath4) and os.path.isfile(filePath1): print(str(pm["nationalDex"]) + " = Wrong") 
 
-    try: os.rename("NormalAll/" + str(pm["nationalDex"]) + "FN.gif", "NormalAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FN.gif")
-    except: pass
+    # Renaming Spritesheets
+    #try: os.rename("NormalAll/" + str(pm["nationalDex"]) + "FN.gif", "NormalAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FN.gif")
+    #except: pass
 
-    try: os.rename("NormalAll/" + str(pm["nationalDex"]) + "FNF.gif", "NormalAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FNF.gif")
-    except: pass
+    #try: os.rename("NormalAll/" + str(pm["nationalDex"]) + "FNF.gif", "NormalAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FNF.gif")
+    #except: pass
 
-    try: os.rename("NormalAll/" + str(pm["nationalDex"]) + "FNM.gif", "NormalAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FNM.gif")
-    except: pass
+    #try: os.rename("NormalAll/" + str(pm["nationalDex"]) + "FNM.gif", "NormalAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FNM.gif")
+    #except: pass
 
-    try: os.rename("NormalAll/" + str(pm["nationalDex"]) + "FNM1.gif", "NormalAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FNM1.gif")
-    except: pass
+    #try: os.rename("NormalAll/" + str(pm["nationalDex"]) + "FNM1.gif", "NormalAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FNM1.gif")
+    #except: pass
 
-    try: os.rename("NormalAll/" + str(pm["nationalDex"]) + "FNM2.gif", "NormalAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FNM2.gif")
-    except: pass
+    #try: os.rename("NormalAll/" + str(pm["nationalDex"]) + "FNM2.gif", "NormalAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FNM2.gif")
+    #except: pass
 
-    try: os.rename("NormalAll/" + str(pm["nationalDex"]) + "FNA.gif", "NormalAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FNA.gif")
-    except: pass
+    #try: os.rename("NormalAll/" + str(pm["nationalDex"]) + "FNA.gif", "NormalAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FNA.gif")
+    #except: pass
 
-    try: os.rename("ShinyAll/" + str(pm["nationalDex"]) + "FS.gif", "ShinyAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FS.gif")
-    except: pass
+    #try: os.rename("ShinyAll/" + str(pm["nationalDex"]) + "FS.gif", "ShinyAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FS.gif")
+    #except: pass
 
-    try: os.rename("ShinyAll/" + str(pm["nationalDex"]) + "FSF.gif", "ShinyAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FSF.gif")
-    except: pass
+    #try: os.rename("ShinyAll/" + str(pm["nationalDex"]) + "FSF.gif", "ShinyAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FSF.gif")
+    #except: pass
 
-    try: os.rename("ShinyAll/" + str(pm["nationalDex"]) + "FSM.gif", "ShinyAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FSM.gif")
-    except: pass
+    #try: os.rename("ShinyAll/" + str(pm["nationalDex"]) + "FSM.gif", "ShinyAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FSM.gif")
+    #except: pass
 
-    try: os.rename("ShinyAll/" + str(pm["nationalDex"]) + "FSM1.gif", "ShinyAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FSM1.gif")
-    except: pass
+    #try: os.rename("ShinyAll/" + str(pm["nationalDex"]) + "FSM1.gif", "ShinyAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FSM1.gif")
+    #except: pass
 
-    try: os.rename("ShinyAll/" + str(pm["nationalDex"]) + "FSM2.gif", "ShinyAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FSM2.gif")
-    except: pass
+    #try: os.rename("ShinyAll/" + str(pm["nationalDex"]) + "FSM2.gif", "ShinyAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FSM2.gif")
+    #except: pass
 
-    try: os.rename("ShinyAll/" + str(pm["nationalDex"]) + "FSA.gif", "ShinyAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FSA.gif")
-    except: pass
+    #try: os.rename("ShinyAll/" + str(pm["nationalDex"]) + "FSA.gif", "ShinyAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FSA.gif")
+    #except: pass
 
-    for x in range(0,30):
-        try: os.rename("ShinyAll/" + str(pm["nationalDex"]) + "FSL" + str('{0:02d}'.format(x)) + ".gif", "ShinyAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FSL" + str('{0:02d}'.format(x)) + ".gif")
-        except: pass
+    #for x in range(0,30):
+    #    try: os.rename("ShinyAll/" + str(pm["nationalDex"]) + "FSL" + str('{0:02d}'.format(x)) + ".gif", "ShinyAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FSL" + str('{0:02d}'.format(x)) + ".gif")
+    #    except: pass
 
-        try: os.rename("NormalAll/" + str(pm["nationalDex"]) + "FNL" + str('{0:02d}'.format(x)) + ".gif", "NormalAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FNL" + str('{0:02d}'.format(x)) + ".gif")
-        except: pass
+    #    try: os.rename("NormalAll/" + str(pm["nationalDex"]) + "FNL" + str('{0:02d}'.format(x)) + ".gif", "NormalAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FNL" + str('{0:02d}'.format(x)) + ".gif")
+    #    except: pass
 
     # DB Update
 
-    #filePathFN = "NormalAll/" + str(pm["nationalDex"]) + "FN.gif"
-    #filePathFNF = "NormalAll/" + str(pm["nationalDex"]) + "FNF.gif"
-    #filePathFNM = "NormalAll/" + str(pm["nationalDex"]) + "FNM.gif"
-    #filePathFNM1 = "NormalAll/" + str(pm["nationalDex"]) + "FNM1.gif"
-    #filePathFNM2 = "NormalAll/" + str(pm["nationalDex"]) + "FNM2.gif"
-    #filePathFNA = "NormalAll/" + str(pm["nationalDex"]) + "FNA.gif"
+    print(pm["nationalDex"])
 
-    #filePathFS = "ShinyAll/" + str(pm["nationalDex"]) + "FS.gif"
-    #filePathFSF = "ShinyAll/" + str(pm["nationalDex"]) + "FSF.gif"
-    #filePathFSM = "ShinyAll/" + str(pm["nationalDex"]) + "FSM.gif"
-    #filePathFSM1 = "ShinyAll/" + str(pm["nationalDex"]) + "FSM1.gif"
-    #filePathFSM2 = "ShinyAll/" + str(pm["nationalDex"]) + "FSM2.gif"
-    #filePathFSA = "ShinyAll/" + str(pm["nationalDex"]) + "FSA.gif"
+    filePathFN = "NormalAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FN.gif"
+    filePathFNF = "NormalAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FNF.gif"
+    filePathFNM = "NormalAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FNM.gif"
+    filePathFNM1 = "NormalAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FNM1.gif"
+    filePathFNM2 = "NormalAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FNM2.gif"
+    filePathFNA = "NormalAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FNA.gif"
 
-    #filePathMultiFormCheck1 = "NormalAll/" + str(pm["nationalDex"]) + "FNL01.gif"
-    #filePathMultiFormCheck2 = "NormalAll/" + str(pm["nationalDex"]) + "FSL01.gif"
+    filePathFS = "ShinyAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FS.gif"
+    filePathFSF = "ShinyAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FSF.gif"
+    filePathFSM = "ShinyAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FSM.gif"
+    filePathFSM1 = "ShinyAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FSM1.gif"
+    filePathFSM2 = "ShinyAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FSM2.gif"
+    filePathFSA = "ShinyAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FSA.gif"
 
-    #if not os.path.isfile(filePathMultiFormCheck1) and not os.path.isfile(filePathMultiFormCheck2): 
+    filePathMultiFormCheck1 = "NormalAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FNL01.gif"
+    filePathMultiFormCheck2 = "ShinyAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FSL01.gif"
 
-    #    parameters = (pm["nationalDex"],)
-    #    c.execute("INSERT INTO sprites (nationalDex) VALUES (?)",parameters)
-    #    conn.commit()
+    if not os.path.isfile(filePathMultiFormCheck1) and not os.path.isfile(filePathMultiFormCheck2): 
 
-    #    if os.path.isfile(filePathFN):
-    #        c.execute("UPDATE sprites SET spriteSheetHDFront = '" + str('{0:03d}'.format(pm["nationalDex"])) + "FN.gif' WHERE nationalDex = ?",parameters)
-    #        conn.commit()
+        parameters = (pm["nationalDex"],)
+        c.execute("INSERT INTO sprites (nationalDex) VALUES (?)",parameters)
+        conn.commit()
 
-    #    if os.path.isfile(filePathFNF):
-    #        c.execute("UPDATE sprites SET spriteSheetHDFrontFemale = '" + str('{0:03d}'.format(pm["nationalDex"])) + "FNF.gif' WHERE nationalDex = ?",parameters)
-    #        conn.commit()
+        if os.path.isfile(filePathFN):
+            c.execute("UPDATE sprites SET spriteSheetHDFront = '" + str('{0:03d}'.format(pm["nationalDex"])) + "FN.gif' WHERE nationalDex = ?",parameters)
+            conn.commit()
 
-    #    if os.path.isfile(filePathFS):
-    #        c.execute("UPDATE sprites SET spriteSheetHDFrontShiny = '" + str('{0:03d}'.format(pm["nationalDex"])) + "FS.gif' WHERE nationalDex = ?",parameters)
-    #        conn.commit()
+        if os.path.isfile(filePathFNF):
+            c.execute("UPDATE sprites SET spriteSheetHDFrontFemale = '" + str('{0:03d}'.format(pm["nationalDex"])) + "FNF.gif' WHERE nationalDex = ?",parameters)
+            conn.commit()
 
-    #    if os.path.isfile(filePathFSF):
-    #        c.execute("UPDATE sprites SET spriteSheetHDFrontFemaleShiny = '" + str('{0:03d}'.format(pm["nationalDex"])) + "FSF.gif' WHERE nationalDex = ?",parameters)
-    #        conn.commit()
+        if os.path.isfile(filePathFS):
+            c.execute("UPDATE sprites SET spriteSheetHDFrontShiny = '" + str('{0:03d}'.format(pm["nationalDex"])) + "FS.gif' WHERE nationalDex = ?",parameters)
+            conn.commit()
+
+        if os.path.isfile(filePathFSF):
+            c.execute("UPDATE sprites SET spriteSheetHDFrontFemaleShiny = '" + str('{0:03d}'.format(pm["nationalDex"])) + "FSF.gif' WHERE nationalDex = ?",parameters)
+            conn.commit()
 
 
-    #    if os.path.isfile(filePathFSM) or os.path.isfile(filePathFNM): 
-    #        c.execute("INSERT INTO sprites (nationalDex,isMegaEvolution) VALUES (?,1)",parameters)
-    #        conn.commit()
+        if os.path.isfile(filePathFSM) or os.path.isfile(filePathFNM): 
+            c.execute("INSERT INTO sprites (nationalDex,isMegaEvolution) VALUES (?,1)",parameters)
+            conn.commit()
 
-    #        if os.path.isfile(filePathFNM):
-    #            c.execute("UPDATE sprites SET spriteSheetHDFront = '" + str('{0:03d}'.format(pm["nationalDex"])) + "FNM.gif' WHERE nationalDex = ?",parameters)
-    #            conn.commit()
+            if os.path.isfile(filePathFNM):
+                c.execute("UPDATE sprites SET spriteSheetHDFront = '" + str('{0:03d}'.format(pm["nationalDex"])) + "FNM.gif' WHERE nationalDex = ? AND isMegaEvolution = 1",parameters)
+                conn.commit()
 
-    #        if os.path.isfile(filePathFSM):
-    #            c.execute("UPDATE sprites SET spriteSheetHDFrontShiny = '" + str('{0:03d}'.format(pm["nationalDex"])) + "FSM.gif' WHERE nationalDex = ?",parameters)
-    #            conn.commit()
+            if os.path.isfile(filePathFSM):
+                c.execute("UPDATE sprites SET spriteSheetHDFrontShiny = '" + str('{0:03d}'.format(pm["nationalDex"])) + "FSM.gif' WHERE nationalDex = ? AND isMegaEvolution = 1",parameters)
+                conn.commit()
 
-    #    if os.path.isfile(filePathFSM1) or os.path.isfile(filePathFNM1): 
-    #        c.execute("INSERT INTO sprites (nationalDex,isMegaEvolution) VALUES (?,1)",parameters)
-    #        conn.commit()
+        if os.path.isfile(filePathFSM1) or os.path.isfile(filePathFNM1): 
+            c.execute("INSERT INTO sprites (nationalDex,isMegaEvolution) VALUES (?,1)",parameters)
+            conn.commit()
 
-    #        if os.path.isfile(filePathFNM1):
-    #            c.execute("UPDATE sprites SET spriteSheetHDFront = '" + str('{0:03d}'.format(pm["nationalDex"])) + "FNM1.gif' WHERE nationalDex = ?",parameters)
-    #            conn.commit()
+            if os.path.isfile(filePathFNM1):
+                c.execute("UPDATE sprites SET spriteSheetHDFront = '" + str('{0:03d}'.format(pm["nationalDex"])) + "FNM1.gif' WHERE nationalDex = ? AND isMegaEvolution = 1",parameters)
+                conn.commit()
 
-    #        if os.path.isfile(filePathFSM1):
-    #            c.execute("UPDATE sprites SET spriteSheetHDFrontShiny = '" + str('{0:03d}'.format(pm["nationalDex"])) + "FSM1.gif' WHERE nationalDex = ?",parameters)
-    #            conn.commit()
+            if os.path.isfile(filePathFSM1):
+                c.execute("UPDATE sprites SET spriteSheetHDFrontShiny = '" + str('{0:03d}'.format(pm["nationalDex"])) + "FSM1.gif' WHERE nationalDex = ? AND isMegaEvolution = 1",parameters)
+                conn.commit()
 
-    #    if os.path.isfile(filePathFSM2) or os.path.isfile(filePathFNM2): 
-    #        c.execute("INSERT INTO sprites (nationalDex,isMegaEvolution) VALUES (?,1)",parameters)
-    #        conn.commit()
+        if os.path.isfile(filePathFSM2) or os.path.isfile(filePathFNM2): 
+            c.execute("INSERT INTO sprites (nationalDex,isMegaEvolution) VALUES (?,1)",parameters)
+            conn.commit()
 
-    #        if os.path.isfile(filePathFNM2):
-    #            c.execute("UPDATE sprites SET spriteSheetHDFront = '" + str('{0:03d}'.format(pm["nationalDex"])) + "FNM2.gif' WHERE nationalDex = ?",parameters)
-    #            conn.commit()
+            if os.path.isfile(filePathFNM2):
+                c.execute("UPDATE sprites SET spriteSheetHDFront = '" + str('{0:03d}'.format(pm["nationalDex"])) + "FNM2.gif' WHERE nationalDex = ? AND isMegaEvolution = 1",parameters)
+                conn.commit()
 
-    #        if os.path.isfile(filePathFSM2):
-    #            c.execute("UPDATE sprites SET spriteSheetHDFrontShiny = '" + str('{0:03d}'.format(pm["nationalDex"])) + "FSM2.gif' WHERE nationalDex = ?",parameters)
-    #            conn.commit()
+            if os.path.isfile(filePathFSM2):
+                c.execute("UPDATE sprites SET spriteSheetHDFrontShiny = '" + str('{0:03d}'.format(pm["nationalDex"])) + "FSM2.gif' WHERE nationalDex = ? AND isMegaEvolution = 1",parameters)
+                conn.commit()
 
-    #    if os.path.isfile(filePathFSA) or os.path.isfile(filePathFNA): 
-    #        c.execute("INSERT INTO sprites (nationalDex,isAlolaForm) VALUES (?,1)",parameters)
-    #        conn.commit()
+        if os.path.isfile(filePathFSA) or os.path.isfile(filePathFNA): 
+            c.execute("INSERT INTO sprites (nationalDex,isAlolaForm) VALUES (?,1)",parameters)
+            conn.commit()
 
-    #        if os.path.isfile(filePathFNA):
-    #            c.execute("UPDATE sprites SET spriteSheetHDFront = '" + str('{0:03d}'.format(pm["nationalDex"])) + "FNA.gif' WHERE nationalDex = ?",parameters)
-    #            conn.commit()
+            if os.path.isfile(filePathFNA):
+                c.execute("UPDATE sprites SET spriteSheetHDFront = '" + str('{0:03d}'.format(pm["nationalDex"])) + "FNA.gif' WHERE nationalDex = ? AND isAlolaForm = 1",parameters)
+                conn.commit()
 
-    #        if os.path.isfile(filePathFSA):
-    #            c.execute("UPDATE sprites SET spriteSheetHDFrontShiny = '" + str('{0:03d}'.format(pm["nationalDex"])) + "FSA.gif' WHERE nationalDex = ?",parameters)
-    #            conn.commit()
+            if os.path.isfile(filePathFSA):
+                c.execute("UPDATE sprites SET spriteSheetHDFrontShiny = '" + str('{0:03d}'.format(pm["nationalDex"])) + "FSA.gif' WHERE nationalDex = ? AND isAlolaForm = 1",parameters)
+                conn.commit()
 
-    #else:
+    else:
 
-    #    for x in range(0,30):
+        for x in range(0,30):
 
-    #        filePathMultiFormFN = "NormalAll/" + str(pm["nationalDex"]) + "FNL" + str('{0:02d}'.format(x)) + ".gif"
-    #        filePathMultiFormFS = "ShinyAll/" + str(pm["nationalDex"]) + "FSL" + str('{0:02d}'.format(x)) + ".gif"
+            filePathMultiFormFN = "NormalAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FNL" + str('{0:02d}'.format(x)) + ".gif"
+            filePathMultiFormFS = "ShinyAll/" + str('{0:03d}'.format(pm["nationalDex"])) + "FSL" + str('{0:02d}'.format(x)) + ".gif"
 
-    #        if os.path.isfile(filePathMultiFormFN) or os.path.isfile(filePathMultiFormFS): 
-    #            parameters = (pm["nationalDex"],)
-    #            c.execute("INSERT INTO sprites (nationalDex, formNumber) VALUES (?, " + str(x) + ")",parameters)
-    #            conn.commit()
+            if os.path.isfile(filePathMultiFormFN) or os.path.isfile(filePathMultiFormFS): 
+                parameters = (pm["nationalDex"],)
+                c.execute("INSERT INTO sprites (nationalDex, formNumber) VALUES (?, " + str(x) + ")",parameters)
+                conn.commit()
 
-    #            if os.path.isfile(filePathMultiFormFN):
-    #                c.execute("UPDATE sprites SET spriteSheetHDFront = '" + str('{0:03d}'.format(pm["nationalDex"])) + "FNL" + str('{0:02d}'.format(x)) + ".gif' WHERE nationalDex = ? AND formNumber = " + str(x),parameters)
-    #                conn.commit()
+                if os.path.isfile(filePathMultiFormFN):
+                    c.execute("UPDATE sprites SET spriteSheetHDFront = '" + str('{0:03d}'.format(pm["nationalDex"])) + "FNL" + str('{0:02d}'.format(x)) + ".gif' WHERE nationalDex = ? AND formNumber = " + str(x),parameters)
+                    conn.commit()
 
-    #            if os.path.isfile(filePathMultiFormFS):
-    #                c.execute("UPDATE sprites SET spriteSheetHDFrontFemale = '" + str('{0:03d}'.format(pm["nationalDex"])) + "FSL" + str('{0:02d}'.format(x)) + ".gif' WHERE nationalDex = ? AND formNumber = " + str(x),parameters)
-    #                conn.commit()
+                if os.path.isfile(filePathMultiFormFS):
+                    c.execute("UPDATE sprites SET spriteSheetHDFrontShiny = '" + str('{0:03d}'.format(pm["nationalDex"])) + "FSL" + str('{0:02d}'.format(x)) + ".gif' WHERE nationalDex = ? AND formNumber = " + str(x),parameters)
+                    conn.commit()
     i+=1
 
 print(i)

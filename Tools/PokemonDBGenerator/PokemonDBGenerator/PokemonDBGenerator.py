@@ -53,11 +53,20 @@ client = pokepy.V2Client()
 
 eGr = 0
 
-pokemonWithMega = (15,18,80,208,256,260,302,319,323,334,362,373,376,380,381,384,428,475,351,719,3,6,9,65,94,115,127,130,142,150,181,212,214,229,248,257,282,303,306,308,310,354,359,445,448,460)
+pokemonWithMega = (15,18,80,208,256,260,302,319,323,334,362,373,376,380,381,384,428,475,351,719,3,6,9,65,94,115,127,130,142,150,181,212,214,229,248,257,282,303,306,308,310,354,359,445,448,460,6,150)
+
 for pm in pokemonWithMega:
     parameters = (pm,)
     print(pm)
-    c.execute("UPDATE pokemon SET hasMegaEvolution = 1 WHERE nationalDex = ?",parameters)
+    #c.execute("UPDATE pokemon SET hasMegaEvolution = 1 WHERE nationalDex = ?",parameters)
+    
+    c.execute("SELECT * FROM pokemon WHERE nationalDex = " + str(pm))
+    pokeData = c.fetchone()
+
+    newName = "Mega " + pokeData["name"]
+
+    parameters = (pm,newName,pokeData["typeID1"],pokeData["typeID2"],)
+    c.execute("INSERT INTO pokemonMega (nationalDex,megaName,megaTypeID1,megaTypeID2) VALUES (?,?,?,?)",parameters)
     conn.commit()
 
 
@@ -178,29 +187,29 @@ pokemonSpecies = client.get_pokemon_species(pokemonEvoChain[0].chain.species.nam
 
 
 
-for j in range(1,803):
-    try: 
-        #pokemon = client.get_pokemon(j)
-        pokemonSpecies = client.get_pokemon_species(j)
-        #pokemonEvoChain = client.get_evolution_chain(j)
+#for j in range(1,803):
+#    try: 
+#        #pokemon = client.get_pokemon(j)
+#        pokemonSpecies = client.get_pokemon_species(j)
+#        #pokemonEvoChain = client.get_evolution_chain(j)
 
-        for x in range(0,100):
-            try:
-                if pokemonSpecies[0].flavor_text_entries[x].language.name=="en":
-                     print(str(j)+ ": " + pokemonSpecies[0].flavor_text_entries[x].flavor_text)
-                     parameters = (pokemonSpecies[0].flavor_text_entries[x].flavor_text,j,)
-                     c.execute("UPDATE pokemon SET dexInfo = ? WHERE nationalDex = ?",parameters)
-                     conn.commit()
-                     print()
-                     break
-            except: pass
+#        for x in range(0,100):
+#            try:
+#                if pokemonSpecies[0].flavor_text_entries[x].language.name=="en":
+#                     print(str(j)+ ": " + pokemonSpecies[0].flavor_text_entries[x].flavor_text)
+#                     parameters = (pokemonSpecies[0].flavor_text_entries[x].flavor_text,j,)
+#                     c.execute("UPDATE pokemon SET dexInfo = ? WHERE nationalDex = ?",parameters)
+#                     conn.commit()
+#                     print()
+#                     break
+#            except: pass
        
         
         
 
 
         
-    except: pass
+#    except: pass
 
 
 

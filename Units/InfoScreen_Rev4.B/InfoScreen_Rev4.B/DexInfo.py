@@ -24,6 +24,10 @@ class DexInfo:
 #########################################################################################
 
     pokeData = None
+    formData = None
+    megaData = None
+    megaDataSingle = None
+
     evoChain = None
     currentPokemon = 1
     running = True
@@ -32,33 +36,89 @@ class DexInfo:
     evoSelectActive = False
     statsScreenActive = False
 
+
+    megaEvolutionSelected = False
+    megaEvolutionNumber = 0
+
+
+
     genderFemaleSelected = False
+
+    shinySelected = False
+
 
     conn = sqlite3.connect('pokemon.db')
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
 
     thread = Thread()
+    sleepThread = Thread()
 
 #########################################################################################
 #   TOGGLE FUNCTION                                                                     #
 #########################################################################################
     
-    def ToggleGenderSelectMale():
-        DexInfo.genderFemaleSelected = False
-        DexInfo.loadNewPokemon = True
+    def ToggleShinyOn():
+        DexInfo.shinySelected = True
         DexInfo.LoadSpritesheet()
 
-    def ToggleGenderSelectFemale():
-        DexInfo.genderFemaleSelected = True
+    def ToggleShinyOff():
+        DexInfo.shinySelected = False
+        DexInfo.LoadSpritesheet()
+
+    def ToggleMegaEvolution1():
+        if DexInfo.megaEvolutionNumber == 1 and DexInfo.megaEvolutionSelected == True: DexInfo.megaEvolutionSelected = False
+        else: DexInfo.megaEvolutionSelected = True
+        DexInfo.megaEvolutionNumber = 1
         DexInfo.loadNewPokemon = True
+
+        DexInfo.LoadSpritesheet()
+
+    def ToggleMegaEvolution2():
+        if DexInfo.megaEvolutionNumber == 2 and DexInfo.megaEvolutionSelected == True: DexInfo.megaEvolutionSelected = False
+        else: DexInfo.megaEvolutionSelected = True
+        DexInfo.megaEvolutionNumber = 2
+        DexInfo.loadNewPokemon = True
+
+        DexInfo.LoadSpritesheet()
+
+    def ToggleNormalMale():
+        DexInfo.shinySelected = False
+        DexInfo.genderFemaleSelected = False
+        DexInfo.megaEvolutionSelected = False
+        DexInfo.loadNewPokemon = True
+
+        DexInfo.LoadSpritesheet()
+
+    def ToggleNormalFemale():
+        DexInfo.shinySelected = False
+        DexInfo.genderFemaleSelected = True
+        DexInfo.megaEvolutionSelected = False
+        DexInfo.loadNewPokemon = True
+
+        DexInfo.LoadSpritesheet()
+
+    def ToggleShinyMale():
+        DexInfo.shinySelected = True
+        DexInfo.genderFemaleSelected = False
+        DexInfo.megaEvolutionSelected = False
+        DexInfo.loadNewPokemon = True
+
+        DexInfo.LoadSpritesheet()
+
+    def ToggleShinyFemale():
+        DexInfo.shinySelected = True
+        DexInfo.genderFemaleSelected = True
+        DexInfo.megaEvolutionSelected = False
+        DexInfo.loadNewPokemon = True
+
         DexInfo.LoadSpritesheet()
 
     def ToggleStatsScreen():
         if DexInfo.statsScreenActive: DexInfo.statsScreenActive = False
         else: DexInfo.statsScreenActive = True
         DexInfo.oneTimeCycleLoad = True
-
+         
         DexInfo.evoScreenActive = False
         DexInfo.evoSelectActive = False
     
@@ -81,44 +141,153 @@ class DexInfo:
     def ToggleNextDex():
         DexInfo.loadNewPokemon = True
         DexInfo.evoSelectActive = False
+        DexInfo.megaEvolutionSelected = False
         DexInfo.currentPokemon += 1
         if DexInfo.currentPokemon >= 803: DexInfo.currentPokemon = 1
+
+        DexInfo.LoadSpritesheet()
 
     def TogglePrevDex():
         DexInfo.loadNewPokemon = True
         DexInfo.evoSelectActive = False
+        DexInfo.megaEvolutionSelected = False
         DexInfo.currentPokemon -= 1
         if DexInfo.currentPokemon <=  0: DexInfo.currentPokemon = 802
+
+        DexInfo.LoadSpritesheet()
 
     def ToggleNextEvo():
         DexInfo.loadNewPokemon = True
         DexInfo.evoSelectActive = False
+        DexInfo.megaEvolutionSelected = False
         if DexInfo.pokeData["nextEvolution"] != None:
             DexInfo.currentPokemon = DexInfo.pokeData["nextEvolution"]
+
+        DexInfo.LoadSpritesheet()
 
     def TogglePrevEvo():
         DexInfo.loadNewPokemon = True
         DexInfo.evoSelectActive = False
+        DexInfo.megaEvolutionSelected = False
         if DexInfo.pokeData["prevEvolution"] != None:
             DexInfo.currentPokemon = DexInfo.pokeData["prevEvolution"]
+
+        DexInfo.LoadSpritesheet()
 
     def ToggleDexNumber(dexNumber):
         DexInfo.loadNewPokemon = True
         DexInfo.evoSelectActive = False
+        DexInfo.megaEvolutionSelected = False
         DexInfo.currentPokemon = dexNumber
 
-    def LoadSpritesheet():
-        parameters = (DexInfo.currentPokemon,)
-        DexInfo.c.execute("SELECT * FROM pokemon WHERE nationalDex = ?",parameters)
-        pokeTmp = DexInfo.c.fetchone()
+        DexInfo.LoadSpritesheet()
 
-        if pokeTmp["hasMegaEvolution"] == 1 and DexInfo.MegaEvolutionSelected:
-            DexInfo.thread = Thread(target = Sprite.Create, args = ("spritesheets/Simplified/" + str(DexInfo.currentPokemon) + "FNM.gif",DexInfo.currentPokemon,)) 
-        elif pokeTmp["genderDifference"] == 1:
-            if DexInfo.genderFemaleSelected: DexInfo.thread = Thread(target = Sprite.Create, args = ("spritesheets/Simplified/" + str(DexInfo.currentPokemon) + "FNF.gif",DexInfo.currentPokemon,)) 
-            else: DexInfo.thread = Thread(target = Sprite.Create, args = ("spritesheets/Simplified/" + str(DexInfo.currentPokemon) + "FN.gif",DexInfo.currentPokemon,)) 
-        else: 
-            DexInfo.thread = Thread(target = Sprite.Create, args = ("spritesheets/Simplified/" + str(DexInfo.currentPokemon) + "FN.gif",DexInfo.currentPokemon,)) 
+    def GetPokeData(nationalDex):
+        parameters = (nationalDex,)
+        DexInfo.c.execute("""SELECT *,
+                evoNext.evoNextDex AS nextEvolution,
+                evoPrev.evoDex AS prevEvolution,
+                typeA.typeName AS type1Name,
+                typeB.typeName AS type2Name
+                FROM pokemon 
+                LEFT JOIN sprites ON pokemon.nationalDex = sprites.nationalDex
+                AND (sprites.isMegaEvolution IS NULL OR sprites.isMegaEvolution = '')
+                LEFT JOIN types AS typeA ON pokemon.typeID1 = typeA.id 
+                LEFT JOIN types AS typeB ON pokemon.typeID2 = typeB.id 
+                LEFT JOIN regions ON pokemon.regionID = regions.id 
+                LEFT JOIN evYields ON pokemon.nationalDex = evYields.nationalDex
+                LEFT JOIN evYieldTypes ON evYields.evYieldTypeID = evYieldTypes.id
+                LEFT JOIN growthRates ON pokemon.growthRateID = growthRates.id
+                LEFT JOIN eggGroups ON pokemon.eggGroupID = eggGroups.id
+                LEFT JOIN evolutions AS evoNext ON pokemon.nationalDex = evoNext.evoDex
+                LEFT JOIN evolutions AS evoPrev ON pokemon.nationalDex = evoPrev.evoNextDex
+                WHERE pokemon.nationalDex = ? 
+                """,parameters)
+        return DexInfo.c.fetchone()
+
+    def GetMegaData(nationalDex):
+        parameters = (nationalDex,)
+        DexInfo.c.execute("""SELECT *,
+                typeA.typeName AS type1Name,
+                typeB.typeName AS type2Name
+                FROM pokemon
+                LEFT JOIN pokemonMega ON pokemon.nationalDex = pokemonMega.nationalDex
+                LEFT JOIN megaStones ON pokemonMega.megaStoneID = megaStones.id
+                LEFT JOIN sprites ON pokemon.nationalDex = sprites.nationalDex
+                AND sprites.isMegaEvolution = 1
+                LEFT JOIN types AS typeA ON pokemonMega.megaTypeID1 = typeA.id 
+                LEFT JOIN types AS typeB ON pokemonMega.megaTypeID2 = typeB.id 
+                WHERE pokemon.nationalDex = ?
+                ORDER BY megaName ASC
+                """,parameters)
+        # Duplicate entries because of left join
+        result = DexInfo.c.fetchall()
+        if len(result) > 1: return [result[0],result[3]]
+        else: return result
+
+    def GetFormData(nationalDex):
+        parameters = (nationalDex,)
+        DexInfo.c.execute("""SELECT *,
+                evoNext.evoNextDex AS nextEvolution,
+                evoPrev.evoDex AS prevEvolution,
+                typeA.typeName AS type1Name,
+                typeB.typeName AS type2Name
+                FROM pokemon 
+                LEFT JOIN sprites ON pokemon.nationalDex = sprites.nationalDex
+                LEFT JOIN types AS typeA ON pokemon.typeID1 = typeA.id 
+                LEFT JOIN types AS typeB ON pokemon.typeID2 = typeB.id 
+                LEFT JOIN regions ON pokemon.regionID = regions.id 
+                LEFT JOIN evYields ON pokemon.nationalDex = evYields.nationalDex
+                LEFT JOIN evYieldTypes ON evYields.evYieldTypeID = evYieldTypes.id
+                LEFT JOIN growthRates ON pokemon.growthRateID = growthRates.id
+                LEFT JOIN eggGroups ON pokemon.eggGroupID = eggGroups.id
+                LEFT JOIN evolutions AS evoNext ON pokemon.nationalDex = evoNext.evoDex
+                LEFT JOIN evolutions AS evoPrev ON pokemon.nationalDex = evoPrev.evoNextDex
+                WHERE pokemon.nationalDex = ? 
+                """,parameters)
+        return DexInfo.c.fetchone()
+
+    def LoadSpritesheet():
+
+        pokeTmp = DexInfo.GetPokeData(DexInfo.currentPokemon)
+        megaTmp = DexInfo.GetMegaData(DexInfo.currentPokemon)
+
+        if DexInfo.shinySelected:
+        # SHINY
+            # Spritesheets for Mega-Evolutions
+            if pokeTmp["hasMegaEvolution"] == 1 and DexInfo.megaEvolutionSelected:
+                if len(megaTmp) > 1:
+                    if DexInfo.megaEvolutionNumber == 1: spriteFile = megaTmp[0]["spriteSheetHDFrontShiny"]
+                    else: spriteFile = megaTmp[1]["spriteSheetHDFrontShiny"]
+                else: spriteFile = megaTmp[0]["spriteSheetHDFrontShiny"]
+
+            # Spritesheets for Gender-Difference
+            elif pokeTmp["genderDifference"] == 1:
+                if DexInfo.genderFemaleSelected: spriteFile = pokeTmp["spriteSheetHDFrontFemaleShiny"]
+                else: spriteFile = pokeTmp["spriteSheetHDFrontShiny"]
+
+            # Default Spritesheet
+            else:
+                spriteFile = pokeTmp["spriteSheetHDFrontShiny"]
+        else:
+        # NORMAL
+            # Spritesheets for Mega-Evolutions
+            if pokeTmp["hasMegaEvolution"] == 1 and DexInfo.megaEvolutionSelected:
+                if len(megaTmp) > 1:
+                    if DexInfo.megaEvolutionNumber == 1: spriteFile = megaTmp[0]["spriteSheetHDFront"]
+                    else: spriteFile = megaTmp[1]["spriteSheetHDFront"]
+                else: spriteFile = megaTmp[0]["spriteSheetHDFront"]
+
+            # Spritesheets for Gender-Difference
+            elif pokeTmp["genderDifference"] == 1:
+                if DexInfo.genderFemaleSelected: spriteFile = pokeTmp["spriteSheetHDFrontFemale"]
+                else: spriteFile = pokeTmp["spriteSheetHDFront"]
+
+            # Default Spritesheet
+            else:
+                spriteFile = pokeTmp["spriteSheetHDFront"]
+
+        DexInfo.thread = Thread(target = Sprite.Create, args = ("spriteSheets/" + str(spriteFile),DexInfo.currentPokemon,)) 
         DexInfo.thread.start()
 
     def EvoChain():
@@ -196,6 +365,15 @@ class DexInfo:
 
         return (colorA,colorB)
 
+    def MegaEvolutionCount():
+        parameters = (DexInfo.currentPokemon,)
+        # CHANGE TO pokemonMega-Database
+        DexInfo.c.execute("SELECT * FROM sprites WHERE nationalDex = ? AND isMegaEvolution = 1",parameters)
+        pmResult = DexInfo.c.fetchall()
+
+        if pmResult != None: return len(pmResult)
+        else: return 0 
+
 #########################################################################################
 #########################################################################################
 #   MAIN START                                                                          #
@@ -266,30 +444,21 @@ class DexInfo:
             statResMax= DexInfo.c.fetchone()
             statSegment.append(statResMax[stat])
             statMinMaxVals.append(statSegment)
-           
 
         while DexInfo.running:
 
             # Loading data
-            parameters = (DexInfo.currentPokemon,)
-            DexInfo.c.execute("""SELECT *,
-                        evoNext.evoNextDex AS nextEvolution,
-                        evoPrev.evoDex AS prevEvolution,
-                        typeA.typeName AS type1Name,
-                        typeB.typeName AS type2Name
-                        FROM pokemon 
-                        LEFT JOIN sprites ON pokemon.nationalDex = sprites.nationalDex
-                        LEFT JOIN types AS typeA ON pokemon.typeID1 = typeA.id 
-                        LEFT JOIN types AS typeB ON pokemon.typeID2 = typeB.id 
-                        LEFT JOIN regions ON pokemon.regionID = regions.id 
-                        LEFT JOIN evYields ON pokemon.nationalDex = evYields.nationalDex
-                        LEFT JOIN evYieldTypes ON evYields.evYieldTypeID = evYieldTypes.id
-                        LEFT JOIN growthRates ON pokemon.growthRateID = growthRates.id
-                        LEFT JOIN eggGroups ON pokemon.eggGroupID = eggGroups.id
-                        LEFT JOIN evolutions AS evoNext ON pokemon.nationalDex = evoNext.evoDex
-                        LEFT JOIN evolutions AS evoPrev ON pokemon.nationalDex = evoPrev.evoNextDex
-                        WHERE pokemon.nationalDex = ?""",parameters)
-            DexInfo.pokeData = DexInfo.c.fetchone()
+            DexInfo.pokeData = DexInfo.GetPokeData(DexInfo.currentPokemon)
+
+            DexInfo.formData = None
+
+            DexInfo.megaData = DexInfo.GetMegaData(DexInfo.currentPokemon)
+
+            if DexInfo.megaEvolutionSelected:
+                if len(DexInfo.megaData) > 1:
+                    if DexInfo.megaEvolutionNumber == 1: DexInfo.megaDataSingle = DexInfo.megaData[0] 
+                    else: DexInfo.megaDataSingle = DexInfo.megaData[1]
+                else: DexInfo.megaDataSingle = DexInfo.megaData[0]
 
             dexTypeColor = (int(DexInfo.pokeData["typeColor"].split(',')[0]), int(DexInfo.pokeData["typeColor"].split(',')[1]), int(DexInfo.pokeData["typeColor"].split(',')[2]))
             dexTypeColorDark = (int(DexInfo.pokeData["typeColorBright"].split(',')[0]), int(DexInfo.pokeData["typeColorBright"].split(',')[1]), int(DexInfo.pokeData["typeColorBright"].split(',')[2]))
@@ -303,26 +472,30 @@ class DexInfo:
             Button.fontFamily = "joy.otf"
 
             # Nav Buttons
-            btnPrevDex = Button.RoundRect(mainSurface,(320,430,100,30),10,"Prev Dex",15,2,DexInfo.TogglePrevDex,None,DexInfo.LoadSpritesheet)
-            btnPrevEvo = Button.RoundRect(mainSurface,(440,430,100,30),10,"Prev Evo",15,2,DexInfo.TogglePrevEvo,None,DexInfo.LoadSpritesheet)
-            btnNextEvo = Button.RoundRect(mainSurface,(560,430,100,30),10,"Next Evo",15,2,DexInfo.ToggleNextEvo,None,DexInfo.LoadSpritesheet)
-            btnNextEvoSelect = Button.RoundRect(mainSurface,(560,430,100,30),10,"Next Evo",15,2,DexInfo.ToggleEvoSelector)
-            btnNextDex = Button.RoundRect(mainSurface,(680,430,100,30),10,"Next Dex",15,2,DexInfo.ToggleNextDex,None,DexInfo.LoadSpritesheet)
+            btnPrevDex = Button.RoundRect(mainSurface,(320,425,110,40),15,"Prev Dex",18,1,DexInfo.TogglePrevDex,None)
+            btnPrevEvo = Button.RoundRect(mainSurface,(440,425,110,40),15,"Prev Evo",18,1,DexInfo.TogglePrevEvo,None)
+            btnNextEvo = Button.RoundRect(mainSurface,(560,425,110,40),15,"Next Evo",18,1,DexInfo.ToggleNextEvo,None)
+            btnNextEvoSelect = Button.RoundRect(mainSurface,(560,425,110,40),15,"Next Evo",18,1,DexInfo.ToggleEvoSelector)
+            btnNextDex = Button.RoundRect(mainSurface,(680,425,110,40),15,"Next Dex",18,1,DexInfo.ToggleNextDex,None)
 
             # Gender Buttons
-            btnGenderM = Button.RoundRect(mainSurface,(18,160,40,40),10,"M",25,2,DexInfo.ToggleGenderSelectMale)
-            btnGenderF = Button.RoundRect(mainSurface,(18,210,40,40),10,"F",25,2,DexInfo.ToggleGenderSelectFemale)
+            btnFormNormal = Button.RoundRect(mainSurface,(520,150,126,40),15,"Normal",20,1,DexInfo.ToggleShinyOff)
+            btnFormShiny = Button.RoundRect(mainSurface,(661,150,126,40),15,"Shiny",20,1,DexInfo.ToggleShinyOn)
+
+            btnFormNormalMale = Button.RoundRect(mainSurface,(520,150,60,40),15,"M",25,1,DexInfo.ToggleNormalMale)
+            btnFormNormalFemale = Button.RoundRect(mainSurface,(520 + 66,150,60,40),15,"F",25,1,DexInfo.ToggleNormalFemale)
+
+            btnFormShinyMale = Button.RoundRect(mainSurface,(661,150,60,40),15,"SM",25,1,DexInfo.ToggleShinyMale)
+            btnFormShinyFemale = Button.RoundRect(mainSurface,(661 + 66,150,60,40),15,"SF",25,1,DexInfo.ToggleShinyFemale)
+
+            
 
             # MegaEvolution Buttons
-            btnMegaEvo1 = Button.RoundRect(mainSurface,(18,240,40,40),10,"ME1",25,2,DexInfo.ToggleGenderSelectMale)
-            btnMegaEvo2 = Button.RoundRect(mainSurface,(18,280,40,40),10,"ME2",25,2,DexInfo.ToggleGenderSelectFemale)
-
-            # Form Buttons
-            btnFormNormal = Button.RoundRect(mainSurface,(520,155,126,30),10,"Normal",18,2)
-            btnFormShiny = Button.RoundRect(mainSurface,(661,155,126,30),10,"Shiny",18,2)
+            btnMegaEvo1 = Button.RoundRect(mainSurface,(18,280,40,40),10,"ME1",25,1,DexInfo.ToggleMegaEvolution1)
+            btnMegaEvo2 = Button.RoundRect(mainSurface,(18,340,40,40),10,"ME2",25,1,DexInfo.ToggleMegaEvolution2)
 
             # ScreenToggle Buttons
-            btnEvoChainScreen = Button.RoundRect(mainSurface,(745,230,40,65),15,"E-C",20,2,DexInfo.ToggleEvoChainScreen)
+            btnEvoChainScreen = Button.RoundRect(mainSurface,(745,230,40,65),15,"E-C",20,1,DexInfo.ToggleEvoChainScreen)
             btnStatsScreen = Button.RoundRect(mainSurface,(525+115,90,146,45),15,"More Stats",17,None,DexInfo.ToggleStatsScreen)
 
             
@@ -372,7 +545,10 @@ class DexInfo:
             Draw.Pokeball(mainSurface,(35,35),dexTypeColor,(40,40,40))
 
             Text.Write(mainSurface,(28,376),"#" + str('{0:03d}'.format(DexInfo.pokeData["nationalDex"])),35,"joy.otf",(255,255,255))
-            Text.Write(mainSurface,(138,376),DexInfo.pokeData["name"],35,"joy.otf",(255,255,255))
+            
+            if DexInfo.megaEvolutionSelected: Text.Write(mainSurface,(138,382),DexInfo.megaDataSingle["megaName"],25,"joy.otf",(255,255,255))
+            else: Text.Write(mainSurface,(138,376),DexInfo.pokeData["name"],35,"joy.otf",(255,255,255))
+
             Text.Write(mainSurface,(20,425),"Species:",20,"calibrilight.ttf",(255,255,255))
             Text.Write(mainSurface,(20,445),"Region:",20,"calibrilight.ttf",(255,255,255))
             Text.Write(mainSurface,(90,425),DexInfo.pokeData["species"],20,"calibrilight.ttf",(255,255,255))
@@ -385,11 +561,18 @@ class DexInfo:
             pygame.draw.rect(mainSurface,dexTypeColor,(464,383,45,12))
             Text.Write(mainSurface,(425,396),"T  Y  P  E  :",18,"joy.otf",dexTypeColor)
 
-            if DexInfo.pokeData["type2Name"] == None or DexInfo.pokeData["type2Name"] == "":
-                Draw.TypeSignSingle(mainSurface,(520,380),dexTypeColor,DexInfo.pokeData["type1Name"])
+            if DexInfo.megaEvolutionSelected:
+                if DexInfo.megaDataSingle["type2Name"] == None or DexInfo.megaDataSingle["type2Name"] == "":
+                    Draw.TypeSignSingle(mainSurface,(520,380),dexTypeColor,DexInfo.megaDataSingle["type1Name"])
+                else:
+                    Draw.TypeSign1(mainSurface,(520,380),dexTypeColor,DexInfo.megaDataSingle["type1Name"])
+                    Draw.TypeSign2(mainSurface,(645,380),dexTypeColorDark,DexInfo.megaDataSingle["type2Name"])
             else:
-                Draw.TypeSign1(mainSurface,(520,380),dexTypeColor,DexInfo.pokeData["type1Name"])
-                Draw.TypeSign2(mainSurface,(645,380),dexTypeColorDark,DexInfo.pokeData["type2Name"])
+                if DexInfo.pokeData["type2Name"] == None or DexInfo.pokeData["type2Name"] == "":
+                    Draw.TypeSignSingle(mainSurface,(520,380),dexTypeColor,DexInfo.pokeData["type1Name"])
+                else:
+                    Draw.TypeSign1(mainSurface,(520,380),dexTypeColor,DexInfo.pokeData["type1Name"])
+                    Draw.TypeSign2(mainSurface,(645,380),dexTypeColorDark,DexInfo.pokeData["type2Name"])
 
 
             # Drawing Buttons before cycle (fixes visual bug)
@@ -401,9 +584,15 @@ class DexInfo:
 
 
                     
-            # Shiny Buttons
-            pygame.display.update(btnFormNormal.Show(False))
-            pygame.display.update(btnFormShiny.Show(False))
+            # Gender & Form Buttons
+            if DexInfo.pokeData["genderDifference"] == 1:    
+                pygame.display.update(btnFormNormalMale.Show(False))
+                pygame.display.update(btnFormNormalFemale.Show(False))
+                pygame.display.update(btnFormShinyMale.Show(False))
+                pygame.display.update(btnFormShinyFemale.Show(False))
+            else:
+                pygame.display.update(btnFormNormal.Show(False))
+                pygame.display.update(btnFormShiny.Show(False))
 
             # Screen Select Buttons
             pygame.display.update(btnEvoChainScreen.Show(False))
@@ -439,6 +628,9 @@ class DexInfo:
                     pygame.quit()
                     sys.exit()
 
+                mouse = pygame.mouse.get_pos()
+                click = pygame.mouse.get_pressed()
+
 
                 if DexInfo.pokeData["nextEvolution"] != None: nextEvoExists = True
                 else: nextEvoExists = False
@@ -455,11 +647,15 @@ class DexInfo:
                     else: pygame.display.update(btnNextEvo.Show(disabled = not nextEvoExists))
                     pygame.display.update(btnNextDex.Show())
 
-      
-
-                    # Shiny Buttons
-                    pygame.display.update(btnFormNormal.Show())
-                    pygame.display.update(btnFormShiny.Show())
+                    # Gender & Form Buttons
+                    if DexInfo.pokeData["genderDifference"] == 1:    
+                        pygame.display.update(btnFormNormalMale.Show())
+                        pygame.display.update(btnFormNormalFemale.Show())
+                        pygame.display.update(btnFormShinyMale.Show())
+                        pygame.display.update(btnFormShinyFemale.Show())
+                    else:
+                        pygame.display.update(btnFormNormal.Show())
+                        pygame.display.update(btnFormShiny.Show())
 
                     # Screen Select Buttons
                     pygame.display.update(btnEvoChainScreen.Show())
@@ -472,11 +668,16 @@ class DexInfo:
                     pygame.display.update(btnPrevEvo.Show(False,not prevEvoExists))
                     pygame.display.update(btnNextEvo.Show(False,not nextEvoExists))
                     pygame.display.update(btnNextDex.Show(False))
-
-                    
-                    # Shiny Buttons
-                    pygame.display.update(btnFormNormal.Show(False))
-                    pygame.display.update(btnFormShiny.Show(False))
+    
+                    # Gender & Form Buttons
+                    if DexInfo.pokeData["genderDifference"] == 1:    
+                        pygame.display.update(btnFormNormalMale.Show(False))
+                        pygame.display.update(btnFormNormalFemale.Show(False))
+                        pygame.display.update(btnFormShinyMale.Show(False))
+                        pygame.display.update(btnFormShinyFemale.Show(False))
+                    else:
+                        pygame.display.update(btnFormNormal.Show(False))
+                        pygame.display.update(btnFormShiny.Show(False))
 
                     # Screen Select Buttons
                     pygame.display.update(btnEvoChainScreen.Show(False))
@@ -556,9 +757,6 @@ class DexInfo:
                     if len(nextEvos) > 4: verticalOffset = 70
 
                     evoCount = 0
-
-                    mouse = pygame.mouse.get_pos()
-                    click = pygame.mouse.get_pressed()
 
                     for evo in nextEvos:
 
@@ -645,15 +843,32 @@ class DexInfo:
 
 ############### ANIMATED SPRITE CYCLE ##################################################################
                 else:
-                    # Gender Buttons
-                    if DexInfo.pokeData["genderDifference"] == 1:              
-                        pygame.display.update(btnGenderM.Show())
-                        pygame.display.update(btnGenderF.Show())
 
+                    # Mega Evolution Buttons
                     if DexInfo.pokeData["hasMegaEvolution"] != None:
-                        pygame.display.update(btnMegaEvo1.Show())
-                        ifpygame.display.update(btnMegaEvo2.Show())
-                        
+                        megaStoneImg = pygame.transform.scale(pygame.image.load("megaStones/" + DexInfo.megaData[0]["megaStoneImage"]),(80,80))
+                        mainSurface.blit(megaStoneImg,(10,290))
+                        if 10 < mouse[0] < 90 and 290 < mouse[1] < 370:
+                            Text.Write(mainSurface,(50,330),"Mega",18,"joy.otf",dexTypeColor,True)
+                            if not DexInfo.sleepThread.isAlive() and click[0] == 1: 
+                                DexInfo.ToggleMegaEvolution1()
+                                DexInfo.sleepThread = Thread(target = time.sleep, args = (0.3,)) 
+                                DexInfo.sleepThread.start()    
+                        else: Text.Write(mainSurface,(50,330),"Mega",18,"joy.otf",(0,0,0),True)
+                        pygame.display.update((14,274,92,92))
+
+                        if len(DexInfo.megaData) > 1: 
+                            megaStoneImg = pygame.transform.scale(pygame.image.load("megaStones/" + DexInfo.megaData[1]["megaStoneImage"]),(80,80))
+                            mainSurface.blit(megaStoneImg,(10,220))
+                            if 10 < mouse[0] < 90 and 220 < mouse[1] < 300:
+                                Text.Write(mainSurface,(50,260),"Mega",18,"joy.otf",dexTypeColor,True)
+                                if not DexInfo.sleepThread.isAlive() and click[0] == 1: 
+                                    DexInfo.ToggleMegaEvolution2()
+                                    DexInfo.sleepThread = Thread(target = time.sleep, args = (0.3,)) 
+                                    DexInfo.sleepThread.start()    
+                            else: Text.Write(mainSurface,(50,260),"Mega",18,"joy.otf",(0,0,0),True)
+                            pygame.display.update((14,204,92,92))
+
 
                     if DexInfo.oneTimeCycleLoad: 
                         # Sprite-Box
