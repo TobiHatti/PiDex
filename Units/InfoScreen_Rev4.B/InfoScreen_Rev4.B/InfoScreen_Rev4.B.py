@@ -44,6 +44,7 @@ while True:
     DexInfo.Show(1)
 
     pygame.display.update()
+    clock.tick(1)
     
 
 

@@ -27,6 +27,7 @@ class DexInfo:
     formData = None
     megaData = None
     megaDataSingle = None
+    formDataAll = None
 
     evoChain = None
     currentPokemon = 1
@@ -36,11 +37,12 @@ class DexInfo:
     evoSelectActive = False
     statsScreenActive = False
 
+    formNumberSelected = None
 
     megaEvolutionSelected = False
     megaEvolutionNumber = 0
 
-
+    alolaFormSelected = False
 
     genderFemaleSelected = False
 
@@ -58,6 +60,33 @@ class DexInfo:
 #   TOGGLE FUNCTION                                                                     #
 #########################################################################################
     
+    def ReturnToMenu():
+        DexInfo.loadNewPokemon = True
+        DexInfo.running = False
+
+    def ToggleNextForm():
+        DexInfo.formNumberSelected += 1
+        if DexInfo.formNumberSelected > len(DexInfo.formDataAll): DexInfo.formNumberSelected = 1 
+
+        DexInfo.loadNewPokemon = True
+
+        DexInfo.LoadSpritesheet()
+
+    def TogglePrevForm():
+        DexInfo.formNumberSelected -= 1
+        if DexInfo.formNumberSelected < 1: DexInfo.formNumberSelected = len(DexInfo.formDataAll) 
+
+        DexInfo.loadNewPokemon = True
+
+        DexInfo.LoadSpritesheet()
+
+    def ToggleAlolaForm():
+        if DexInfo.alolaFormSelected: DexInfo.alolaFormSelected = False
+        else: DexInfo.alolaFormSelected = True
+        DexInfo.loadNewPokemon = True
+
+        DexInfo.LoadSpritesheet()
+
     def ToggleShinyOn():
         DexInfo.shinySelected = True
         DexInfo.LoadSpritesheet()
@@ -139,6 +168,8 @@ class DexInfo:
         DexInfo.statsScreenActive = False
 
     def ToggleNextDex():
+        DexInfo.formNumberSelected = None
+        DexInfo.alolaFormSelected = False
         DexInfo.loadNewPokemon = True
         DexInfo.evoSelectActive = False
         DexInfo.megaEvolutionSelected = False
@@ -148,6 +179,8 @@ class DexInfo:
         DexInfo.LoadSpritesheet()
 
     def TogglePrevDex():
+        DexInfo.formNumberSelected = None
+        DexInfo.alolaFormSelected = False
         DexInfo.loadNewPokemon = True
         DexInfo.evoSelectActive = False
         DexInfo.megaEvolutionSelected = False
@@ -157,6 +190,8 @@ class DexInfo:
         DexInfo.LoadSpritesheet()
 
     def ToggleNextEvo():
+        DexInfo.formNumberSelected = None
+        DexInfo.alolaFormSelected = False
         DexInfo.loadNewPokemon = True
         DexInfo.evoSelectActive = False
         DexInfo.megaEvolutionSelected = False
@@ -166,6 +201,8 @@ class DexInfo:
         DexInfo.LoadSpritesheet()
 
     def TogglePrevEvo():
+        DexInfo.formNumberSelected = None
+        DexInfo.alolaFormSelected = False
         DexInfo.loadNewPokemon = True
         DexInfo.evoSelectActive = False
         DexInfo.megaEvolutionSelected = False
@@ -175,6 +212,8 @@ class DexInfo:
         DexInfo.LoadSpritesheet()
 
     def ToggleDexNumber(dexNumber):
+        DexInfo.formNumberSelected = None
+        DexInfo.alolaFormSelected = False
         DexInfo.loadNewPokemon = True
         DexInfo.evoSelectActive = False
         DexInfo.megaEvolutionSelected = False
@@ -225,41 +264,72 @@ class DexInfo:
         if len(result) > 1: return [result[0],result[3]]
         else: return result
 
-    def GetFormData(nationalDex):
+    def GetAlolaData(nationalDex):
         parameters = (nationalDex,)
         DexInfo.c.execute("""SELECT *,
-                evoNext.evoNextDex AS nextEvolution,
-                evoPrev.evoDex AS prevEvolution,
                 typeA.typeName AS type1Name,
                 typeB.typeName AS type2Name
                 FROM pokemon 
                 LEFT JOIN sprites ON pokemon.nationalDex = sprites.nationalDex
+                AND sprites.isAlolaForm = 1
                 LEFT JOIN types AS typeA ON pokemon.typeID1 = typeA.id 
                 LEFT JOIN types AS typeB ON pokemon.typeID2 = typeB.id 
-                LEFT JOIN regions ON pokemon.regionID = regions.id 
-                LEFT JOIN evYields ON pokemon.nationalDex = evYields.nationalDex
-                LEFT JOIN evYieldTypes ON evYields.evYieldTypeID = evYieldTypes.id
-                LEFT JOIN growthRates ON pokemon.growthRateID = growthRates.id
-                LEFT JOIN eggGroups ON pokemon.eggGroupID = eggGroups.id
-                LEFT JOIN evolutions AS evoNext ON pokemon.nationalDex = evoNext.evoDex
-                LEFT JOIN evolutions AS evoPrev ON pokemon.nationalDex = evoPrev.evoNextDex
+                WHERE pokemon.nationalDex = ?
+                """,parameters)
+        return DexInfo.c.fetchone()
+
+
+    def GetFormData(nationalDex,formNumber):
+        parameters = (formNumber,formNumber,nationalDex,)
+        DexInfo.c.execute("""SELECT *,
+                typeA.typeName AS type1Name,
+                typeB.typeName AS type2Name
+                FROM pokemon 
+                LEFT JOIN sprites ON pokemon.nationalDex = sprites.nationalDex
+                AND sprites.formNumber = ?
+                LEFT JOIN types AS typeA ON pokemon.typeID1 = typeA.id 
+                LEFT JOIN types AS typeB ON pokemon.typeID2 = typeB.id   
+                LEFT JOIN pokemonForms ON pokemon.nationalDex = pokemonForms.nationalDex
+                AND pokemonForms.formNumber = ?
                 WHERE pokemon.nationalDex = ? 
                 """,parameters)
         return DexInfo.c.fetchone()
+
+    def GetFormDataAll(nationalDex):
+        parameters = (nationalDex,)
+        DexInfo.c.execute("""SELECT *
+                FROM pokemonForms 
+                WHERE nationalDex = ? 
+                """,parameters)
+        return DexInfo.c.fetchall()
 
     def LoadSpritesheet():
 
         pokeTmp = DexInfo.GetPokeData(DexInfo.currentPokemon)
         megaTmp = DexInfo.GetMegaData(DexInfo.currentPokemon)
+        alolaTmp = DexInfo.GetAlolaData(DexInfo.currentPokemon)
+
+        if pokeTmp["hasMultipleForms"] == 1 and DexInfo.formNumberSelected == None: DexInfo.formNumberSelected = pokeTmp["defaultForm"]
+        formTmp = DexInfo.GetFormData(DexInfo.currentPokemon,DexInfo.formNumberSelected)
+
+        
 
         if DexInfo.shinySelected:
         # SHINY
+            # Spritesheets for Multiple Forms
+            if pokeTmp["hasMultipleForms"] == 1:
+                spriteFile = formTmp["spriteSheetHDFrontShiny"]
+
             # Spritesheets for Mega-Evolutions
-            if pokeTmp["hasMegaEvolution"] == 1 and DexInfo.megaEvolutionSelected:
+            elif pokeTmp["hasMegaEvolution"] == 1 and DexInfo.megaEvolutionSelected:
                 if len(megaTmp) > 1:
                     if DexInfo.megaEvolutionNumber == 1: spriteFile = megaTmp[0]["spriteSheetHDFrontShiny"]
                     else: spriteFile = megaTmp[1]["spriteSheetHDFrontShiny"]
                 else: spriteFile = megaTmp[0]["spriteSheetHDFrontShiny"]
+
+            # Spritesheets for Alola-Form
+            elif pokeTmp["hasAlolaForm"] == 1 and DexInfo.alolaFormSelected:
+                spriteFile = alolaTmp["spriteSheetHDFrontShiny"]
 
             # Spritesheets for Gender-Difference
             elif pokeTmp["genderDifference"] == 1:
@@ -271,12 +341,20 @@ class DexInfo:
                 spriteFile = pokeTmp["spriteSheetHDFrontShiny"]
         else:
         # NORMAL
+            # Spritesheets for Multiple Forms
+            if pokeTmp["hasMultipleForms"] == 1:
+                spriteFile = formTmp["spriteSheetHDFront"]
+
             # Spritesheets for Mega-Evolutions
-            if pokeTmp["hasMegaEvolution"] == 1 and DexInfo.megaEvolutionSelected:
+            elif pokeTmp["hasMegaEvolution"] == 1 and DexInfo.megaEvolutionSelected:
                 if len(megaTmp) > 1:
                     if DexInfo.megaEvolutionNumber == 1: spriteFile = megaTmp[0]["spriteSheetHDFront"]
                     else: spriteFile = megaTmp[1]["spriteSheetHDFront"]
                 else: spriteFile = megaTmp[0]["spriteSheetHDFront"]
+
+            # Spritesheets for Alola-Form
+            elif pokeTmp["hasAlolaForm"] == 1 and DexInfo.alolaFormSelected:
+                spriteFile = alolaTmp["spriteSheetHDFront"]
 
             # Spritesheets for Gender-Difference
             elif pokeTmp["genderDifference"] == 1:
@@ -394,7 +472,7 @@ class DexInfo:
         displayHeight = 480
 
         
-
+        idleCtr = 0
 
         try:
             if os.uname()[1] == 'raspberrypi': 
@@ -422,7 +500,7 @@ class DexInfo:
         runtimeCtr = 0
 
         loadActiveCounter = 0
-        spriteReloadTrigger = 30
+        spriteReloadTrigger = 10
         spriteReloaded = False
 
         thread = None
@@ -445,15 +523,27 @@ class DexInfo:
             statSegment.append(statResMax[stat])
             statMinMaxVals.append(statSegment)
 
+        DexInfo.currentPokemon = selectedPokemon
+
+        DexInfo.LoadSpritesheet()
+
         while DexInfo.running:
 
             # Loading data
             DexInfo.pokeData = DexInfo.GetPokeData(DexInfo.currentPokemon)
 
-            DexInfo.formData = None
+            if DexInfo.pokeData["hasMultipleForms"] == 1 and DexInfo.formNumberSelected == None: DexInfo.formNumberSelected = DexInfo.pokeData["defaultForm"]
+
+            DexInfo.formData = DexInfo.GetFormData(DexInfo.currentPokemon,DexInfo.formNumberSelected)
+
+            DexInfo.formDataAll = DexInfo.GetFormDataAll(DexInfo.currentPokemon)
 
             DexInfo.megaData = DexInfo.GetMegaData(DexInfo.currentPokemon)
 
+            DexInfo.alolaData = DexInfo.GetAlolaData(DexInfo.currentPokemon)
+
+            # Set default Form
+            
             if DexInfo.megaEvolutionSelected:
                 if len(DexInfo.megaData) > 1:
                     if DexInfo.megaEvolutionNumber == 1: DexInfo.megaDataSingle = DexInfo.megaData[0] 
@@ -472,11 +562,13 @@ class DexInfo:
             Button.fontFamily = "joy.otf"
 
             # Nav Buttons
-            btnPrevDex = Button.RoundRect(mainSurface,(320,425,110,40),15,"Prev Dex",18,1,DexInfo.TogglePrevDex,None)
-            btnPrevEvo = Button.RoundRect(mainSurface,(440,425,110,40),15,"Prev Evo",18,1,DexInfo.TogglePrevEvo,None)
-            btnNextEvo = Button.RoundRect(mainSurface,(560,425,110,40),15,"Next Evo",18,1,DexInfo.ToggleNextEvo,None)
+            btnPrevDex = Button.RoundRect(mainSurface,(320,425,110,40),15,"Prev Dex",18,1,DexInfo.TogglePrevDex)
+            btnPrevEvo = Button.RoundRect(mainSurface,(440,425,110,40),15,"Prev Evo",18,1,DexInfo.TogglePrevEvo)
+            btnNextEvo = Button.RoundRect(mainSurface,(560,425,110,40),15,"Next Evo",18,1,DexInfo.ToggleNextEvo)
             btnNextEvoSelect = Button.RoundRect(mainSurface,(560,425,110,40),15,"Next Evo",18,1,DexInfo.ToggleEvoSelector)
-            btnNextDex = Button.RoundRect(mainSurface,(680,425,110,40),15,"Next Dex",18,1,DexInfo.ToggleNextDex,None)
+            btnReturn = Button.RoundRect(mainSurface,(15,80,80,40),15,"< Back",18,1,DexInfo.ReturnToMenu)
+
+            btnNextDex = Button.RoundRect(mainSurface,(680,425,110,40),15,"Next Dex",18,1,DexInfo.ToggleNextDex)
 
             # Gender Buttons
             btnFormNormal = Button.RoundRect(mainSurface,(520,150,126,40),15,"Normal",20,1,DexInfo.ToggleShinyOff)
@@ -484,11 +576,15 @@ class DexInfo:
 
             btnFormNormalMale = Button.RoundRect(mainSurface,(520,150,60,40),15,"M",25,1,DexInfo.ToggleNormalMale)
             btnFormNormalFemale = Button.RoundRect(mainSurface,(520 + 66,150,60,40),15,"F",25,1,DexInfo.ToggleNormalFemale)
-
             btnFormShinyMale = Button.RoundRect(mainSurface,(661,150,60,40),15,"SM",25,1,DexInfo.ToggleShinyMale)
             btnFormShinyFemale = Button.RoundRect(mainSurface,(661 + 66,150,60,40),15,"SF",25,1,DexInfo.ToggleShinyFemale)
 
-            
+            # Alola Button
+            btnAlolaToggle = Button.RoundRect(mainSurface,(16,325,70,40),18,"Alola",18,1,DexInfo.ToggleAlolaForm)
+
+            # Form Selectors
+            btnNextForm = Button.RoundRect(mainSurface,(465,160,40,80),18,">",18,1,DexInfo.ToggleNextForm)
+            btnPrevForm = Button.RoundRect(mainSurface,(15,160,40,80),18,"<",18,1,DexInfo.TogglePrevForm)
 
             # MegaEvolution Buttons
             btnMegaEvo1 = Button.RoundRect(mainSurface,(18,280,40,40),10,"ME1",25,1,DexInfo.ToggleMegaEvolution1)
@@ -575,17 +671,20 @@ class DexInfo:
                     Draw.TypeSign2(mainSurface,(645,380),dexTypeColorDark,DexInfo.pokeData["type2Name"])
 
 
+            
+
             # Drawing Buttons before cycle (fixes visual bug)
             # Nav Buttons
             pygame.display.update(btnPrevDex.Show(False))
             pygame.display.update(btnPrevEvo.Show(False))
             pygame.display.update(btnNextEvo.Show(False))
             pygame.display.update(btnNextDex.Show(False))
+            pygame.display.update(btnReturn.Show(False))
 
 
                     
             # Gender & Form Buttons
-            if DexInfo.pokeData["genderDifference"] == 1:    
+            if DexInfo.pokeData["genderDifference"] == 1 and not DexInfo.alolaFormSelected:    
                 pygame.display.update(btnFormNormalMale.Show(False))
                 pygame.display.update(btnFormNormalFemale.Show(False))
                 pygame.display.update(btnFormShinyMale.Show(False))
@@ -646,9 +745,11 @@ class DexInfo:
                     if DexInfo.HasMultipleEvos(): pygame.display.update(btnNextEvoSelect.Show(disabled = not nextEvoExists))
                     else: pygame.display.update(btnNextEvo.Show(disabled = not nextEvoExists))
                     pygame.display.update(btnNextDex.Show())
+                    pygame.display.update(btnReturn.Show())
+
 
                     # Gender & Form Buttons
-                    if DexInfo.pokeData["genderDifference"] == 1:    
+                    if DexInfo.pokeData["genderDifference"] == 1 and not DexInfo.alolaFormSelected:    
                         pygame.display.update(btnFormNormalMale.Show())
                         pygame.display.update(btnFormNormalFemale.Show())
                         pygame.display.update(btnFormShinyMale.Show())
@@ -668,9 +769,10 @@ class DexInfo:
                     pygame.display.update(btnPrevEvo.Show(False,not prevEvoExists))
                     pygame.display.update(btnNextEvo.Show(False,not nextEvoExists))
                     pygame.display.update(btnNextDex.Show(False))
+                    pygame.display.update(btnReturn.Show(False))
     
                     # Gender & Form Buttons
-                    if DexInfo.pokeData["genderDifference"] == 1:    
+                    if DexInfo.pokeData["genderDifference"] == 1 and not DexInfo.alolaFormSelected:    
                         pygame.display.update(btnFormNormalMale.Show(False))
                         pygame.display.update(btnFormNormalFemale.Show(False))
                         pygame.display.update(btnFormShinyMale.Show(False))
@@ -844,6 +946,16 @@ class DexInfo:
 ############### ANIMATED SPRITE CYCLE ##################################################################
                 else:
 
+                    # Form Buttons
+                    if DexInfo.pokeData["hasMultipleForms"] == 1:
+                        
+                        pygame.display.update(btnNextForm.Show())
+                        pygame.display.update(btnPrevForm.Show())
+
+                    # Alola Form Button
+                    if DexInfo.pokeData["hasAlolaForm"] == 1:
+                        pygame.display.update(btnAlolaToggle.Show())
+
                     # Mega Evolution Buttons
                     if DexInfo.pokeData["hasMegaEvolution"] != None:
                         megaStoneImg = pygame.transform.scale(pygame.image.load("megaStones/" + DexInfo.megaData[0]["megaStoneImage"]),(80,80))
@@ -879,6 +991,9 @@ class DexInfo:
                         spriteImg = pygame.transform.scale(spriteImg,(96,96))
                         mainSurface.blit(spriteImg,(412-3,18-3))
                         Text.Write(mainSurface,(456,118),"Show Sprites",12,"joy.otf",(255,255,255),True)
+
+                        if DexInfo.pokeData["hasMultipleForms"] == 1: Text.Write(mainSurface,(250,350),"Form: " + DexInfo.formData["formName"],25,"joy.otf",(255,255,255),True)
+
                         pygame.display.update(0,0,526,386)
 
                     if not DexInfo.thread.isAlive() and Sprite.loadedSpriteNr == DexInfo.currentPokemon:
@@ -909,6 +1024,8 @@ class DexInfo:
                             pygame.gfxdraw.filled_circle(spriteSurface,180,150,8,dexTypeColorDark)
                         pygame.draw.rect(mainSurface,(40,40,40),(22,330,476,36))
                         mainSurface.blit(spriteSurface,(100,30))
+
+
                         pygame.display.update(100,30,300,300)
 
                 clock.tick(60)
@@ -926,4 +1043,65 @@ class DexInfo:
                     DexInfo.LoadSpritesheet()  
                     spriteReloaded = True
 
+                idleCtr += 1
+                if click[0] == 1: idleCtr = 0
+                if idleCtr > 1000:
+                    idleCtr = 0
+                    DexInfo.SleepState()
+                    DexInfo.oneTimeCycleLoad = True
+                    DexInfo.loadNewPokemon = True
+        
+        DexInfo.running = True
         return  DexInfo.currentPokemon
+
+    def SleepState():
+        # PyGame Initialisation
+        clock = pygame.time.Clock()
+
+        # Window and Surface Initialisation
+        displayWidth = 800
+        displayHeight = 480
+
+        try:
+            if os.uname()[1] == 'raspberrypi': 
+                mainSurface = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
+                pygame.mouse.set_cursor((8,8),(0,0),(0,0,0,0,0,0,0,0),(0,0,0,0,0,0,0,0))
+            else: 
+                mainSurface = pygame.display.set_mode((displayWidth,displayHeight))
+                pygame.mouse.set_visible(True)
+        except:
+            mainSurface = pygame.display.set_mode((displayWidth,displayHeight))
+            pygame.mouse.set_visible(True)
+
+        run = True
+
+        pygame.draw.rect(mainSurface,(40,40,40),(0,0,800,480))
+        sleepSurface = pygame.Surface((600,300)).convert_alpha()
+        sleepImg = pygame.image.load("sleeping.png").convert_alpha()
+
+        runtimeCtr = 0
+
+        while run:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+            click = pygame.mouse.get_pressed()
+
+            if click[0] == 1:
+                run = False
+
+            sleepSurface.fill((40,40,40))
+            sleepSurface.set_colorkey((0,0,0))
+            if runtimeCtr % 2 == 0: sleepSurface.blit(sleepImg,(0,0))
+            else: sleepSurface.blit(sleepImg,(-600,0))
+            mainSurface.blit(sleepSurface,(100,180))
+            Text.Write(mainSurface,(400,140),"Sleeping...",30,"joy.otf",(200,200,200),True)
+            pygame.display.update()
+                
+            runtimeCtr += 1
+            if runtimeCtr > 100: runtimeCtr = 0
+
+            clock.tick(2)
+        return
+
