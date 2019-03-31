@@ -84,9 +84,28 @@ class Draw(object):
         Text.Write(surface,(pos[0]+75,pos[1]+18),text,20,"joy.otf",(255,255,255),True)
         return (pos[0],pos[1],220,35)
 
+    def RRCursor(surface,color,rect,radius,borderWidth=None,borderColor=(0,0,0)):
+
+        if borderWidth != None:  Draw.RRCursor(surface,borderColor,(rect[0]-borderWidth,rect[1]-borderWidth,rect[2]+2*borderWidth,rect[3]+2*borderWidth),radius+borderWidth)
+
+        pygame.gfxdraw.aacircle(surface,rect[0]+radius,rect[1]+radius,radius,color)
+        pygame.gfxdraw.filled_circle(surface,rect[0]+radius,rect[1]+radius,radius,color)
+
+
+        pygame.gfxdraw.aacircle(surface,rect[0]-radius + rect[2]-1,rect[1]-radius + rect[3]-1,radius,color)
+        pygame.gfxdraw.filled_circle(surface,rect[0]-radius + rect[2]-1,rect[1]-radius + rect[3]-1,radius,color)
+
+        pygame.draw.rect(surface,color,(rect[0] + radius, rect[1], rect[2] - 2*radius, rect[3]))
+        pygame.draw.rect(surface,color,(rect[0], rect[1] + radius, rect[2], rect[3] - 2*radius))
+
+
+        if borderWidth != None: return (rect[0]-borderWidth,rect[1]-borderWidth,rect[2]+2*borderWidth,rect[3]+2*borderWidth)
+        else: return rect
+
     class Arrow:
 
         def Left(surface,color,pos,size):
             pygame.gfxdraw.aapolygon(surface,((pos[0],pos[1]-10*size),(pos[0]+10*size,pos[1]),(pos[0],pos[1]+10*size),(pos[0],pos[1]-10*size)),color)
             pygame.gfxdraw.filled_polygon(surface,((pos[0],pos[1]-10*size),(pos[0]+10*size,pos[1]),(pos[0],pos[1]+10*size),(pos[0],pos[1]-10*size)),color)
             
+
