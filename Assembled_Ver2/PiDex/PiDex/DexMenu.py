@@ -7,6 +7,7 @@ import random
 import sys
 import sqlite3
 import os
+import math
 
 from CButton import Button
 from SpriteManager import Sprite
@@ -53,6 +54,8 @@ class DexMenu:
                 LEFT JOIN eggGroups ON pokemon.eggGroupID = eggGroups.id
                 LEFT JOIN evolutions AS evoNext ON pokemon.nationalDex = evoNext.evoDex
                 LEFT JOIN evolutions AS evoPrev ON pokemon.nationalDex = evoPrev.evoNextDex
+                WHERE pokemon.nationalDex IS NOT NULL
+                ORDER BY pokemon.nationalDex ASC
                 """)
         return DexInfo.c.fetchall()
 
@@ -110,6 +113,26 @@ class DexMenu:
         scrollDirectionUp = False
 
 
+        
+
+        
+
+        # Define loaded sprites shonw on screen (rows)
+        dexStartRange = 0
+        dexEndRange = 6
+
+       
+        mainSurface.fill((30,30,30))
+
+        Draw.RoundRect(mainSurface,(40,40,40),(150,20,640,410),20,2,(255,0,0),"Pokedex")
+        Draw.Pokeball(mainSurface,(140,35),(255,0,0),(40,40,40))
+
+        pokeData = DexMenu.GetPokeDataAll() 
+        generationData = DexMenu.GetGenerations()
+
+
+        pygame.display.update()
+
         while DexMenu.running:
 
             # Event Processing
@@ -129,121 +152,72 @@ class DexMenu:
             click = pygame.mouse.get_pressed()
 
 
-
-
-            # Define loaded sprites shonw on screen (rows)
-            dexStartRange = 0
-            dexEndRange = 6
-
-            dexOffsetStep = abs(int(dexScrollOffset / 96))
-
-         
             mainSurface.fill((30,30,30))
             dexSurface.fill((40,40,40))
             dexSurface.set_colorkey((0,0,0))
 
-            Draw.RoundRect(mainSurface,(40,40,40),(150,20,640,410),20,2,(255,0,0),"Pokedex")
-            Draw.Pokeball(mainSurface,(140,35),(255,0,0),(40,40,40))
+            dexOffsetStep = abs(int(dexScrollOffset / 96))
 
-            pokeData = DexMenu.GetPokeDataAll() 
-            generationData = DexMenu.GetGenerations()
-
-            row = 0
+            
 
             selectedDexNumber = 1
 
-            startDex = selectedDexNumber - 18
-            endDex = selectedDexNumber + 18
-
-           
-
-            for gen in generationData:
-
-                #print("==========="+ gen["genName"] + "===========")
-
-                # Determine if Gen is included in range
-                if (startDex < gen["genDexStart"] and endDex < gen["genDexStart"]) or (startDex > gen["genDexEnd"] and endDex > gen["genDexEnd"]): continue
-
-                for pm in range(int(gen["genDexStart"]),int(gen["genDexEnd"]+1),6):
-
-                    #if gen["genDexStart"] <= selectedDexNumber <= gen["genDexEnd"]:
-                    #    colPos = (selectedDexNumber - gen["genDexStart"]) % 6
+            startDex = selectedDexNumber - 4
+            endDex = selectedDexNumber + 31
 
 
-                    
-                    for column in range(0,6):
-                        if startDex <= pm <= endDex:
-                            if pm <= int(gen["genDexEnd"]):
-                                #print("Col " + str(column) + " Row " + str(row) + ": " + str(pm))
-                                
-                                pokeSprite = pygame.transform.scale(pygame.image.load("sprites/" + str('{0:03d}'.format(pm)) + "/sprite-small-FN-" + str('{0:03d}'.format(pm)) + ".png"),(96,96)).convert_alpha()
-                                dexSurface.blit(pokeSprite,(column * 96, row * 96 + dexScrollOffset))
-                                print(row)
-                                
-                                pm += 1
-                            
-                        else: break
-                    row += 1
-
-            mainSurface.blit(dexSurface,(170,50))        
-                    
+            dexGenOffset = 0          
 
 
 
-            #for row in range(dexStartRange + dexOffsetStep,dexEndRange + dexOffsetStep):
+            
+            for pm in range(pm-10,pm+10):
                 
-            #    rowCount = row
-
-            #    for column in range(0,6):
-
-            #        dexNumber = (row * 6 + column) + 1
-
-            #        if 0 <= dexNumber <= 151: dexGen =1
-
-            #        if dexNumber <= 151:
-            #            pokeSprite = pygame.transform.scale(pygame.image.load("sprites/" + str('{0:03d}'.format(dexNumber)) + "/sprite-small-FN-" + str('{0:03d}'.format(dexNumber)) + ".png"),(96,96)).convert_alpha()
-            #            dexSurface.blit(pokeSprite,(column * 96, row * 96 + dexScrollOffset)) 
-
-            #mainSurface.blit(dexSurface,(170,50))
-
-
-            #for x in range(dexStartRange + dexOffsetStep,dexEndRange + dexOffsetStep):
-
-            #    print(dexOffsetStep*6)
-
-            #    rowCount = x
-
-            #    for m in range(0,6):
-                    
-            #        dexNumber = (x * 6 + m) + 1
 
 
 
-            #        if dexNumber < 803:
-            #            img = pygame.transform.scale(pygame.image.load("sprites/" + str('{0:03d}'.format(dexNumber)) + "/sprite-small-FN-" + str('{0:03d}'.format(dexNumber)) + ".png"),(96,96)).convert_alpha()
+            #for gen in generationData:
 
-            #            if (m*96+170) < mouse[0]  < (m*96+96+170) and (x*96+dexScrollOffset+50) < mouse[1]  < (x*96+dexScrollOffset+96+50): 
-            #                Draw.RRCursor(dexSurface,(40,40,40),((m*96)+2,(x*96+dexScrollOffset)+2,96-2,96-2),20,2,(255,255,255))
+            #    row = 0
 
-            #                # Additional condition for scroll support
-            #                if click[0] == 1 and engagedMousePos == (0,0):
-            #                    selectionEngaged = True
-            #                    engagedMousePos = mouse
-            #                if selectionEngaged and click[0] == 0:
-            #                    selectionEngaged = False
-            #                    if engagedMousePos[0] - 10 < mouse[0] < engagedMousePos[0] + 10 and engagedMousePos[1] - 10 < mouse[1] < engagedMousePos[1] + 10:
-            #                        dexScrollOffset = -int(((DexInfo.Show(dexNumber) * 96)/6) - 2 * 96) 
-            #                    engagedMousePos = (0,0)
+                
 
+            #    # Offset after generation switch
+            #    if int(gen["genNr"]) > 1 and int(gen["genNr"]) <=6: dexGenOffset += math.ceil((generationData[int(gen["genNr"])]["genDexEnd"]-generationData[int(gen["genNr"])]["genDexStart"]+1) / 6)
 
-            #            dexSurface.blit(img,(m * 96, x * 96 + dexScrollOffset)) 
+            #    print(dexGenOffset)
 
+            #    # Determine if Gen is included in range
+            #    if (startDex + dexOffsetStep*6 < gen["genDexStart"] and endDex + dexOffsetStep*6 < gen["genDexStart"]) or (startDex + dexOffsetStep*6 > gen["genDexEnd"] and endDex + dexOffsetStep*6 > gen["genDexEnd"]): continue
+            #    else: print("GEN: " + str(gen["genName"]))
 
-            #mainSurface.blit(dexSurface,(170,50))
+                
 
+            #    for pm in range(int(gen["genDexStart"]),int(gen["genDexEnd"]+1),6):
 
+            #        #print("=====" + str(row))
 
+            #        for column in range(0,6):
+            #            if startDex + dexOffsetStep*6 <= pm <= endDex + dexOffsetStep*6:
+            #                if pm <= int(gen["genDexEnd"]):
 
+            #                    pokeSprite = pygame.transform.scale(pygame.image.load("sprites/" + str('{0:03d}'.format(pm)) + "/sprite-small-FN-" + str('{0:03d}'.format(pm)) + ".png"),(96,96)).convert_alpha()
+                                
+            #                    if int(gen["genNr"] > 1): dexSurface.blit(pokeSprite,(column * 96, (dexGenOffset+row) * 96 + dexScrollOffset))
+            #                    else: dexSurface.blit(pokeSprite,(column * 96, (dexGenOffset+row) * 96 + dexScrollOffset))
+                               
+            #                    #print(str(pm) + " in Col " + str((dexGenOffset+row)))
+                                
+            #                    pm += 1
+                            
+            #            else: break
+            #        row += 1
+
+                
+                
+
+            #mainSurface.blit(dexSurface,(170,50))        
+            
 
             # Scrolling generall
             if click[0] == 1: clickCtr += 1
@@ -255,5 +229,5 @@ class DexMenu:
                 if dexScrollOffset < -(802/6)*96 + 3*96: dexScrollOffset = -(802/6)*96 + 3*96
                
 
-            pygame.display.update()
+            pygame.display.update((170,50,600,380))
             clock.tick(60)
