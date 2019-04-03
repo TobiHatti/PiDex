@@ -95,7 +95,7 @@ class DexMenu:
             mainSurface = pygame.display.set_mode((displayWidth,displayHeight))
             pygame.mouse.set_visible(True)
 
-        dexSurface = pygame.Surface((600,380)).convert_alpha()
+        dexSurface = pygame.Surface((600,15000)).convert_alpha()
 
         selectionEngaged = False
         engagedMousePos = (0,0)
@@ -131,6 +131,39 @@ class DexMenu:
         generationData = DexMenu.GetGenerations()
 
 
+        # Creating Dex-Surface
+
+        yOffset = 0
+
+        dexSurface.fill((40,40,40))
+        dexSurface.set_colorkey((0,0,0))
+
+        for gen in generationData:
+            pygame.draw.rect(dexSurface,(255,0,0),(0,yOffset,100,10))
+            yOffset += 20
+
+            for pm in range(int(gen["genDexStart"]),int(gen["genDexEnd"]+1),6):
+                
+                for column in range(0,6):
+                 
+                        if pm <= int(gen["genDexEnd"]):
+                            print("Load " + str(pm))
+                            filePath = "sprites/" + str('{0:03d}'.format(pm)) + "/sprite-small-FN-" + str('{0:03d}'.format(pm)) + ".png"
+                            
+                            if os.path.isfile(filePath): pokeSprite = pygame.image.load(filePath).convert_alpha()
+                            else: pokeSprite = pygame.image.load("notFound.gif").convert_alpha()
+
+                            pokeSprite = pygame.transform.scale(pokeSprite,(96,96))
+
+                            dexSurface.blit(pokeSprite,(column * 96, yOffset))
+                        pm += 1    
+
+                yOffset += 96
+            yOffset += 20
+                          
+
+
+
         pygame.display.update()
 
         while DexMenu.running:
@@ -153,27 +186,27 @@ class DexMenu:
 
 
             mainSurface.fill((30,30,30))
-            dexSurface.fill((40,40,40))
-            dexSurface.set_colorkey((0,0,0))
+            
 
             dexOffsetStep = abs(int(dexScrollOffset / 96))
 
             
 
             selectedDexNumber = 1
-
+             
             startDex = selectedDexNumber - 4
             endDex = selectedDexNumber + 31
 
 
             dexGenOffset = 0          
 
+              
+            mainSurface.blit(dexSurface,(170,50))    
 
-
-            
-            for pm in range(pm-10,pm+10):
-                
-
+            for x in range(1,15000,1):
+                mainSurface.blit(dexSurface,(170,50-x))  
+                pygame.display.update((170,50,600,380))
+                clock.tick(60)
 
 
             #for gen in generationData:
