@@ -206,9 +206,7 @@ class DexMenu:
             # TODO: Gen-Selection Buttons
 
 
-
-
-
+            
             selectedDexNumber = 1
              
             startDex = selectedDexNumber - 4
@@ -216,6 +214,42 @@ class DexMenu:
 
 
             mainSurface.blit(dexSurface,(170,50+dexScrollOffset))  
+
+            pygame.draw.circle(mainSurface,(0,255,0),(mouse[0],mouse[1]),10)
+
+            #print("MousePos = " + str(abs(dexScrollOffset) + mouse[1] - 50 - 40))
+
+
+            mouseDexPosRow = abs(dexScrollOffset) + mouse[1] - 50
+
+            mouseDexPosRowOffset = 0
+
+            if 40 <= mouseDexPosRow < (math.ceil(generationData[0]["genDexEnd"] / 6)+1) * 96 - 80: mouseDexPosRowOffset = 40
+            elif math.ceil(generationData[0]["genDexEnd"] / 6) * 96 + 80 <= mouseDexPosRow < (math.ceil(generationData[1]["genDexEnd"] / 6)+1) * 96 + 80: mouseDexPosRowOffset = 80
+            elif math.ceil(generationData[1]["genDexEnd"] / 6) * 96 + 200 <= mouseDexPosRow < (math.ceil(generationData[2]["genDexEnd"] / 6)+1) * 96 + 80: mouseDexPosRowOffset = 120
+            #elif math.ceil(generationData[2]["genDexEnd"] / 6) * 96 + 40 <= mouseDexPosRow < (math.ceil(generationData[3]["genDexEnd"] / 6)+1) * 96 + 0: mouseDexPosRowOffset = 160
+            #elif math.ceil(generationData[3]["genDexEnd"] / 6) * 96 + 40 <= mouseDexPosRow < (math.ceil(generationData[4]["genDexEnd"] / 6)+1) * 96 + 0: mouseDexPosRowOffset = 200
+            #elif math.ceil(generationData[4]["genDexEnd"] / 6) * 96 + 40 <= mouseDexPosRow < (math.ceil(generationData[5]["genDexEnd"] / 6)+1) * 96 + 0: mouseDexPosRowOffset = 240
+
+            print(mouseDexPosRowOffset)
+
+            mouseDexPosRow += mouseDexPosRowOffset
+
+            mouseDexRow = math.ceil(mouseDexPosRow/96)-1
+
+            mouseDexPosCol = mouse[0]-170
+            mouseDexCol = math.ceil(mouseDexPosCol/96) - 1
+            
+            # Only for Gen 1. At next gen add 40 to y-Offset
+            mouseDexNr = (mouseDexRow*6 + mouseDexCol)+1
+
+            #print("Col: " + str(mouseDexCol))
+
+            #print("Dex-No: " + str(mouseDexNr))
+
+           
+            
+
 
 
 
