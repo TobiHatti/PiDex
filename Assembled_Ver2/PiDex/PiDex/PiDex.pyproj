@@ -25,6 +25,9 @@
     <Compile Include="CDrawing.py" />
     <Compile Include="CText.py" />
     <Compile Include="CUserInterface.py" />
+    <Compile Include="DexHome.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="DexInfo.py" />
     <Compile Include="DexMenu.py">
       <SubType>Code</SubType>

@@ -102,6 +102,15 @@ class Draw(object):
         if borderWidth != None: return (rect[0]-borderWidth,rect[1]-borderWidth,rect[2]+2*borderWidth,rect[3]+2*borderWidth)
         else: return rect
 
+    def DexCursor(surface, pos, text = None):
+        b1 = ( (pos[0],pos[1]-48) , (pos[0]-40,pos[1]-48) , (pos[0]-48,pos[1]-40) , (pos[0]-48,pos[1]) )
+        b2 = ( (pos[0],pos[1]+48) , (pos[0]+40,pos[1]+48) , (pos[0]+48,pos[1]+40) , (pos[0]+48,pos[1]) )
+
+        if text != None: Text.Write(surface,(pos[0]-40,pos[1]-40),text,18,"joy.otf",(255,255,255))
+
+        pygame.draw.lines(surface,(255,0,0),False,b1,5)
+        pygame.draw.lines(surface,(255,255,255),False,b2,5)
+
     class Arrow:
 
         def Left(surface,color,pos,size):

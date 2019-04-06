@@ -7,6 +7,7 @@ import math
 
 from DexInfo import DexInfo
 from DexMenu import DexMenu
+from DexHome import DexHome
 
 # PyGame Initialisation
 pygame.init()
