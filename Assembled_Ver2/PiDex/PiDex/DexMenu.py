@@ -1,6 +1,7 @@
 # Importing Modules
 import pygame
 from pygame import gfxdraw
+from pygame.locals import *
 from threading import Thread
 import time
 import random
@@ -155,9 +156,11 @@ class DexMenu:
 
         idleCtr = 0
 
+        flags = FULLSCREEN | DOUBLEBUF
+
         try:
             if os.uname()[1] == 'raspberrypi': 
-                mainSurface = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
+                mainSurface = pygame.display.set_mode((0,0),flags)
                 pygame.mouse.set_cursor((8,8),(0,0),(0,0,0,0,0,0,0,0),(0,0,0,0,0,0,0,0))
             else: 
                 mainSurface = pygame.display.set_mode((displayWidth,displayHeight))
@@ -165,6 +168,8 @@ class DexMenu:
         except:
             mainSurface = pygame.display.set_mode((displayWidth,displayHeight))
             pygame.mouse.set_visible(True)
+
+        pygame.event.set_allowed([QUIT, KEYDOWN, KEYUP])
 
 #########################################################################################
 #   SURFACE DEFINITIONS                                                                 #

@@ -111,6 +111,15 @@ class Draw(object):
         pygame.draw.lines(surface,(255,0,0),False,b1,5)
         pygame.draw.lines(surface,(255,255,255),False,b2,5)
 
+    def AAFilledCircle(surface,x,y,r,infillColor,borderColor,borderWidth=None):
+
+        pygame.gfxdraw.aacircle(surface,x,y,r,borderColor)
+        pygame.gfxdraw.filled_circle(surface,x,y,r,borderColor)
+
+        if borderWidth != None:
+            pygame.gfxdraw.aacircle(surface,x,y,r-borderWidth,infillColor)
+            pygame.gfxdraw.filled_circle(surface,x,y,r-borderWidth,infillColor)
+
     class Arrow:
 
         def Left(surface,color,pos,size):

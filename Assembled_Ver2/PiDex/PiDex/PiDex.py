@@ -1,5 +1,6 @@
 # Importing Modules
 import pygame
+from pygame.locals import *
 import time
 import random
 import sys
@@ -17,9 +18,11 @@ clock = pygame.time.Clock()
 displayWidth = 800
 displayHeight = 480
 
+flags = FULLSCREEN | DOUBLEBUF
+
 try:
     if os.uname()[1] == 'raspberrypi': 
-        mainSurface = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
+        mainSurface = pygame.display.set_mode((0,0),flags)
         pygame.mouse.set_cursor((8,8),(0,0),(0,0,0,0,0,0,0,0),(0,0,0,0,0,0,0,0))
     else: 
         mainSurface = pygame.display.set_mode((displayWidth,displayHeight))
@@ -43,7 +46,7 @@ while True:
         pygame.quit()
         sys.exit()
 
-    DexMenu.Show()
+    DexHome.Show()
 
     pygame.display.update()
     clock.tick(1)

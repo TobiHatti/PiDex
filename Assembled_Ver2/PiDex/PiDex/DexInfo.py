@@ -1,6 +1,7 @@
 # Importing Modules
 import pygame
 from pygame import gfxdraw
+from pygame.locals import *
 from threading import Thread
 import time
 import random
@@ -89,10 +90,12 @@ class DexInfo:
 
     def ToggleShinyOn():
         DexInfo.shinySelected = True
+        DexInfo.oneTimeCycleLoad = True
         DexInfo.LoadSpritesheet()
 
     def ToggleShinyOff():
         DexInfo.shinySelected = False
+        DexInfo.oneTimeCycleLoad = True
         DexInfo.LoadSpritesheet()
 
     def ToggleMegaEvolution1():
@@ -116,6 +119,7 @@ class DexInfo:
         DexInfo.genderFemaleSelected = False
         DexInfo.megaEvolutionSelected = False
         DexInfo.loadNewPokemon = True
+        DexInfo.oneTimeCycleLoad = True
 
         DexInfo.LoadSpritesheet()
 
@@ -124,6 +128,7 @@ class DexInfo:
         DexInfo.genderFemaleSelected = True
         DexInfo.megaEvolutionSelected = False
         DexInfo.loadNewPokemon = True
+        DexInfo.oneTimeCycleLoad = True
 
         DexInfo.LoadSpritesheet()
 
@@ -132,6 +137,7 @@ class DexInfo:
         DexInfo.genderFemaleSelected = False
         DexInfo.megaEvolutionSelected = False
         DexInfo.loadNewPokemon = True
+        DexInfo.oneTimeCycleLoad = True
 
         DexInfo.LoadSpritesheet()
 
@@ -140,6 +146,7 @@ class DexInfo:
         DexInfo.genderFemaleSelected = True
         DexInfo.megaEvolutionSelected = False
         DexInfo.loadNewPokemon = True
+        DexInfo.oneTimeCycleLoad = True
 
         DexInfo.LoadSpritesheet()
 
@@ -474,9 +481,11 @@ class DexInfo:
         
         idleCtr = 0
 
+        flags = FULLSCREEN | DOUBLEBUF
+
         try:
             if os.uname()[1] == 'raspberrypi': 
-                mainSurface = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
+                mainSurface = pygame.display.set_mode((0,0),flags)
                 pygame.mouse.set_cursor((8,8),(0,0),(0,0,0,0,0,0,0,0),(0,0,0,0,0,0,0,0))
             else: 
                 mainSurface = pygame.display.set_mode((displayWidth,displayHeight))
@@ -484,6 +493,8 @@ class DexInfo:
         except:
             mainSurface = pygame.display.set_mode((displayWidth,displayHeight))
             pygame.mouse.set_visible(True)
+
+        pygame.event.set_allowed([QUIT, KEYDOWN, KEYUP])
 
 #########################################################################################
 #   SURFACE DEFINITIONS                                                                 #
@@ -986,6 +997,7 @@ class DexInfo:
                             else: Text.Write(mainSurface,(50,260),"Mega",18,"joy.otf",(0,0,0),True)
                             pygame.display.update((14,204,92,92))
 
+                        
 
                     if DexInfo.oneTimeCycleLoad: 
                         # Sprite-Box
@@ -998,7 +1010,7 @@ class DexInfo:
                         Text.Write(mainSurface,(456,118),"Show Sprites",12,"joy.otf",(255,255,255),True)
 
                         if DexInfo.pokeData["hasMultipleForms"] == 1: Text.Write(mainSurface,(250,350),"Form: " + DexInfo.formData["formName"],25,"joy.otf",(255,255,255),True)
-
+                        if DexInfo.shinySelected: Text.Write(mainSurface,(470,350),"S",30,"joy.otf",(255,255,255),True)
                         pygame.display.update(0,0,526,386)
 
                     if not DexInfo.thread.isAlive() and Sprite.loadedSpriteNr == DexInfo.currentPokemon:
