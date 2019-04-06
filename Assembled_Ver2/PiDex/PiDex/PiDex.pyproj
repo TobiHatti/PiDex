@@ -32,6 +32,9 @@
     <Compile Include="DexMenu.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DexSearch.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="PiDex.py" />
     <Compile Include="SpriteManager.py" />
   </ItemGroup>

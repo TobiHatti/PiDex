@@ -572,37 +572,37 @@ class DexInfo:
             Button.fontFamily = "joy.otf"
 
             # Nav Buttons
-            btnPrevDex = Button.RoundRect(mainSurface,(320,425,110,40),15,"Prev Dex",18,1,DexInfo.TogglePrevDex)
-            btnPrevEvo = Button.RoundRect(mainSurface,(440,425,110,40),15,"Prev Evo",18,1,DexInfo.TogglePrevEvo)
-            btnNextEvo = Button.RoundRect(mainSurface,(560,425,110,40),15,"Next Evo",18,1,DexInfo.ToggleNextEvo)
-            btnNextEvoSelect = Button.RoundRect(mainSurface,(560,425,110,40),15,"Next Evo",18,1,DexInfo.ToggleEvoSelector)
-            btnReturn = Button.RoundRect(mainSurface,(15,80,80,40),18,"< Back",18,1,DexInfo.ReturnToMenu)
+            btnPrevDex = Button.RoundRect(mainSurface,(320,425,110,40),15,"Prev Dex",18,1,DexInfo.TogglePrevDex,None,None,None,60,5)
+            btnPrevEvo = Button.RoundRect(mainSurface,(440,425,110,40),15,"Prev Evo",18,1,DexInfo.TogglePrevEvo,None,None,None,60,5)
+            btnNextEvo = Button.RoundRect(mainSurface,(560,425,110,40),15,"Next Evo",18,1,DexInfo.ToggleNextEvo,None,None,None,60,5)
+            btnNextEvoSelect = Button.RoundRect(mainSurface,(560,425,110,40),15,"Next Evo",18,1,DexInfo.ToggleEvoSelector,None,None,None,60,5)
+            btnReturn = Button.RoundRect(mainSurface,(15,80,80,40),18,"< Back",18,1,DexInfo.ReturnToMenu,None,None,None,60,5)
 
-            btnNextDex = Button.RoundRect(mainSurface,(680,425,110,40),15,"Next Dex",18,1,DexInfo.ToggleNextDex)
+            btnNextDex = Button.RoundRect(mainSurface,(680,425,110,40),15,"Next Dex",18,1,DexInfo.ToggleNextDex,None,None,None,60,5)
 
             # Gender Buttons
-            btnFormNormal = Button.RoundRect(mainSurface,(520,150,126,40),15,"Normal",20,1,DexInfo.ToggleShinyOff)
-            btnFormShiny = Button.RoundRect(mainSurface,(661,150,126,40),15,"Shiny",20,1,DexInfo.ToggleShinyOn)
+            btnFormNormal = Button.RoundRect(mainSurface,(520,150,126,40),15,"Normal",20,1,DexInfo.ToggleShinyOff,None,None,None,10)
+            btnFormShiny = Button.RoundRect(mainSurface,(661,150,126,40),15,"Shiny",20,1,DexInfo.ToggleShinyOn,None,None,None,10)
 
-            btnFormNormalMale = Button.RoundRect(mainSurface,(520,150,60,40),15,"M",25,1,DexInfo.ToggleNormalMale)
-            btnFormNormalFemale = Button.RoundRect(mainSurface,(520 + 66,150,60,40),15,"F",25,1,DexInfo.ToggleNormalFemale)
-            btnFormShinyMale = Button.RoundRect(mainSurface,(661,150,60,40),15,"SM",25,1,DexInfo.ToggleShinyMale)
-            btnFormShinyFemale = Button.RoundRect(mainSurface,(661 + 66,150,60,40),15,"SF",25,1,DexInfo.ToggleShinyFemale)
+            btnFormNormalMale = Button.RoundRect(mainSurface,(520,150,60,40),15,"M",25,1,DexInfo.ToggleNormalMale,None,None,None,10)
+            btnFormNormalFemale = Button.RoundRect(mainSurface,(520 + 66,150,60,40),15,"F",25,1,DexInfo.ToggleNormalFemale,None,None,None,10)
+            btnFormShinyMale = Button.RoundRect(mainSurface,(661,150,60,40),15,"SM",25,1,DexInfo.ToggleShinyMale,None,None,None,10)
+            btnFormShinyFemale = Button.RoundRect(mainSurface,(661 + 66,150,60,40),15,"SF",25,1,DexInfo.ToggleShinyFemale,None,None,None,10)
 
             # Alola Button
-            btnAlolaToggle = Button.RoundRect(mainSurface,(16,325,70,40),18,"Alola",18,1,DexInfo.ToggleAlolaForm)
+            btnAlolaToggle = Button.RoundRect(mainSurface,(16,325,70,40),18,"Alola",18,1,DexInfo.ToggleAlolaForm,None,None,None,40,30)
 
             # Form Selectors
-            btnNextForm = Button.RoundRect(mainSurface,(465,160,40,80),18,">",18,1,DexInfo.ToggleNextForm)
-            btnPrevForm = Button.RoundRect(mainSurface,(15,160,40,80),18,"<",18,1,DexInfo.TogglePrevForm)
+            btnNextForm = Button.RoundRect(mainSurface,(465,160,40,80),18,">",18,1,DexInfo.ToggleNextForm,None,None,None,40,50)
+            btnPrevForm = Button.RoundRect(mainSurface,(15,160,40,80),18,"<",18,1,DexInfo.TogglePrevForm,None,None,None,40,50)
 
             # MegaEvolution Buttons
-            btnMegaEvo1 = Button.RoundRect(mainSurface,(18,280,40,40),10,"ME1",25,1,DexInfo.ToggleMegaEvolution1)
-            btnMegaEvo2 = Button.RoundRect(mainSurface,(18,340,40,40),10,"ME2",25,1,DexInfo.ToggleMegaEvolution2)
+            btnMegaEvo1 = Button.RoundRect(mainSurface,(18,280,40,40),10,"ME1",25,1,DexInfo.ToggleMegaEvolution1,None,None,None,0,30)
+            btnMegaEvo2 = Button.RoundRect(mainSurface,(18,340,40,40),10,"ME2",25,1,DexInfo.ToggleMegaEvolution2,None,None,None,0,30)
 
             # ScreenToggle Buttons
-            btnEvoChainScreen = Button.RoundRect(mainSurface,(745,230,40,65),15,"E-C",20,1,DexInfo.ToggleEvoChainScreen)
-            btnStatsScreen = Button.RoundRect(mainSurface,(525+115,90,146,45),15,"More Stats",17,None,DexInfo.ToggleStatsScreen)
+            btnEvoChainScreen = Button.RoundRect(mainSurface,(745,230,40,65),15,"E-C",20,1,DexInfo.ToggleEvoChainScreen,None,None,None,10,10)
+            btnStatsScreen = Button.RoundRect(mainSurface,(525+115,90,146,45),15,"More Stats",17,None,DexInfo.ToggleStatsScreen,None,None,None,10)
 
             
 

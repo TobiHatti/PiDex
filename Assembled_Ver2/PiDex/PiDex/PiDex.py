@@ -9,6 +9,7 @@ import math
 from DexInfo import DexInfo
 from DexMenu import DexMenu
 from DexHome import DexHome
+from DexSearch import DexSearch
 
 # PyGame Initialisation
 pygame.init()

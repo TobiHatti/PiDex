@@ -19,13 +19,15 @@ class Button:
 
     class RoundRect:
 
-        def __init__(self, surface, rect, radius, text, fontSize, borderWidth = None, clickAction = None, clickParameters = None, releaseAction = None, releaseParameters = None):
+        def __init__(self, surface, rect, radius, text, fontSize, borderWidth = None, clickAction = None, clickParameters = None, releaseAction = None, releaseParameters = None,triggerMarginTB = 0, triggerMarginLR = 0):
             self.surface = surface
             self.rect = rect
             self.radius = radius
             self.text = text
             self.fontSize = fontSize
             self.borderWidth = borderWidth
+            self.triggerMarginTB = triggerMarginTB
+            self.triggerMarginLR = triggerMarginLR
 
             self.idleColor = Button.idleColor
             self.hoverColor = Button.hoverColor
@@ -48,7 +50,7 @@ class Button:
 
             if not disabled:
                 if enabled:
-                    if self.rect[0] < mouse[0] < self.rect[0] + self.rect[2] and self.rect[1] < mouse[1] < self.rect[1] + self.rect[3]:
+                    if self.rect[0] - self.triggerMarginLR < mouse[0] < self.rect[0] + self.rect[2] + self.triggerMarginLR and self.rect[1] - self.triggerMarginTB < mouse[1] < self.rect[1] + self.rect[3] + self.triggerMarginTB:
  
                         Draw.RoundRect(self.surface,self.hoverColor,self.rect,self.radius,self.borderWidth,self.borderColor)
 

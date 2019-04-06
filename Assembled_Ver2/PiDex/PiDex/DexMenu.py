@@ -17,6 +17,7 @@ from CText import Text
 from CUserInterface import UI
 
 from DexInfo import DexInfo 
+from DexSearch import DexSearch 
 
 
 
@@ -38,6 +39,8 @@ class DexMenu:
     reload = True
 
     dexScrollOffset = 0
+
+    searchEnabled = False
 
 #########################################################################################
 #   FUNCTIONS                                                                           #
@@ -135,6 +138,9 @@ class DexMenu:
     def ToggleGen7():
         DexMenu.dexScrollOffset = - (40+26*96) - (40+17*96) - (40+23*96) - (40+18*96) - (40+26*96) - (40+12*96)
 
+    def ToggleSearch():
+        DexMenu.searchEnabled = True
+        
 #########################################################################################
 #########################################################################################
 #   MAIN START                                                                          #
@@ -240,6 +246,7 @@ class DexMenu:
             btnToggleGen5 = Button.RoundRect(mainSurface,(10,330,125,40),15,"Gen. 5",18,1,DexMenu.ToggleGen5)
             btnToggleGen6 = Button.RoundRect(mainSurface,(10,380,125,40),15,"Gen. 6",18,1,DexMenu.ToggleGen6)
             btnToggleGen7 = Button.RoundRect(mainSurface,(10,430,125,40),15,"Gen. 7",18,1,DexMenu.ToggleGen7)
+            btnSearch = Button.RoundRect(mainSurface,(600,20,125,28),10,"Search...",18,1,DexMenu.ToggleSearch)
 
             btnBackButton = Button.RoundRect(mainSurface,(10,10,90,60),15,"< Back",18,1,DexMenu.ReturnToMenu)
 
@@ -278,6 +285,7 @@ class DexMenu:
                 # Drawing to Screen
                 mainSurface.fill((30,30,30))
                 mainSurface.blit(dexSurface,(170,50+DexMenu.dexScrollOffset))
+                pygame.draw.rect(mainSurface,(255,0,0),(600-2,20-2,125+3,28+3))
 
                 # Updating Buttons
                 pygame.display.update(btnToggleGen1.Show())
@@ -287,6 +295,7 @@ class DexMenu:
                 pygame.display.update(btnToggleGen5.Show())
                 pygame.display.update(btnToggleGen6.Show())
                 pygame.display.update(btnToggleGen7.Show())
+                pygame.display.update(btnSearch.Show())
 
                 pygame.display.update(btnBackButton.Show())
 
@@ -378,6 +387,16 @@ class DexMenu:
                     DexMenu.dexScrollOffset += 2*mouseRel[1]
                     if DexMenu.dexScrollOffset > 0: DexMenu.dexScrollOffset = 0
                     if DexMenu.dexScrollOffset < -(802/6)*96 - 3*96: DexMenu.dexScrollOffset = -(802/6)*96 - 3*96
+
+
+                if DexMenu.searchEnabled:    
+                    selectedDex = DexSearch.Show()
+                    DexMenu.reload = True
+                    passNextEngageCtr = 10
+                    if selectedDex != None: selectedDex = DexInfo.Show(selectedDex)
+                    DexMenu.searchEnabled = False
+
+                    
 
                 # Sleep Trigger
                 idleCtr += 1
