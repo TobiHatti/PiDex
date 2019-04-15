@@ -163,6 +163,8 @@ class DexSearch:
             searchResSurface.fill((40,40,40))
             searchResSurface.set_colorkey((0,0,0))
 
+            DexSearch.searchVal = ""
+
             DexSearch.reload = False
 
 #########################################################################################

@@ -221,7 +221,7 @@ class DexMenu:
         DexMenu.thread.start()
 
         while DexMenu.thread.isAlive():
-            pygame.draw.rect(mainSurface,(40,40,40),(0,0,800,480))
+            pygame.draw.rect(mainSurface,(30,30,30),(0,0,800,480))
             Text.Write(mainSurface,(400,140),"Loading...",30,"joy.otf",(200,200,200),True)
             pygame.display.update()
             clock.tick(10)
@@ -239,14 +239,14 @@ class DexMenu:
             Button.fontFamily = "joy.otf"
 
              # Buttons Declarations
-            btnToggleGen1 = Button.RoundRect(mainSurface,(10,130,125,40),15,"Gen. 1",18,1,DexMenu.ToggleGen1)
-            btnToggleGen2 = Button.RoundRect(mainSurface,(10,180,125,40),15,"Gen. 2",18,1,DexMenu.ToggleGen2)
-            btnToggleGen3 = Button.RoundRect(mainSurface,(10,230,125,40),15,"Gen. 3",18,1,DexMenu.ToggleGen3)
-            btnToggleGen4 = Button.RoundRect(mainSurface,(10,280,125,40),15,"Gen. 4",18,1,DexMenu.ToggleGen4)
-            btnToggleGen5 = Button.RoundRect(mainSurface,(10,330,125,40),15,"Gen. 5",18,1,DexMenu.ToggleGen5)
-            btnToggleGen6 = Button.RoundRect(mainSurface,(10,380,125,40),15,"Gen. 6",18,1,DexMenu.ToggleGen6)
-            btnToggleGen7 = Button.RoundRect(mainSurface,(10,430,125,40),15,"Gen. 7",18,1,DexMenu.ToggleGen7)
-            btnSearch = Button.RoundRect(mainSurface,(600,20,125,28),10,"Search...",18,1,DexMenu.ToggleSearch)
+            btnToggleGen1 = Button.RoundRect(mainSurface,(5,90,65,50),15,"Gen. 1",18,1,DexMenu.ToggleGen1)
+            btnToggleGen2 = Button.RoundRect(mainSurface,(75,90,65,50),15,"Gen. 2",18,1,DexMenu.ToggleGen2)
+            btnToggleGen3 = Button.RoundRect(mainSurface,(5,150,65,50),15,"Gen. 3",18,1,DexMenu.ToggleGen3)
+            btnToggleGen4 = Button.RoundRect(mainSurface,(75,150,65,50),15,"Gen. 4",18,1,DexMenu.ToggleGen4)
+            btnToggleGen5 = Button.RoundRect(mainSurface,(5,210,65,50),15,"Gen. 5",18,1,DexMenu.ToggleGen5)
+            btnToggleGen6 = Button.RoundRect(mainSurface,(75,210,65,50),15,"Gen. 6",18,1,DexMenu.ToggleGen6)
+            btnToggleGen7 = Button.RoundRect(mainSurface,(5,270,65,50),15,"Gen. 7",18,1,DexMenu.ToggleGen7)
+            btnSearch = Button.RoundRect(mainSurface,(5,380,135,50),15,"Search...",18,1,DexMenu.ToggleSearch)
 
             btnBackButton = Button.RoundRect(mainSurface,(10,10,90,60),15,"< Back",18,1,DexMenu.ReturnToMenu)
 
@@ -285,7 +285,6 @@ class DexMenu:
                 # Drawing to Screen
                 mainSurface.fill((30,30,30))
                 mainSurface.blit(dexSurface,(170,50+DexMenu.dexScrollOffset))
-                pygame.draw.rect(mainSurface,(255,0,0),(600-2,20-2,125+3,28+3))
 
                 # Updating Buttons
                 pygame.display.update(btnToggleGen1.Show())
