@@ -20,7 +20,7 @@ from DexInfo import DexInfo
 from DexSearch import DexSearch 
 
 
-
+from io import StringIO
 
 class DexMenu:
 
@@ -220,12 +220,22 @@ class DexMenu:
         DexMenu.thread = Thread(target = DexMenu.LoadSpriteSheet, args = (dexSurface,generationData,)) 
         DexMenu.thread.start()
 
+
+
         while DexMenu.thread.isAlive():
             pygame.draw.rect(mainSurface,(30,30,30),(0,0,800,480))
             Text.Write(mainSurface,(400,140),"Loading...",30,"joy.otf",(200,200,200),True)
             pygame.display.update()
             clock.tick(10)
         
+
+
+
+        pygame.image.save(dexSurface,"DexSurface.png");
+
+
+
+
         while DexMenu.running:
 
             
