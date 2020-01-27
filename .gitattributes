@@ -2,6 +2,7 @@
 # Set default behavior to automatically normalize line endings.
 ###############################################################################
 * text=auto
+*.ps1 linguist-language=PowerShell
 
 ###############################################################################
 # Set default behavior for command prompt diff.
