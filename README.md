@@ -1,4 +1,4 @@
-<img align="right" width="80" height="80" src="https://github.com/TobiHatti/XAMPP-ProjectSelector/blob/master/XPS1/content/xamppProjectSelector.png">
+<img align="right" width="80" height="80" src="https://github.com/TobiHatti/PiDex/blob/master/pidex_logo.png">
 
 # PiDex [v1.0 - Alpha]
 
