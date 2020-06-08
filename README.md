@@ -1,4 +1,4 @@
-<img align="right" width="80" height="80" src="https://github.com/TobiHatti/PiDex/blob/master/pidex_logo.png">
+<img align="right" width="80" height="80" data-rmimg src="https://endev.at/content/projects/PiDex/PiDex_Logo_128.png">
 
 # PiDex [v1.0 - Alpha]
 
@@ -9,24 +9,26 @@
 [![GitHub issues](https://img.shields.io/github/issues-raw/TobiHatti/PiDex)](https://github.com/TobiHatti/PiDex/issues)
 [![GitHub language count](https://img.shields.io/github/languages/count/TobiHatti/PiDex)](https://github.com/TobiHatti/PiDex)
 
+![image](https://endev.at/content/projects/PiDex/PiDex_Banner_1080.png)
+
 Pokédex running on the Raspberry Pi
 (Deprecated due to performance issues > See PiDex2.0 [PRIVATE])
 
-![image](https://github.com/TobiHatti/PiDex/blob/master/pidex_sample_01.png)
+![image](https://endev.at/content/projects/PiDex/projectImages/pidex_sample_01.png)
 
 ### Features
 - Fully featured Pokédex with all essential informations about any pokemon
 - Generations 1-7
 - Animated sprites, all forms and appearances
 
-![image](https://github.com/TobiHatti/PiDex/blob/master/pidex_sample_02.png)
+![image](https://endev.at/content/projects/PiDex/projectImages/pidex_sample_02.png)
 
 ### Development Information
 - Language: Python
 - Version: Python 3
 - Libraries and Frameworks: PyGame, SQLite, PokePy
 
-![image](https://github.com/TobiHatti/PiDex/blob/master/pidex_sample_03.png)
+![image](https://endev.at/content/projects/PiDex/projectImages/pidex_sample_03.png)
 
 ### Note
 This project (as is) is deprecated due to unusable performance on the raspberry pi 
@@ -34,7 +36,7 @@ This project (as is) is deprecated due to unusable performance on the raspberry 
 
 The new (and up-to-date) version, written in Java, is currently private and not available to the public.
 
-![image](https://github.com/TobiHatti/PiDex/blob/master/pidex_sample_04.png)
+![image](https://endev.at/content/projects/PiDex/projectImages/pidex_sample_04.png)
 
 ## Download
 Get the latest release [here](https://github.com/TobiHatti/PiDex/releases)
