@@ -9,7 +9,7 @@
 [![GitHub issues](https://img.shields.io/github/issues-raw/TobiHatti/PiDex)](https://github.com/TobiHatti/PiDex/issues)
 [![GitHub language count](https://img.shields.io/github/languages/count/TobiHatti/PiDex)](https://github.com/TobiHatti/PiDex)
 
-![image](https://endev.at/content/projects/PiDex/PiDex_Banner_1080.png)
+![image](https://endev.at/content/projects/PiDex/PiDex_Banner_300.png)
 
 Pokédex running on the Raspberry Pi
 (Deprecated due to performance issues > See PiDex2.0 [PRIVATE])
