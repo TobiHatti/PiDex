@@ -1,9 +1,9 @@
-<img align="right" width="80" height="80" data-rmimg src="https://endev.at/content/projects/PiDex/PiDex_Logo_128.png">
+<img align="right" width="80" height="80" data-rmimg src="https://endev.at/content/projects/PiDex/pidex_logo.png">
 
 # PiDex [v1.0 - Alpha]
 
 ![GitHub](https://img.shields.io/github/license/TobiHatti/PiDex)
-[![GitHub Release Date](https://img.shields.io/github/release-date/TobiHatti/PiDex)](https://github.com/TobiHatti/PiDex/releases)
+[![GitHub Release Date](https://img.shields.io/github/release-date-pre/TobiHatti/PiDex)](https://github.com/TobiHatti/PiDex/releases)
 [![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/TobiHatti/PiDex?include_prereleases)](https://github.com/TobiHatti/PiDex/releases)
 [![GitHub last commit](https://img.shields.io/github/last-commit/TobiHatti/PiDex)](https://github.com/TobiHatti/PiDex/commits/master)
 [![GitHub issues](https://img.shields.io/github/issues-raw/TobiHatti/PiDex)](https://github.com/TobiHatti/PiDex/issues)
